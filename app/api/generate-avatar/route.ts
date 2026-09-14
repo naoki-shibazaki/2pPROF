@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       response_format: 'b64_json',
     })
 
-    const b64 = imgRes.data[0].b64_json
+    const b64 = imgRes.data?.[0]?.b64_json
     if (!b64) {
       return NextResponse.json({ error: 'Image generation failed' }, { status: 500 })
     }
