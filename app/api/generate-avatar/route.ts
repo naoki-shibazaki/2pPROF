@@ -4,7 +4,7 @@ import OpenAI from 'openai'
 export async function POST(req: NextRequest) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   try {
-    const { imageBase64 } = await req.json()
+    const { imageBase64, stylePrompt } = await req.json()
     if (!imageBase64) {
       return NextResponse.json({ error: 'No image provided' }, { status: 400 })
     }
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
             },
             {
               type: 'text',
-              text: 'Describe this person\'s appearance briefly for a pixel art chibi character: hair color and style, skin tone, eye color, notable features, outfit colors. Keep it under 60 words.',
+              text: 'Describe this person\'s appearance briefly: hair color and style, skin tone, eye color, notable features, outfit colors. Keep it under 60 words.',
             },
           ],
         },
@@ -32,10 +32,14 @@ export async function POST(req: NextRequest) {
 
     const description = visionRes.choices[0].message.content ?? 'a person'
 
-    // Step 2: DALL-E 3 でドット絵キャラ生成
+    // Step 2: DALL-E 3 でスタイル変換
+    const basePrompt = stylePrompt
+      ? stylePrompt.replace('{{desc}}', description)
+      : `Pixel art chibi character portrait, cute and adorable, 16-bit retro RPG game style, ${description}. Synthwave cyberpunk color palette, thick black pixel outlines, flat shading, clean sprite style.`
+
     const imgRes = await openai.images.generate({
       model: 'dall-e-3',
-      prompt: `Pixel art chibi character portrait, cute and adorable, 16-bit retro RPG game style, ${description}. Centered face and upper body, synthwave cyberpunk color palette, thick black pixel outlines, flat shading, no background, clean sprite style. High quality pixel art.`,
+      prompt: basePrompt,
       n: 1,
       size: '1024x1024',
       response_format: 'b64_json',
