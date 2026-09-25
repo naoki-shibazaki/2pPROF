@@ -1,26 +1,23 @@
 'use client'
 
-export type Tab = 'my' | 'others'
+export type Tab = 'my' | 'friends' | 'others'
 
 interface PixelTabBarProps {
   activeTab: Tab
   onTabChange: (tab: Tab) => void
+  friendCount?: number
 }
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'my',     label: '自分',  icon: '▶' },
-  { id: 'others', label: '他人',  icon: '♡' },
-]
+export default function PixelTabBar({ activeTab, onTabChange, friendCount }: PixelTabBarProps) {
+  const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: 'my',      label: 'マイページ',                                    icon: '▶' },
+    { id: 'friends', label: `友達${friendCount !== undefined ? `(${friendCount})` : ''}`, icon: '♡' },
+    { id: 'others',  label: '他己紹介',                                      icon: '★' },
+  ]
 
-/**
- * Pixel-art tab switcher.
- * Active tab: white background, no bottom border (visually "open" into the window).
- * Inactive tab: muted blue-grey, sits below the active tab.
- */
-export default function PixelTabBar({ activeTab, onTabChange }: PixelTabBarProps) {
   return (
     <div className="pixel-tabbar">
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
@@ -30,7 +27,7 @@ export default function PixelTabBar({ activeTab, onTabChange }: PixelTabBarProps
           aria-selected={activeTab === tab.id}
           role="tab"
         >
-          {tab.icon} {tab.label}
+          {tab.label}
         </button>
       ))}
     </div>

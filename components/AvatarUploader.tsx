@@ -127,23 +127,28 @@ export default function AvatarUploader() {
   return (
     <>
       <div className="flex flex-col items-center gap-2">
-        {/* アバター表示 */}
-        <div className="pixel-portrait">
+        {/* アバター表示 – クリックでスタイル選択 */}
+        <button
+          onClick={!loading ? openStylePicker : undefined}
+          className="pixel-portrait"
+          style={{ cursor: loading ? 'default' : 'pointer', background: 'none', padding: 0, border: 'none', display: 'inline-flex' }}
+          title="クリックして写真を変更"
+        >
           {loading ? (
             <div className="flex flex-col items-center justify-center gap-1"
-              style={{ width: 80, height: 80, background: 'rgba(20,8,40,0.90)' }}>
+              style={{ width: 140, height: 140, background: 'rgba(20,8,40,0.90)' }}>
               <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff', textShadow: '0 0 6px rgba(64,232,255,0.70)' }}>
                 変換中...
               </span>
             </div>
           ) : avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl} alt="avatar" width={80} height={80}
+            <img src={avatarUrl} alt="avatar" width={140} height={140}
               style={{ imageRendering: 'pixelated', display: 'block', objectFit: 'cover' }} />
           ) : (
-            <AvatarSVG size={80} />
+            <AvatarSVG size={140} />
           )}
-        </div>
+        </button>
 
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
 

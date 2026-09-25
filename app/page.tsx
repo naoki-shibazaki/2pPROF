@@ -1,38 +1,17 @@
-'use client'
+import { auth } from '@/auth'
+import { sql } from '@/lib/db'
+import { redirect } from 'next/navigation'
+import HomeClient from '@/components/HomeClient'
 
-import { useState } from 'react'
-import PixelBackground from '@/components/PixelBackground'
-import PixelWindow from '@/components/PixelWindow'
-import PixelTabBar, { type Tab } from '@/components/PixelTabBar'
-import MyProfile from '@/components/MyProfile'
-import OthersTab from '@/components/OthersTab'
+export default async function Home() {
+  const session = await auth()
+  if (!session?.user) redirect('/login')
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<Tab>('my')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userId = (session.user as any).id
+  const rows = await sql`SELECT onboarded FROM users WHERE id = ${userId}`
 
-  return (
-    <div className="relative min-h-dvh">
-      {/* Pixel art scene fills the entire background */}
-      <PixelBackground />
+  if (!rows[0]?.onboarded) redirect('/onboarding')
 
-      {/* Centered window card – sits on top of the scene */}
-      <main
-        className="relative z-10 flex justify-center items-start min-h-dvh px-3 py-10"
-        role="main"
-      >
-        <PixelWindow>
-          {/* Tab navigation */}
-          <PixelTabBar activeTab={activeTab} onTabChange={setActiveTab} />
-
-          {/* Tab content */}
-          {activeTab === 'my' ? <MyProfile /> : <OthersTab />}
-
-          {/* Status bar */}
-          <div className="pixel-statusbar">
-            ★ 2P PROF v1.0 ★ ともだちと紹介しあおう！
-          </div>
-        </PixelWindow>
-      </main>
-    </div>
-  )
+  return <HomeClient />
 }
