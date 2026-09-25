@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { signOut } from 'next-auth/react'
+import ProfileCardModal from './ProfileCardModal'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
 import HexStatus from './HexStatus'
@@ -55,6 +56,7 @@ export default function MyProfile() {
   const maxHP = profileData.level * 10
   const [currentHP, setCurrentHP] = useState(maxHP)
   const [editingHP, setEditingHP] = useState(false)
+  const [showCard, setShowCard] = useState(false)
 
 
   useEffect(() => {
@@ -230,6 +232,26 @@ export default function MyProfile() {
         </div>
 
       </div>
+
+      {/* ── プロフカード生成 ── */}
+      {user?.handle && (
+        <div className="px-4 py-2 flex justify-center" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
+          <button
+            onClick={() => setShowCard(true)}
+            style={{
+              ...STYLE, fontSize: 10, color: '#40e8ff',
+              background: 'rgba(8,6,20,0.92)',
+              border: '1px solid rgba(64,232,255,0.45)',
+              padding: '5px 16px', cursor: 'pointer', letterSpacing: '0.08em',
+            }}
+          >
+            🃏 プロフカードを生成
+          </button>
+        </div>
+      )}
+      {showCard && user?.handle && (
+        <ProfileCardModal handle={user.handle} onClose={() => setShowCard(false)} />
+      )}
 
       {/* ── 招待リンク ── */}
       <InviteButton />
