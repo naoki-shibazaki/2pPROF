@@ -47,6 +47,12 @@ export default function ProfilePage() {
   const [qSent, setQSent] = useState(false)
   const qInputRef = useRef<HTMLInputElement>(null)
 
+  // Introduction
+  const [showIntro, setShowIntro] = useState(false)
+  const [introText, setIntroText] = useState('')
+  const [introSending, setIntroSending] = useState(false)
+  const [introSent, setIntroSent] = useState(false)
+
   useEffect(() => {
     fetch(`/api/user/${handle}`)
       .then(r => {
@@ -76,6 +82,18 @@ export default function ProfilePage() {
       setIsFollowing(true)
     }
     setFollowLoading(false)
+  }
+
+  async function sendIntro() {
+    if (!introText.trim() || !handle) return
+    setIntroSending(true)
+    const res = await fetch('/api/introductions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle, body: introText }),
+    })
+    if (res.ok) { setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntro(false); setIntroText('') }, 2000) }
+    setIntroSending(false)
   }
 
   async function sendQuestion() {
@@ -354,6 +372,69 @@ export default function ProfilePage() {
                           </button>
                           <button
                             onClick={() => { setShowQuestion(false); setQuestionText('') }}
+                            style={{
+                              ...STYLE, fontSize: 10, color: '#504870',
+                              background: 'transparent', border: '1px solid rgba(80,72,112,0.30)',
+                              padding: '5px 12px', cursor: 'pointer',
+                            }}
+                          >
+                            キャンセル
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* ── 紹介文を書く ── */}
+                {!user.isSelf && (
+                  <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(64,232,255,0.10)' }}>
+                    {!showIntro ? (
+                      <button
+                        onClick={() => setShowIntro(true)}
+                        style={{
+                          ...STYLE, width: '100%', fontSize: 10, color: '#40e8ff',
+                          background: 'rgba(8,6,20,0.92)',
+                          border: '1px solid rgba(64,232,255,0.40)',
+                          boxShadow: '0 0 8px rgba(64,232,255,0.10)',
+                          padding: '8px 0', cursor: 'pointer', letterSpacing: '0.08em',
+                        }}
+                      >
+                        ✎ この人の紹介文を書く
+                      </button>
+                    ) : introSent ? (
+                      <div style={{ ...STYLE, fontSize: 11, color: '#38ff78', textAlign: 'center', padding: '8px 0', textShadow: '0 0 8px rgba(56,255,120,0.60)' }}>
+                        ✓ 紹介文を送りました！
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(64,232,255,0.35)', padding: 10 }}>
+                        <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff', letterSpacing: '0.08em' }}>✎ この人の紹介文を書く</span>
+                        <textarea
+                          value={introText}
+                          onChange={e => setIntroText(e.target.value)}
+                          placeholder={`${user.name ?? user.handle} さんの紹介文を書いてあげよう`}
+                          maxLength={200}
+                          rows={3}
+                          style={{
+                            ...STYLE, fontSize: 11, color: '#d0c8f0',
+                            background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)',
+                            padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.8,
+                          }}
+                        />
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={sendIntro}
+                            disabled={introSending || !introText.trim()}
+                            style={{
+                              ...STYLE, flex: 1, fontSize: 10, color: '#40e8ff',
+                              background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.45)',
+                              padding: '5px 0', cursor: 'pointer', opacity: introSending ? 0.5 : 1,
+                            }}
+                          >
+                            {introSending ? '送信中...' : '送信'}
+                          </button>
+                          <button
+                            onClick={() => { setShowIntro(false); setIntroText('') }}
                             style={{
                               ...STYLE, fontSize: 10, color: '#504870',
                               background: 'transparent', border: '1px solid rgba(80,72,112,0.30)',

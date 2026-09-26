@@ -142,6 +142,17 @@ export async function initSchema() {
       )
     `)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_notif_user ON notifications(user_id, read)`)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS introductions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        target_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        body TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(target_id, author_id)
+      )
+    `)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_intro_target ON introductions(target_id)`)
     // Indices for frequently queried columns
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)
