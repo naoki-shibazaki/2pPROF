@@ -156,19 +156,6 @@ export default function AvatarUploader() {
 
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleChange} />
 
-        {!loading && (
-          <button onClick={openStylePicker} style={{
-            ...STYLE, fontSize: 10, color: '#ffd700',
-            background: 'rgba(8,6,20,0.92)',
-            border: '2px solid #ffd700',
-            boxShadow: '0 0 8px rgba(255,215,0,0.35)',
-            textShadow: '0 0 6px rgba(255,215,0,0.55)',
-            padding: '3px 10px', cursor: 'pointer', letterSpacing: '0.08em',
-          }}>
-            {avatarUrl ? '▶ スタイルを変更' : '▶ 写真をセット'}
-          </button>
-        )}
-
         {error && (
           <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', textAlign: 'center', maxWidth: 160 }}>
             ⚠ {error}
