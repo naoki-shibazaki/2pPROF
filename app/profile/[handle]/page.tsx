@@ -52,7 +52,7 @@ export default function ProfilePage() {
   const [introText, setIntroText] = useState('')
   const [introSending, setIntroSending] = useState(false)
   const [introSent, setIntroSent] = useState(false)
-  const [metYear, setMetYear] = useState('')
+  const [metYear, setMetYear] = useState(() => String(new Date().getFullYear()))
   const [metMonth, setMetMonth] = useState('')
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function ProfilePage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ handle, body: introText, metYear: metYear || null, metMonth: metMonth || null }),
     })
-    if (res.ok) { setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntro(false); setIntroText(''); setMetYear(''); setMetMonth('') }, 2000) }
+    if (res.ok) { setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntro(false); setIntroText(''); setMetYear(String(new Date().getFullYear())); setMetMonth('') }, 2000) }
     setIntroSending(false)
   }
 
@@ -469,7 +469,7 @@ export default function ProfilePage() {
                             {introSending ? '送信中...' : '送信'}
                           </button>
                           <button
-                            onClick={() => { setShowIntro(false); setIntroText(''); setMetYear(''); setMetMonth('') }}
+                            onClick={() => { setShowIntro(false); setIntroText(''); setMetYear(String(new Date().getFullYear())); setMetMonth('') }}
                             style={{
                               ...STYLE, fontSize: 10, color: '#504870',
                               background: 'transparent', border: '1px solid rgba(80,72,112,0.30)',
