@@ -11,7 +11,8 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
 type QAItem = { q: string; a: string }
 type IntroItem = { id: string; body: string; met_year: number | null; met_month: number | null; author_name: string | null; author_handle: string | null }
-type TabType = 'profile' | 'qa' | 'intro'
+type FriendItem = { id: string; name: string | null; handle: string | null; image: string | null; proximity_count: number }
+type TabType = 'profile' | 'friends' | 'intro'
 
 type PublicUser = {
   id: string
@@ -49,6 +50,16 @@ export default function ProfilePage() {
   const [qSending, setQSending] = useState(false)
   const [qSent, setQSent] = useState(false)
   const qInputRef = useRef<HTMLInputElement>(null)
+
+  // Friends list
+  const [friends, setFriends] = useState<FriendItem[]>([])
+  useEffect(() => {
+    if (!handle) return
+    fetch(`/api/friends?handle=${handle}`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setFriends(data) })
+      .catch(() => {})
+  }, [handle])
 
   // Introductions list
   const [intros, setIntros] = useState<IntroItem[]>([])
@@ -135,8 +146,8 @@ export default function ProfilePage() {
   const titleText = loading ? 'プロフィール' : notFound ? 'プロフィール' : user?.handle ? `@${user.handle}` : 'プロフィール'
 
   const tabs: { id: TabType; label: string; badge?: number }[] = [
-    { id: 'profile', label: 'プロフ' },
-    { id: 'qa', label: 'Q&A', badge: user?.qaItems?.filter(i => i.a.trim()).length },
+    { id: 'profile', label: 'マイページ' },
+    { id: 'friends', label: 'その人の友達', badge: friends.length || undefined },
     { id: 'intro', label: '他己紹介', badge: intros.length || undefined },
   ]
 
@@ -254,7 +265,7 @@ export default function ProfilePage() {
                 {/* ── Tab content ── */}
                 <div className="overflow-y-auto" style={{ maxHeight: 'calc(100dvh - 280px)' }}>
 
-                  {/* プロフ tab */}
+                  {/* マイページ tab */}
                   {activeTab === 'profile' && (
                     <div>
                       {/* あなたとの関係 */}
@@ -283,19 +294,15 @@ export default function ProfilePage() {
                           <p className="text-xs whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>{user.bio}</p>
                         </div>
                       )}
-                    </div>
-                  )}
 
-                  {/* Q&A tab */}
-                  {activeTab === 'qa' && (
-                    <div>
-                      {user.qaItems?.filter(i => i.a.trim()).length === 0 ? (
-                        <div className="flex flex-col items-center gap-3 py-10">
-                          <span style={{ fontSize: 28 }}>📝</span>
-                          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>まだ回答がありません</p>
+                      {/* Q&A */}
+                      {user.qaItems?.filter(i => i.a.trim()).length > 0 && (
+                        <div style={{ borderTop: '1px solid rgba(64,232,255,0.15)' }}>
+                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', padding: '6px 12px', ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
+                            ■ Q&amp;A
+                          </div>
+                          {user.qaItems.filter(i => i.a.trim()).map((item, idx) => <QARow key={idx} idx={idx} item={item} />)}
                         </div>
-                      ) : (
-                        user.qaItems.filter(i => i.a.trim()).map((item, idx) => <QARow key={idx} idx={idx} item={item} />)
                       )}
 
                       {/* 質問を送る */}
@@ -323,6 +330,42 @@ export default function ProfilePage() {
                             </div>
                           )}
                         </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* その人の友達 tab */}
+                  {activeTab === 'friends' && (
+                    <div>
+                      {friends.length === 0 ? (
+                        <div className="flex flex-col items-center gap-3 py-10">
+                          <span style={{ fontSize: 28 }}>👥</span>
+                          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>まだ友達がいません</p>
+                        </div>
+                      ) : (
+                        friends.map(f => (
+                          <button
+                            key={f.id}
+                            onClick={() => f.handle && router.push(`/profile/${f.handle}`)}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'none', border: 'none', borderBottom: '1px solid rgba(64,232,255,0.10)', cursor: 'pointer', textAlign: 'left' }}
+                          >
+                            <div style={{ width: 40, height: 40, flexShrink: 0, overflow: 'hidden' }}>
+                              {f.image
+                                // eslint-disable-next-line @next/next/no-img-element
+                                ? <img src={f.image} alt={f.name ?? ''} width={40} height={40} style={{ objectFit: 'cover', imageRendering: 'pixelated', display: 'block' }} />
+                                : <AvatarSVG size={40} />
+                              }
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', letterSpacing: '0.08em' }}>{f.name ?? f.handle ?? '???'}</div>
+                              <div style={{ ...STYLE, fontSize: 8, color: '#604878' }}>@{f.handle}</div>
+                            </div>
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <div style={{ ...STYLE, fontSize: 14, color: '#ffd700' }}>{f.proximity_count}</div>
+                              <div style={{ ...STYLE, fontSize: 7, color: '#504870' }}>近くにいた</div>
+                            </div>
+                          </button>
+                        ))
                       )}
                     </div>
                   )}
