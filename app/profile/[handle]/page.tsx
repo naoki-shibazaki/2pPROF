@@ -52,6 +52,8 @@ export default function ProfilePage() {
   const [introText, setIntroText] = useState('')
   const [introSending, setIntroSending] = useState(false)
   const [introSent, setIntroSent] = useState(false)
+  const [metYear, setMetYear] = useState('')
+  const [metMonth, setMetMonth] = useState('')
 
   useEffect(() => {
     fetch(`/api/user/${handle}`)
@@ -90,9 +92,9 @@ export default function ProfilePage() {
     const res = await fetch('/api/introductions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ handle, body: introText }),
+      body: JSON.stringify({ handle, body: introText, metYear: metYear || null, metMonth: metMonth || null }),
     })
-    if (res.ok) { setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntro(false); setIntroText('') }, 2000) }
+    if (res.ok) { setIntroSent(true); setTimeout(() => { setIntroSent(false); setShowIntro(false); setIntroText(''); setMetYear(''); setMetMonth('') }, 2000) }
     setIntroSending(false)
   }
 
@@ -409,6 +411,39 @@ export default function ProfilePage() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(64,232,255,0.35)', padding: 10 }}>
                         <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff', letterSpacing: '0.08em' }}>✎ この人の紹介文を書く</span>
+                        {/* 出会った年月 */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ ...STYLE, fontSize: 9, color: '#604878', whiteSpace: 'nowrap' }}>出会った頃</span>
+                          <input
+                            type="number"
+                            value={metYear}
+                            onChange={e => setMetYear(e.target.value)}
+                            placeholder="2024"
+                            min={1900}
+                            max={2099}
+                            style={{
+                              ...STYLE, fontSize: 11, color: '#d0c8f0', width: 70, textAlign: 'center',
+                              background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)',
+                              padding: '4px 6px', outline: 'none',
+                            }}
+                          />
+                          <span style={{ ...STYLE, fontSize: 9, color: '#604878' }}>年</span>
+                          <select
+                            value={metMonth}
+                            onChange={e => setMetMonth(e.target.value)}
+                            style={{
+                              ...STYLE, fontSize: 11, color: '#d0c8f0', width: 52,
+                              background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)',
+                              padding: '4px 4px', outline: 'none',
+                            }}
+                          >
+                            <option value="">--</option>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                          <span style={{ ...STYLE, fontSize: 9, color: '#604878' }}>月</span>
+                        </div>
                         <textarea
                           value={introText}
                           onChange={e => setIntroText(e.target.value)}
@@ -434,7 +469,7 @@ export default function ProfilePage() {
                             {introSending ? '送信中...' : '送信'}
                           </button>
                           <button
-                            onClick={() => { setShowIntro(false); setIntroText('') }}
+                            onClick={() => { setShowIntro(false); setIntroText(''); setMetYear(''); setMetMonth('') }}
                             style={{
                               ...STYLE, fontSize: 10, color: '#504870',
                               background: 'transparent', border: '1px solid rgba(80,72,112,0.30)',

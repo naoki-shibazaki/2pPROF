@@ -7,6 +7,8 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 type Intro = {
   id: string
   body: string
+  met_year: number | null
+  met_month: number | null
   author_name: string | null
   author_handle: string | null
   created_at: string
@@ -70,9 +72,16 @@ export default function OthersTab() {
                 <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
                   {intro.body}
                 </p>
-                <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 4 }}>
-                  from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}
-                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                  <p style={{ ...STYLE, fontSize: 8, color: '#504870', margin: 0 }}>
+                    from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}
+                  </p>
+                  {(intro.met_year || intro.met_month) && (
+                    <p style={{ ...STYLE, fontSize: 8, color: '#504878', margin: 0 }}>
+                      {intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜
+                    </p>
+                  )}
+                </div>
               </div>
             )
           })}
