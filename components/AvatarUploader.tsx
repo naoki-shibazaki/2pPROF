@@ -165,15 +165,6 @@ export default function AvatarUploader() {
           </button>
         )}
 
-        {avatarUrl && !loading && (
-          <button onClick={handleReset} style={{
-            ...STYLE, fontSize: 9, color: '#403860',
-            background: 'transparent', border: 'none', cursor: 'pointer',
-          }}>
-            リセット
-          </button>
-        )}
-
         {error && (
           <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', textAlign: 'center', maxWidth: 160 }}>
             ⚠ {error}
