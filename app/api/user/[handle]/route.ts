@@ -16,16 +16,39 @@ export async function GET(_req: Request, { params }: { params: Promise<{ handle:
 
   const user = rows[0]
 
-  // Per-pair proximity count (viewer → this user)
+  const isSelf = myId === user.id
+
+  // Per-pair proximity count + isFollowing
   let proximityCount = 0
-  if (myId) {
-    const pe = await sql`
-      SELECT COUNT(*)::int AS cnt FROM proximity_events
-      WHERE (user_a_id = ${myId}::uuid AND user_b_id = ${user.id}::uuid)
-         OR (user_a_id = ${user.id}::uuid AND user_b_id = ${myId}::uuid)
-    `
+  let isFollowing = false
+  if (myId && !isSelf) {
+    const [pe, fw] = await Promise.all([
+      sql`
+        SELECT COUNT(*)::int AS cnt FROM proximity_events
+        WHERE (user_a_id = ${myId}::uuid AND user_b_id = ${user.id}::uuid)
+           OR (user_a_id = ${user.id}::uuid AND user_b_id = ${myId}::uuid)
+      `,
+      sql`
+        SELECT 1 FROM follows
+        WHERE follower_id = ${myId}::uuid AND following_id = ${user.id}::uuid
+        LIMIT 1
+      `,
+    ])
     proximityCount = pe[0]?.cnt ?? 0
+    isFollowing = fw.length > 0
   }
 
-  return Response.json({ ...user, proximityCount })
+  // Self Q&A (answered only) + follow counts
+  const [qaRows, countRows] = await Promise.all([
+    sql`SELECT items FROM self_qa WHERE user_id = ${user.id}::uuid`,
+    sql`SELECT
+          (SELECT COUNT(*)::int FROM follows WHERE follower_id = ${user.id}::uuid) AS following_count,
+          (SELECT COUNT(*)::int FROM follows WHERE following_id = ${user.id}::uuid) AS followers_count`,
+  ])
+  const allItems: { q: string; a: string }[] = Array.isArray(qaRows[0]?.items) ? qaRows[0].items : []
+  const qaItems = allItems.filter(i => i.a?.trim())
+  const followingCount = countRows[0]?.following_count ?? 0
+  const followersCount = countRows[0]?.followers_count ?? 0
+
+  return Response.json({ ...user, proximityCount, qaItems, isFollowing, isSelf, followingCount, followersCount })
 }

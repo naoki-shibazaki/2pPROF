@@ -22,5 +22,11 @@ export async function POST(req: Request) {
     VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()})
   `
 
+  // 質問受信通知
+  await sql`
+    INSERT INTO notifications (user_id, type, from_user_id)
+    VALUES (${receiverId}::uuid, 'question', ${senderId}::uuid)
+  `.catch(() => {})
+
   return Response.json({ ok: true })
 }

@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PostgresAdapter(pool as any),
-  session: { strategy: 'database' },
+  session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
   },
@@ -103,10 +103,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      if (session.user && user) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user }) {
+      if (user) token.id = (user as any).id ?? user.id
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user && token.id) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(session.user as any).id = user.id
+        ;(session.user as any).id = token.id
       }
       return session
     },

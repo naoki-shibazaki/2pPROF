@@ -13,15 +13,7 @@ type Friend = {
   handle: string | null
   image: string | null
   proximity_count: number
-  isMock?: boolean
 }
-
-const MOCK_FRIENDS: Friend[] = [
-  { id: 'mock-1', name: 'ひろ',   handle: 'hiro_pixel',  image: null, proximity_count: 47, isMock: true },
-  { id: 'mock-2', name: 'さくら', handle: 'sakura_2p',   image: null, proximity_count: 12, isMock: true },
-  { id: 'mock-3', name: 'りょう', handle: 'ryo_cyber',   image: null, proximity_count: 3,  isMock: true },
-  { id: 'mock-4', name: 'ゆい',   handle: 'yui_retro',   image: null, proximity_count: 0,  isMock: true },
-]
 
 export default function FriendsTab({ onCountChange }: { onCountChange?: (n: number) => void }) {
   const router = useRouter()
@@ -62,12 +54,11 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
       .then(data => {
         clearTimeout(timer)
         const real = Array.isArray(data) ? data : []
-        const displayed = real.length > 0 ? real : MOCK_FRIENDS
-        setFriends(displayed)
-        onCountChange?.(displayed.length)
+        setFriends(real)
+        onCountChange?.(real.length)
         setLoading(false)
       })
-      .catch(() => { clearTimeout(timer); setFriends(MOCK_FRIENDS); setLoading(false) })
+      .catch(() => { clearTimeout(timer); setFriends([]); setLoading(false) })
   }, [onCountChange])
 
   useEffect(() => { load() }, [load])
@@ -93,15 +84,14 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
     setAddLoading(false)
   }
 
-  async function handleUnfollow(e: React.MouseEvent, friendId: string, isMock?: boolean) {
+  async function handleUnfollow(e: React.MouseEvent, friendId: string) {
     e.stopPropagation()
-    if (isMock) return
     await fetch(`/api/follows/${friendId}`, { method: 'DELETE' })
     setFriends(prev => prev.filter(f => f.id !== friendId))
   }
 
-  function goToProfile(handle: string | null, isMock?: boolean) {
-    if (!handle || isMock) return
+  function goToProfile(handle: string | null) {
+    if (!handle) return
     router.push(`/profile/${handle}`)
   }
 
@@ -223,15 +213,17 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
             return (
               <div
                 key={f.id}
-                style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', background: 'rgba(4,2,12,0.40)' }}
+                onClick={() => goToProfile(f.handle)}
+                style={{
+                  borderBottom: '1px solid rgba(64,232,255,0.10)',
+                  background: 'rgba(4,2,12,0.40)',
+                  cursor: 'pointer',
+                }}
               >
                 {/* Main row */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px 6px' }}>
-                  {/* Avatar — tap → profile */}
-                  <button
-                    onClick={() => goToProfile(f.handle, f.isMock)}
-                    style={{ background: 'none', border: 'none', padding: 0, cursor: f.isMock ? 'default' : 'pointer', flexShrink: 0 }}
-                  >
+                  {/* Avatar */}
+                  <div style={{ flexShrink: 0 }}>
                     <div style={{ width: 44, height: 44, overflow: 'hidden' }}>
                       {f.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -239,7 +231,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
                           style={{ objectFit: 'cover', imageRendering: 'pixelated', display: 'block' }} />
                       ) : <AvatarSVG size={44} />}
                     </div>
-                  </button>
+                  </div>
 
                   {/* Name + handle */}
                   <div className="flex flex-col flex-1 min-w-0">
@@ -251,7 +243,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
 
                   {/* Proximity count — tap to toggle */}
                   <button
-                    onClick={() => toggleCount(f.id)}
+                    onClick={(e) => { e.stopPropagation(); toggleCount(f.id) }}
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
                   >
                     {isCountHidden
@@ -275,33 +267,23 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {!f.isMock && (
-                      <>
-                        <button
-                          onClick={() => { setQuestionOpenId(questionOpenId === f.id ? null : f.id); setQuestionText('') }}
-                          style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.40)', padding: '2px 8px', cursor: 'pointer' }}
-                        >
-                          💬
-                        </button>
-                        <button
-                          onClick={() => goToProfile(f.handle)}
-                          style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.35)', padding: '2px 8px', cursor: 'pointer' }}
-                        >
-                          プロフィール
-                        </button>
-                        <button
-                          onClick={(e) => handleUnfollow(e, f.id)}
-                          style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'transparent', border: 'none', cursor: 'pointer' }}
-                        >
-                          解除
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setQuestionOpenId(questionOpenId === f.id ? null : f.id); setQuestionText('') }}
+                      style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.40)', padding: '2px 8px', cursor: 'pointer' }}
+                    >
+                      💬
+                    </button>
+                    <button
+                      onClick={(e) => handleUnfollow(e, f.id)}
+                      style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                    >
+                      解除
+                    </button>
                   </div>
                 </div>
 
                 {/* Inline question input */}
-                {!f.isMock && questionOpenId === f.id && (
+                {questionOpenId === f.id && (
                   <div style={{ margin: '0 12px 10px', background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(255,64,192,0.35)', padding: 8 }}>
                     {qSentId === f.id ? (
                       <p style={{ ...STYLE, fontSize: 10, color: '#38ff78', textAlign: 'center', padding: '4px 0' }}>✓ 質問を送りました！</p>
@@ -312,7 +294,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
                           value={questionText}
                           autoFocus
                           onChange={e => setQuestionText(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && sendQuestion(f.handle)}
+                          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendQuestion(f.handle) } }}
                           placeholder="質問を入力..."
                           maxLength={100}
                           style={{ ...STYLE, flex: 1, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '4px 8px', outline: 'none' }}

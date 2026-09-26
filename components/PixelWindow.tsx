@@ -30,7 +30,7 @@ export default function PixelWindow({ children, title = '2P PROF' }: PixelWindow
           <div className="pixel-btn-chrome" />
         </div>
         <span className="flex-1 text-center text-pixel-shadow tracking-widest">
-          ★ {title} ★
+          {title}
         </span>
       </div>
 

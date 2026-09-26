@@ -61,7 +61,7 @@ export default function LevelBadge() {
             cursor: 'pointer',
           }}
         >
-          ★ Lv.{level} {profileData.class}
+          Lv.{level}
         </button>
       ) : (
         /* hidden state — tiny subtle button so user can re-enable */

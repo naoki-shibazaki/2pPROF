@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { signOut } from 'next-auth/react'
-import ProfileCardModal from './ProfileCardModal'
+import QRModal from './QRModal'
+import FollowListModal from './FollowListModal'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
 import HexStatus from './HexStatus'
@@ -21,6 +22,8 @@ type UserProfile = {
   hp: number | null
   proximity_count: number | null
   proximity_mode: string | null
+  following_count: number
+  followers_count: number
 }
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -53,10 +56,12 @@ export default function MyProfile() {
   const [nameDraft, setNameDraft] = useState('')
   const nameInputRef = useRef<HTMLInputElement>(null)
 
-  const maxHP = profileData.level * 10
+  const maxHP = 100
   const [currentHP, setCurrentHP] = useState(maxHP)
-  const [editingHP, setEditingHP] = useState(false)
-  const [showCard, setShowCard] = useState(false)
+
+  const [showQR, setShowQR] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
+  const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
 
 
   useEffect(() => {
@@ -100,8 +105,25 @@ export default function MyProfile() {
 
     if ('geolocation' in navigator) startTracking()
 
+    // Battery → HP sync
+    type BatteryManager = { level: number }
+    if ('getBattery' in navigator) {
+      ;(navigator as Navigator & { getBattery: () => Promise<BatteryManager> })
+        .getBattery()
+        .then(battery => {
+          const hp = Math.round(battery.level * maxHP)
+          setCurrentHP(hp)
+          fetch('/api/user/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hp }),
+          }).catch(() => {})
+        })
+        .catch(() => {})
+    }
+
     return () => { if (intervalId) clearInterval(intervalId) }
-  }, [])
+  }, [maxHP])
 
 
   useEffect(() => {
@@ -174,83 +196,95 @@ export default function MyProfile() {
           @{user?.handle ?? profileData.handle}
         </p>
 
+        {/* フォロー / フォロワー */}
+        {user?.handle && (
+          <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
+            <button
+              onClick={() => setFollowListType('following')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
+            >
+              <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.following_count ?? 0}</span>
+              <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロー</span>
+            </button>
+            <button
+              onClick={() => setFollowListType('followers')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
+            >
+              <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.followers_count ?? 0}</span>
+              <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロワー</span>
+            </button>
+          </div>
+        )}
+
         {/* Personality badges */}
         <PersonalityBadges />
 
-        {/* HP bar – タップでスライダー表示 */}
-        <div className="w-full flex flex-col gap-1.5 mt-1">
-          <button
-            onClick={() => setEditingHP(v => !v)}
-            className="w-full text-left"
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
-          >
-            <StatBar
-              label="HP"
-              color="#ff40c0"
-              fill={currentHP / maxHP}
-              current={currentHP}
-              max={maxHP}
-            />
-          </button>
-          {editingHP && (
-            <div className="flex items-center gap-2 px-1">
-              <span style={{ ...STYLE, fontSize: 9, color: '#ff40c080', minWidth: 16 }}>0</span>
-              <input
-                type="range"
-                min={0}
-                max={maxHP}
-                value={currentHP}
-                onChange={e => {
-                  const v = Number(e.target.value)
-                  setCurrentHP(v)
-                }}
-                onMouseUp={e => {
-                  const v = Number((e.target as HTMLInputElement).value)
-                  fetch('/api/user/profile', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ hp: v }),
-                  })
-                }}
-                onTouchEnd={e => {
-                  const v = Number((e.target as HTMLInputElement).value)
-                  fetch('/api/user/profile', {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ hp: v }),
-                  })
-                }}
-                className="flex-1"
-                style={{
-                  accentColor: '#ff40c0',
-                  cursor: 'pointer',
-                }}
-              />
-              <span style={{ ...STYLE, fontSize: 9, color: '#ff40c080', minWidth: 24, textAlign: 'right' }}>{maxHP}</span>
-            </div>
-          )}
+        {/* HP bar */}
+        <div className="w-full mt-1">
+          <StatBar
+            label="HP"
+            color="#ff40c0"
+            fill={currentHP / maxHP}
+            current={currentHP}
+            max={maxHP}
+          />
         </div>
 
       </div>
 
-      {/* ── プロフカード生成 ── */}
+      {/* ── シェア系ボタン ── */}
       {user?.handle && (
-        <div className="px-4 py-2 flex justify-center" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
-          <button
-            onClick={() => setShowCard(true)}
-            style={{
-              ...STYLE, fontSize: 10, color: '#40e8ff',
-              background: 'rgba(8,6,20,0.92)',
-              border: '1px solid rgba(64,232,255,0.45)',
-              padding: '5px 16px', cursor: 'pointer', letterSpacing: '0.08em',
-            }}
-          >
-            🃏 プロフカードを生成
-          </button>
+        <div className="px-4 py-2 flex flex-col gap-2" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
+          {/* 1行目: QR + シェア */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowQR(true)}
+              style={{
+                ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0',
+                background: 'rgba(8,6,20,0.92)',
+                border: '1px solid rgba(255,64,192,0.45)',
+                padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em',
+              }}
+            >
+              📱 QRコード
+            </button>
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/profile/${user.handle}`
+                if (navigator.share) {
+                  await navigator.share({ title: `${user.name ?? user.handle} のプロフ`, url })
+                } else {
+                  await navigator.clipboard.writeText(url).catch(() => {})
+                  setShareCopied(true)
+                  setTimeout(() => setShareCopied(false), 2500)
+                }
+              }}
+              style={{
+                ...STYLE, flex: 1, fontSize: 10,
+                color: shareCopied ? '#38ff78' : '#ffd700',
+                background: 'rgba(8,6,20,0.92)',
+                border: `1px solid ${shareCopied ? 'rgba(56,255,120,0.50)' : 'rgba(255,215,0,0.45)'}`,
+                padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em',
+              }}
+            >
+              {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
+            </button>
+          </div>
         </div>
       )}
-      {showCard && user?.handle && (
-        <ProfileCardModal handle={user.handle} onClose={() => setShowCard(false)} />
+      {showQR && user?.handle && (
+        <QRModal
+          url={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${user.handle}`}
+          name={user.name ?? user.handle}
+          onClose={() => setShowQR(false)}
+        />
+      )}
+      {followListType && user?.handle && (
+        <FollowListModal
+          handle={user.handle}
+          type={followListType}
+          onClose={() => setFollowListType(null)}
+        />
       )}
 
       {/* ── 招待リンク ── */}

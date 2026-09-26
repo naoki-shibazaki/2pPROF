@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import PixelBackground from '@/components/PixelBackground'
 import PixelWindow from '@/components/PixelWindow'
 import PixelTabBar, { type Tab } from '@/components/PixelTabBar'
@@ -11,17 +11,27 @@ import OthersTab from '@/components/OthersTab'
 export default function HomeClient() {
   const [activeTab, setActiveTab] = useState<Tab>('my')
   const [friendCount, setFriendCount] = useState<number | undefined>(undefined)
+  const [notifCount, setNotifCount] = useState(0)
 
   useEffect(() => {
     fetch('/api/friends')
       .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setFriendCount(data.length > 0 ? data.length : 4) // 4 = mock count
-        }
-      })
-      .catch(() => setFriendCount(4))
+      .then(data => { if (Array.isArray(data)) setFriendCount(data.length) })
+      .catch(() => setFriendCount(0))
+
+    fetch('/api/notifications')
+      .then(r => r.json())
+      .then(data => setNotifCount(data?.count ?? 0))
+      .catch(() => {})
   }, [])
+
+  const handleTabChange = useCallback((tab: Tab) => {
+    setActiveTab(tab)
+    if (tab === 'others' && notifCount > 0) {
+      setNotifCount(0)
+      fetch('/api/notifications', { method: 'POST' }).catch(() => {})
+    }
+  }, [notifCount])
 
   return (
     <div className="relative min-h-dvh">
@@ -31,7 +41,7 @@ export default function HomeClient() {
         role="main"
       >
         <PixelWindow>
-          <PixelTabBar activeTab={activeTab} onTabChange={setActiveTab} friendCount={friendCount} />
+          <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} friendCount={friendCount} notifCount={notifCount} />
           {activeTab === 'my' ? <MyProfile /> : activeTab === 'friends' ? <FriendsTab onCountChange={setFriendCount} /> : <OthersTab />}
           <div className="pixel-statusbar">
             ★ 2P PROF v1.0 ★ ともだちと紹介しあおう！

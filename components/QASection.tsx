@@ -43,7 +43,6 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
   // Self Q&A
   const [items, setItems] = useState<QAItem[]>(defaultItems)
   const [qaLoaded, setQaLoaded] = useState(false)
-  const [expanded, setExpanded] = useState<number | null>(null)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<QAItem[]>([])
 
@@ -76,12 +75,10 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
       .catch(() => {})
   }, [])
 
-  function toggle(idx: number) { setExpanded((prev) => (prev === idx ? null : idx)) }
   function openEdit() { setDraft(items.map(i => ({ ...i }))); setEditing(true) }
   function save() {
     const filtered = draft.filter(i => i.q.trim())
     setItems(filtered)
-    setExpanded(null)
     setEditing(false)
     fetch('/api/qa/self', {
       method: 'PUT',
@@ -180,35 +177,27 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
                 </div>
               ) : (
                 answered.map((item, idx) => {
-                  const isOpen = expanded === idx
                   const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
                   return (
                     <div key={idx} style={{
                       borderBottom: '1px solid rgba(64,232,255,0.10)',
-                      borderLeft: isOpen ? '3px solid #38ff78' : '3px solid transparent',
+                      borderLeft: '3px solid #38ff78',
+                      background: rowBg,
+                      padding: '8px 12px 10px',
                     }}>
-                      <button
-                        onClick={() => toggle(idx)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-left cursor-pointer"
-                        style={{ ...STYLE, background: isOpen ? 'rgba(16,6,32,0.90)' : rowBg }}
-                      >
-                        <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, textShadow: '0 0 5px rgba(64,232,255,0.60)', letterSpacing: '0.04em' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
+                        <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>
                           {String(idx + 1).padStart(2, '0')}
                         </span>
-                        <span className="flex-1 text-xs truncate" style={{ color: isOpen ? '#d0c8f0' : '#9888b8', lineHeight: '1.8' }}>
+                        <p style={{ ...STYLE, fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                           {item.q}
-                        </span>
-                        <span style={{ fontSize: 10, flexShrink: 0, color: isOpen ? '#38ff78' : '#ff40c0', textShadow: isOpen ? '0 0 6px rgba(56,255,120,0.70)' : '0 0 6px rgba(255,64,192,0.55)' }}>
-                          {isOpen ? '▼' : '▶'}
-                        </span>
-                      </button>
-                      {isOpen && (
-                        <div className="px-3 py-2" style={{ background: 'rgba(6,18,8,0.85)', borderTop: '1px solid rgba(56,255,120,0.20)', ...STYLE }}>
-                          <p className="text-xs whitespace-pre-wrap" style={{ color: '#38ff78', lineHeight: '1.9', textShadow: '0 0 4px rgba(56,255,120,0.40)', paddingLeft: 26 }}>
-                            <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
-                          </p>
-                        </div>
-                      )}
+                        </p>
+                      </div>
+                      <div style={{ paddingLeft: 30 }}>
+                        <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+                          <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
+                        </p>
+                      </div>
                     </div>
                   )
                 })

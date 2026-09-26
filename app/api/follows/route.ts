@@ -23,5 +23,11 @@ export async function POST(req: Request) {
     ON CONFLICT DO NOTHING
   `
 
+  // フォローされた通知
+  await sql`
+    INSERT INTO notifications (user_id, type, from_user_id)
+    VALUES (${targetId}::uuid, 'followed', ${userId}::uuid)
+  `.catch(() => {})
+
   return Response.json({ ok: true })
 }
