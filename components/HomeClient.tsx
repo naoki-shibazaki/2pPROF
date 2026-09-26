@@ -44,7 +44,7 @@ export default function HomeClient() {
           <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} friendCount={friendCount} notifCount={notifCount} />
           {activeTab === 'my' ? <MyProfile /> : activeTab === 'friends' ? <FriendsTab onCountChange={setFriendCount} /> : <OthersTab />}
           <div className="pixel-statusbar">
-            ★ 2P PROF v1.0 ★ ともだちと紹介しあおう！
+            友達と紹介しあおう！
           </div>
         </PixelWindow>
       </main>

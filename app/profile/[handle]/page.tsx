@@ -441,7 +441,7 @@ export default function ProfilePage() {
             ) : null}
 
             {/* ── Status bar ── */}
-            <div className="pixel-statusbar">★ 2P PROF v1.0 ★ ともだちと紹介しあおう！</div>
+            <div className="pixel-statusbar">友達と紹介しあおう！</div>
           </div>
 
         </div>
