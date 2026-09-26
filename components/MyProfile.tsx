@@ -73,7 +73,7 @@ export default function MyProfile() {
         const dbName = u.name ?? profileData.name
         setName(dbName)
         setNameDraft(dbName)
-        if (u.hp !== null && u.hp !== undefined) setCurrentHP(u.hp)
+        if (u.hp !== null && u.hp !== undefined) setCurrentHP(Math.min(u.hp, 100))
       })
 
 
