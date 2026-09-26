@@ -19,12 +19,23 @@ async function ensureTable() {
   await sql`ALTER TABLE introductions ADD COLUMN IF NOT EXISTS met_month SMALLINT`.catch(() => {})
 }
 
-// GET: 自分宛の紹介文一覧
-export async function GET() {
-  const session = await auth()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userId = (session?.user as any)?.id
-  if (!userId) return Response.json([])
+// GET: 紹介文一覧（?handle=xxx で任意ユーザー、なければ自分）
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const handle = searchParams.get('handle')
+
+  let targetId: string | null = null
+
+  if (handle) {
+    const rows = await sql`SELECT id FROM users WHERE handle = ${handle}`.catch(() => [])
+    targetId = rows[0]?.id ?? null
+    if (!targetId) return Response.json([])
+  } else {
+    const session = await auth()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    targetId = (session?.user as any)?.id ?? null
+    if (!targetId) return Response.json([])
+  }
 
   try {
     const rows = await sql`
@@ -32,7 +43,7 @@ export async function GET() {
              u.name AS author_name, u.handle AS author_handle
       FROM introductions i
       JOIN users u ON u.id = i.author_id
-      WHERE i.target_id = ${userId}::uuid
+      WHERE i.target_id = ${targetId}::uuid
       ORDER BY i.created_at DESC
     `
     return Response.json(rows)

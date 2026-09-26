@@ -47,7 +47,18 @@ export default function ProfilePage() {
   const [qSent, setQSent] = useState(false)
   const qInputRef = useRef<HTMLInputElement>(null)
 
-  // Introduction
+  // Introductions list
+  type IntroItem = { id: string; body: string; met_year: number | null; met_month: number | null; author_name: string | null; author_handle: string | null }
+  const [intros, setIntros] = useState<IntroItem[]>([])
+  useEffect(() => {
+    if (!handle) return
+    fetch(`/api/introductions?handle=${handle}`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setIntros(data) })
+      .catch(() => {})
+  }, [handle])
+
+  // Introduction write
   const [showIntro, setShowIntro] = useState(false)
   const [introText, setIntroText] = useState('')
   const [introSending, setIntroSending] = useState(false)
@@ -385,6 +396,46 @@ export default function ProfilePage() {
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* ── 他己紹介一覧 ── */}
+                {intros.length > 0 && (
+                  <div style={{ borderTop: '1px solid rgba(64,232,255,0.15)' }}>
+                    <div style={{
+                      background: 'rgba(4,10,22,0.85)',
+                      borderBottom: '1px solid rgba(64,232,255,0.38)',
+                      padding: '6px 12px',
+                      ...STYLE, fontSize: 10, color: '#40e8ff',
+                      letterSpacing: '0.06em', textShadow: '0 0 6px rgba(64,232,255,0.60)',
+                    }}>
+                      ♡ ともだちからの紹介文
+                    </div>
+                    {intros.map((intro, idx) => {
+                      const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
+                      return (
+                        <div key={intro.id} style={{
+                          borderBottom: '1px solid rgba(64,232,255,0.10)',
+                          borderLeft: '3px solid #40e8ff',
+                          background: rowBg,
+                          padding: '10px 12px',
+                        }}>
+                          <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+                            {intro.body}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+                            <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>
+                              from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}
+                            </span>
+                            {(intro.met_year || intro.met_month) && (
+                              <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>
+                                {intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 )}
 
