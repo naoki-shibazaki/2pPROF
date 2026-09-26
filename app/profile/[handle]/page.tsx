@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
-import QRModal from '@/components/QRModal'
 import FollowListModal from '@/components/FollowListModal'
 import PixelBackground from '@/components/PixelBackground'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
@@ -37,9 +36,8 @@ export default function ProfilePage() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
 
-  // Share / QR
+  // Share
   const [shareCopied, setShareCopied] = useState(false)
-  const [showQR, setShowQR] = useState(false)
   const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
 
   // Question sending
@@ -214,17 +212,6 @@ export default function ProfilePage() {
                       </button>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => setShowQR(true)}
-                          style={{
-                            ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0',
-                            background: 'rgba(8,6,20,0.92)',
-                            border: '1px solid rgba(255,64,192,0.45)',
-                            padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em',
-                          }}
-                        >
-                          📱 QRコード
-                        </button>
-                        <button
                           onClick={async () => {
                             const url = `${window.location.origin}/profile/${user.handle}`
                             if (navigator.share) {
@@ -307,7 +294,7 @@ export default function ProfilePage() {
                       borderBottom: '1px solid rgba(64,232,255,0.38)',
                     }}>
                       <div style={{ ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em', padding: '6px 12px', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
-                        ■ 自分の回答
+                        ■ Q&amp;A
                       </div>
                     </div>
                     {user.qaItems.filter(i => i.a.trim() !== '').map((item, idx) => (
@@ -394,13 +381,6 @@ export default function ProfilePage() {
       </main>
 
       {/* ── Modals ── */}
-      {showQR && user?.handle && (
-        <QRModal
-          url={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${user.handle}`}
-          name={user.name ?? user.handle ?? ''}
-          onClose={() => setShowQR(false)}
-        />
-      )}
       {followListType && user?.handle && (
         <FollowListModal
           handle={user.handle}
