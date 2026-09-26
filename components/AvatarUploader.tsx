@@ -54,6 +54,7 @@ const STYLES: AvatarStyle[] = [
 export default function AvatarUploader() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [picking, setPicking] = useState(false)
@@ -62,6 +63,7 @@ export default function AvatarUploader() {
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) setAvatarUrl(saved)
+    setMounted(true)
   }, [])
 
   function openStylePicker() {
@@ -145,8 +147,10 @@ export default function AvatarUploader() {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={avatarUrl} alt="avatar" width={140} height={140}
               style={{ imageRendering: 'pixelated', display: 'block', objectFit: 'cover' }} />
-          ) : (
+          ) : mounted ? (
             <AvatarSVG size={140} />
+          ) : (
+            <div style={{ width: 140, height: 140, background: 'rgba(20,8,40,0.90)' }} />
           )}
         </button>
 
