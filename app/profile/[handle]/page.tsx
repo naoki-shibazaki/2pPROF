@@ -50,7 +50,7 @@ export default function ProfilePage() {
   const [questionText, setQuestionText] = useState('')
   const [qSending, setQSending] = useState(false)
   const [qSent, setQSent] = useState(false)
-  const qInputRef = useRef<HTMLInputElement>(null)
+  const qInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Friends list
   const [friends, setFriends] = useState<FriendItem[]>([])
@@ -308,28 +308,51 @@ export default function ProfilePage() {
                         </div>
                       )}
 
-                      {/* 質問を送る */}
+                      {/* 質問を送る – accordion */}
                       {!user.isSelf && (
-                        <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>
-                          {!showQuestion ? (
-                            <button onClick={() => setShowQuestion(true)} style={{ ...STYLE, width: '100%', fontSize: 10, color: '#ff40c0', background: 'rgba(8,6,20,0.92)', border: '1px solid rgba(255,64,192,0.45)', padding: '8px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>
-                              💬 質問を送る
-                            </button>
-                          ) : qSent ? (
-                            <div style={{ ...STYLE, fontSize: 11, color: '#38ff78', textAlign: 'center', padding: '8px 0' }}>✓ 質問を送りました！</div>
-                          ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(255,64,192,0.35)', padding: 10 }}>
-                              <span style={{ ...STYLE, fontSize: 9, color: '#ff40c0' }}>💬 質問を送る</span>
-                              <input ref={qInputRef} type="text" value={questionText} onChange={e => setQuestionText(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendQuestion() } }} placeholder="質問を入力..." maxLength={100}
-                                style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(208,200,240,0.30)', padding: '5px 8px', outline: 'none' }} />
-                              <div style={{ display: 'flex', gap: 6 }}>
-                                <button onClick={sendQuestion} disabled={qSending || !questionText.trim()} style={{ ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: 'pointer', opacity: qSending ? 0.5 : 1 }}>
-                                  {qSending ? '送信中...' : '送信'}
-                                </button>
-                                <button onClick={() => { setShowQuestion(false); setQuestionText('') }} style={{ ...STYLE, fontSize: 10, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '5px 12px', cursor: 'pointer' }}>
-                                  キャンセル
-                                </button>
-                              </div>
+                        <div style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>
+                          {/* Accordion header */}
+                          <button
+                            onClick={() => { if (!qSent) setShowQuestion(q => !q) }}
+                            style={{
+                              ...STYLE,
+                              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                              width: '100%', padding: '5px 12px', cursor: 'pointer',
+                              background: showQuestion ? 'rgba(255,64,192,0.06)' : 'rgba(4,2,12,0.40)',
+                              border: 'none',
+                              color: showQuestion ? '#ff40c0' : '#504870',
+                              textShadow: showQuestion ? '0 0 5px rgba(255,64,192,0.40)' : 'none',
+                            }}
+                          >
+                            <span style={{ fontSize: 9 }}>💬 質問を送る</span>
+                            {!qSent && <span style={{ fontSize: 8 }}>{showQuestion ? '▲' : '▼'}</span>}
+                          </button>
+
+                          {/* Accordion body */}
+                          {showQuestion && (
+                            <div style={{ padding: '8px 12px 10px', background: 'rgba(4,2,12,0.50)', borderTop: '1px solid rgba(255,64,192,0.10)' }}>
+                              {qSent ? (
+                                <p style={{ ...STYLE, fontSize: 10, color: '#38ff78', textAlign: 'center' }}>✓ 質問を送りました！</p>
+                              ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                  <textarea
+                                    ref={qInputRef}
+                                    value={questionText}
+                                    onChange={e => setQuestionText(e.target.value)}
+                                    placeholder="質問を入力..."
+                                    maxLength={100}
+                                    rows={3}
+                                    style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
+                                  />
+                                  <button
+                                    onClick={sendQuestion}
+                                    disabled={qSending || !questionText.trim()}
+                                    style={{ ...STYLE, fontSize: 10, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: qSending ? 'default' : 'pointer', opacity: qSending ? 0.5 : 1 }}
+                                  >
+                                    {qSending ? '送信中...' : '送信'}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
