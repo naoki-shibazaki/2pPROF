@@ -79,9 +79,10 @@ export async function POST(req: Request) {
   const status = flagged ? 'rejected' : 'pending'
 
   try {
-    await sql`
+    const inserted = await sql`
       INSERT INTO qa_comments (target_user_id, question_hash, author_id, body, status, moderation_flagged)
       VALUES (${targetId}::uuid, ${qhash}, ${authorId}::uuid, ${body.trim()}, ${status}, ${flagged})
+      RETURNING id
     `
     if (!flagged) {
       await sql`
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
         VALUES (${targetId}::uuid, 'qa_comment', ${authorId}::uuid)
       `.catch(() => {})
     }
-    return Response.json({ ok: true, flagged })
+    return Response.json({ ok: true, flagged, id: inserted[0]?.id ?? null })
   } catch {
     await ensureTable().catch(() => {})
     return Response.json({ ok: false }, { status: 500 })

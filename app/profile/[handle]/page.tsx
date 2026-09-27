@@ -458,6 +458,7 @@ export default function ProfilePage() {
 }
 
 type QAComment = { id: string; body: string; created_at: string; author_name: string | null; author_handle: string | null }
+type MyPending = { id: string; body: string }
 
 function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; a: string }; handle: string; isSelf: boolean }) {
   const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
@@ -466,16 +467,27 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
   const [commentsLoaded, setCommentsLoaded] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [flagged, setFlagged] = useState(false)
+  const [submitFlagged, setSubmitFlagged] = useState(false)
+
+  // Own pending comment (editable)
+  const [myPending, setMyPending] = useState<MyPending | null>(null)
+  const [editingPending, setEditingPending] = useState(false)
+  const [editText, setEditText] = useState('')
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   const qhash = qaHash(item.q)
 
   async function loadComments() {
     try {
-      const r = await fetch(`/api/qa-comments?handle=${encodeURIComponent(handle)}&qhash=${qhash}`)
-      const data = await r.json()
-      if (Array.isArray(data)) setComments(data)
+      const [commRes, myRes] = await Promise.all([
+        fetch(`/api/qa-comments?handle=${encodeURIComponent(handle)}&qhash=${qhash}`),
+        fetch(`/api/qa-comments/my?handle=${encodeURIComponent(handle)}&qhash=${qhash}`),
+      ])
+      const commData = await commRes.json()
+      const myData = await myRes.json()
+      if (Array.isArray(commData)) setComments(commData)
+      if (myData?.id) setMyPending(myData)
     } catch { /* silent */ }
     setCommentsLoaded(true)
   }
@@ -495,13 +507,37 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
         body: JSON.stringify({ handle, qhash, body: commentText }),
       })
       const data = await r.json()
-      if (data.ok) {
-        setSubmitted(true)
-        setFlagged(data.flagged ?? false)
+      if (data.ok && !data.flagged && data.id) {
+        setMyPending({ id: data.id, body: commentText })
         setCommentText('')
+      } else if (data.flagged) {
+        setSubmitFlagged(true)
       }
     } catch { /* silent */ }
     setSubmitting(false)
+  }
+
+  async function saveEdit() {
+    if (!myPending || !editText.trim() || editSaving) return
+    setEditSaving(true)
+    setEditError(null)
+    try {
+      const r = await fetch(`/api/qa-comments/${myPending.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ body: editText }),
+      })
+      const data = await r.json()
+      if (data.ok) {
+        setMyPending({ ...myPending, body: editText })
+        setEditingPending(false)
+      } else {
+        setEditError(data.flagged ? '⚠ このコメントは送信できませんでした' : '保存に失敗しました')
+      }
+    } catch {
+      setEditError('保存に失敗しました')
+    }
+    setEditSaving(false)
   }
 
   return (
@@ -545,29 +581,71 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
             </div>
           )}
 
-          {/* Comment form (non-self only) */}
+          {/* Non-self: own pending comment or new comment form */}
           {!isSelf && (
-            submitted ? (
-              <p style={{ ...STYLE, fontSize: 9, color: flagged ? '#ff4060' : '#38ff78' }}>
-                {flagged ? '⚠ このコメントは送信できませんでした' : '✓ コメントを送りました（承認後に表示されます）'}
-              </p>
-            ) : (
-              <div style={{ display: 'flex', gap: 6 }}>
-                <input
-                  type="text"
+            submitFlagged ? (
+              <p style={{ ...STYLE, fontSize: 9, color: '#ff4060' }}>⚠ このコメントは送信できませんでした</p>
+            ) : myPending ? (
+              // Show own pending comment with edit option
+              <div style={{ borderLeft: '2px solid rgba(255,136,48,0.40)', paddingLeft: 8, marginTop: commentsLoaded && comments.length > 0 ? 8 : 0 }}>
+                {editingPending ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <textarea
+                      value={editText}
+                      onChange={e => setEditText(e.target.value)}
+                      maxLength={200}
+                      rows={3}
+                      style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,136,48,0.40)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
+                    />
+                    {editError && <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', margin: 0 }}>{editError}</p>}
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        onClick={saveEdit}
+                        disabled={editSaving || !editText.trim()}
+                        style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '3px 10px', cursor: editSaving ? 'default' : 'pointer', opacity: editSaving ? 0.5 : 1 }}
+                      >
+                        {editSaving ? '保存中...' : '保存'}
+                      </button>
+                      <button
+                        onClick={() => { setEditingPending(false); setEditError(null) }}
+                        style={{ ...STYLE, fontSize: 9, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '3px 10px', cursor: 'pointer' }}
+                      >
+                        キャンセル
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{myPending.body}</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
+                      <span style={{ ...STYLE, fontSize: 8, color: '#ff8830' }}>承認待ち</span>
+                      <button
+                        onClick={() => { setEditText(myPending.body); setEditingPending(true) }}
+                        style={{ ...STYLE, fontSize: 8, color: '#ff8830', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >
+                        [編集]
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : commentsLoaded && (
+              // New comment form
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <textarea
                   value={commentText}
                   onChange={e => setCommentText(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); submitComment() } }}
                   placeholder="コメントを入力..."
                   maxLength={200}
-                  style={{ ...STYLE, flex: 1, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 8px', outline: 'none' }}
+                  rows={3}
+                  style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                 />
                 <button
                   onClick={submitComment}
                   disabled={submitting || !commentText.trim()}
-                  style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 10px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1, flexShrink: 0 }}
+                  style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 0', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1 }}
                 >
-                  送信
+                  {submitting ? '送信中...' : 'コメントを送る'}
                 </button>
               </div>
             )
