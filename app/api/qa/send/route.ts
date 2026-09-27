@@ -19,10 +19,19 @@ export async function POST(req: Request) {
 
   const isAnon = anonymous === true
 
-  await sql`
-    INSERT INTO friend_questions (sender_id, receiver_id, question, anonymous)
-    VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()}, ${isAnon})
-  `
+  try {
+    await sql`
+      INSERT INTO friend_questions (sender_id, receiver_id, question, anonymous)
+      VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()}, ${isAnon})
+    `
+  } catch {
+    // anonymous column may not exist yet — add it then retry
+    await sql`ALTER TABLE friend_questions ADD COLUMN IF NOT EXISTS anonymous BOOLEAN DEFAULT FALSE`.catch(() => {})
+    await sql`
+      INSERT INTO friend_questions (sender_id, receiver_id, question, anonymous)
+      VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()}, ${isAnon})
+    `
+  }
 
   // 質問受信通知
   await sql`

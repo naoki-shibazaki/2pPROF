@@ -345,40 +345,24 @@ export default function ProfilePage() {
                                     rows={3}
                                     style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                                   />
-                                  {/* 公開 / 匿名 トグル */}
-                                  <div style={{ display: 'flex', gap: 6 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <button
-                                      onClick={() => setQuestionAnon(false)}
-                                      style={{
-                                        ...STYLE, flex: 1, fontSize: 9, padding: '4px 0', cursor: 'pointer',
-                                        color: !questionAnon ? '#38ff78' : '#504870',
-                                        background: !questionAnon ? 'rgba(56,255,120,0.08)' : 'rgba(4,2,12,0.60)',
-                                        border: !questionAnon ? '1px solid rgba(56,255,120,0.50)' : '1px solid rgba(80,72,112,0.30)',
-                                        textShadow: !questionAnon ? '0 0 5px rgba(56,255,120,0.50)' : 'none',
-                                      }}
+                                      onClick={sendQuestion}
+                                      disabled={qSending || !questionText.trim()}
+                                      style={{ ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: qSending ? 'default' : 'pointer', opacity: qSending ? 0.5 : 1 }}
                                     >
-                                      👤 公開で送る
+                                      {qSending ? '送信中...' : '送信'}
                                     </button>
-                                    <button
-                                      onClick={() => setQuestionAnon(true)}
-                                      style={{
-                                        ...STYLE, flex: 1, fontSize: 9, padding: '4px 0', cursor: 'pointer',
-                                        color: questionAnon ? '#ff8830' : '#504870',
-                                        background: questionAnon ? 'rgba(255,136,48,0.08)' : 'rgba(4,2,12,0.60)',
-                                        border: questionAnon ? '1px solid rgba(255,136,48,0.50)' : '1px solid rgba(80,72,112,0.30)',
-                                        textShadow: questionAnon ? '0 0 5px rgba(255,136,48,0.50)' : 'none',
-                                      }}
-                                    >
-                                      🕶 匿名で送る
-                                    </button>
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', flexShrink: 0 }}>
+                                      <input
+                                        type="checkbox"
+                                        checked={questionAnon}
+                                        onChange={e => setQuestionAnon(e.target.checked)}
+                                        style={{ accentColor: '#ff8830', width: 13, height: 13, cursor: 'pointer' }}
+                                      />
+                                      <span style={{ ...STYLE, fontSize: 9, color: questionAnon ? '#ff8830' : '#504870' }}>匿名で送る</span>
+                                    </label>
                                   </div>
-                                  <button
-                                    onClick={sendQuestion}
-                                    disabled={qSending || !questionText.trim()}
-                                    style={{ ...STYLE, fontSize: 10, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: qSending ? 'default' : 'pointer', opacity: qSending ? 0.5 : 1 }}
-                                  >
-                                    {qSending ? '送信中...' : '送信'}
-                                  </button>
                                 </div>
                               )}
                             </div>
