@@ -553,15 +553,27 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
             <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
           </p>
         </div>
-        {/* Comment toggle */}
-        <button
-          onClick={toggleExpand}
-          style={{ ...STYLE, fontSize: 9, color: '#604878', background: 'none', border: 'none', cursor: 'pointer', marginTop: 6, paddingLeft: 30 }}
-        >
-          💬 コメント{comments.length > 0 ? ` (${comments.length})` : ''}
-          <span style={{ marginLeft: 4, fontSize: 8 }}>{expanded ? '▲' : '▼'}</span>
-        </button>
       </div>
+
+      {/* Accordion header */}
+      <button
+        onClick={toggleExpand}
+        style={{
+          ...STYLE,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          width: '100%', padding: '5px 12px', cursor: 'pointer',
+          background: expanded ? 'rgba(64,232,255,0.06)' : 'rgba(4,2,12,0.40)',
+          border: 'none',
+          borderTop: '1px solid rgba(64,232,255,0.12)',
+          color: expanded ? '#40e8ff' : '#504870',
+          textShadow: expanded ? '0 0 5px rgba(64,232,255,0.40)' : 'none',
+        }}
+      >
+        <span style={{ fontSize: 9 }}>
+          💬 コメント{comments.length > 0 ? ` (${comments.length})` : (myPending ? ' (1)' : '')}
+        </span>
+        <span style={{ fontSize: 8 }}>{expanded ? '▲' : '▼'}</span>
+      </button>
 
       {/* Comment section */}
       {expanded && (
