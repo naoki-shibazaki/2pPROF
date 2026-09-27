@@ -170,6 +170,17 @@ export async function initSchema() {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_target ON qa_comments(target_user_id, question_hash)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_status ON qa_comments(target_user_id, status)`)
     await client.query(`ALTER TABLE friend_questions ADD COLUMN IF NOT EXISTS anonymous BOOLEAN DEFAULT FALSE`)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS blocks (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        blocker_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        blocked_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(blocker_id, blocked_id)
+      )
+    `)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_blocks_blocker ON blocks(blocker_id)`)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_blocks_blocked ON blocks(blocked_id)`)
     // Indices for frequently queried columns
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)

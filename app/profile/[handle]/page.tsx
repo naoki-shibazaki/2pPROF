@@ -27,6 +27,7 @@ type PublicUser = {
   isSelf: boolean
   followingCount: number
   followersCount: number
+  isBlocked: boolean
 }
 
 export default function ProfilePage() {
@@ -40,6 +41,11 @@ export default function ProfilePage() {
   // Follow
   const [isFollowing, setIsFollowing] = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
+
+  // Block
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [blockLoading, setBlockLoading] = useState(false)
+  const [showBlockConfirm, setShowBlockConfirm] = useState(false)
 
   // Share
   const [shareCopied, setShareCopied] = useState(false)
@@ -80,7 +86,7 @@ export default function ProfilePage() {
         if (r.status === 404) { setNotFound(true); setLoading(false); return null }
         return r.json()
       })
-      .then(data => { if (data) { setUser(data); setIsFollowing(data.isFollowing); setLoading(false) } })
+      .then(data => { if (data) { setUser(data); setIsFollowing(data.isFollowing); setIsBlocked(data.isBlocked ?? false); setLoading(false) } })
       .catch(() => setLoading(false))
   }, [handle])
 
@@ -95,6 +101,29 @@ export default function ProfilePage() {
   useEffect(() => {
     if (showQuestion) qInputRef.current?.focus()
   }, [showQuestion])
+
+  async function toggleBlock() {
+    if (!handle || !user || user.isSelf || blockLoading) return
+    setBlockLoading(true)
+    if (isBlocked) {
+      await fetch('/api/blocks', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle }),
+      })
+      setIsBlocked(false)
+    } else {
+      await fetch('/api/blocks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle }),
+      })
+      setIsBlocked(true)
+      setIsFollowing(false)
+      setShowBlockConfirm(false)
+    }
+    setBlockLoading(false)
+  }
 
   async function toggleFollow() {
     if (!handle || !user || user.isSelf) return
@@ -233,6 +262,33 @@ export default function ProfilePage() {
                       >
                         {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
                       </button>
+
+                      {/* Block button */}
+                      {!showBlockConfirm ? (
+                        <button
+                          onClick={() => isBlocked ? toggleBlock() : setShowBlockConfirm(true)}
+                          disabled={blockLoading}
+                          style={{ ...STYLE, width: '100%', fontSize: 9, color: isBlocked ? '#ff4060' : '#403860', background: 'transparent', border: `1px solid ${isBlocked ? 'rgba(255,64,96,0.35)' : 'rgba(64,56,96,0.25)'}`, padding: '4px 0', cursor: blockLoading ? 'default' : 'pointer', opacity: blockLoading ? 0.5 : 1, letterSpacing: '0.06em' }}
+                        >
+                          {isBlocked ? '🚫 ブロック中（タップで解除）' : 'ブロックする'}
+                        </button>
+                      ) : (
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={toggleBlock}
+                            disabled={blockLoading}
+                            style={{ ...STYLE, flex: 1, fontSize: 9, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.50)', padding: '4px 0', cursor: 'pointer' }}
+                          >
+                            ブロックする
+                          </button>
+                          <button
+                            onClick={() => setShowBlockConfirm(false)}
+                            style={{ ...STYLE, flex: 1, fontSize: 9, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '4px 0', cursor: 'pointer' }}
+                          >
+                            キャンセル
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

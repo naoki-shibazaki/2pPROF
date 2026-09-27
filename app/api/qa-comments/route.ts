@@ -64,6 +64,15 @@ export async function POST(req: Request) {
 
   if (targetId === authorId) return Response.json({ ok: false }, { status: 400 })
 
+  // Block check (either direction)
+  const blocked = await sql`
+    SELECT 1 FROM blocks
+    WHERE (blocker_id = ${authorId}::uuid AND blocked_id = ${targetId}::uuid)
+       OR (blocker_id = ${targetId}::uuid AND blocked_id = ${authorId}::uuid)
+    LIMIT 1
+  `.catch(() => [])
+  if (blocked.length > 0) return Response.json({ ok: false }, { status: 403 })
+
   // OpenAI Moderation (free API)
   let flagged = false
   try {

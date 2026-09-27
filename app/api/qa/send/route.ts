@@ -17,6 +17,15 @@ export async function POST(req: Request) {
   const receiverId = targets[0].id
   if (receiverId === senderId) return Response.json({ error: '自分には送れません' }, { status: 400 })
 
+  // Block check (either direction)
+  const blocked = await sql`
+    SELECT 1 FROM blocks
+    WHERE (blocker_id = ${senderId}::uuid AND blocked_id = ${receiverId}::uuid)
+       OR (blocker_id = ${receiverId}::uuid AND blocked_id = ${senderId}::uuid)
+    LIMIT 1
+  `.catch(() => [])
+  if (blocked.length > 0) return Response.json({ error: 'ブロックされているため送信できません' }, { status: 403 })
+
   const isAnon = anonymous === true
 
   try {
