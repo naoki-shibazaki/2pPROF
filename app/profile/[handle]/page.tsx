@@ -149,8 +149,8 @@ export default function ProfilePage() {
 
   const tabs: { id: TabType; label: string; badge?: number }[] = [
     { id: 'profile', label: 'プロフィール' },
-    { id: 'intro', label: '他己紹介', badge: intros.length || undefined },
     { id: 'friends', label: '友達', badge: friends.length || undefined },
+    { id: 'intro', label: '他己紹介', badge: intros.length || undefined },
   ]
 
   return (
