@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { qaHash } from '@/lib/qa-hash'
 
 export interface QAItem {
   q: string
@@ -37,6 +38,15 @@ const INPUT_STYLE = {
 
 type TabType = 'self' | 'friends'
 
+type PendingComment = {
+  id: string
+  question_hash: string
+  body: string
+  created_at: string
+  author_name: string | null
+  author_handle: string | null
+}
+
 export default function QASection({ items: defaultItems }: QASectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('self')
 
@@ -45,6 +55,10 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
   const [qaLoaded, setQaLoaded] = useState(false)
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState<QAItem[]>([])
+
+  // Pending comments (承認待ち)
+  const [pendingComments, setPendingComments] = useState<PendingComment[]>([])
+  const [expandedHashes, setExpandedHashes] = useState<Set<string>>(new Set())
 
   // Friend Q&A
   const [friendQs, setFriendQs] = useState<FriendQuestion[]>([])
@@ -62,6 +76,34 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
       })
       .catch(() => setQaLoaded(true))
   }, [])
+
+  // Load pending comments
+  useEffect(() => {
+    fetch('/api/qa-comments/pending')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setPendingComments(data) })
+      .catch(() => {})
+  }, [])
+
+  async function handleCommentAction(id: string, status: 'approved' | 'rejected') {
+    const res = await fetch(`/api/qa-comments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    if (res.ok) {
+      setPendingComments(prev => prev.filter(c => c.id !== id))
+    }
+  }
+
+  function toggleHashExpand(hash: string) {
+    setExpandedHashes(prev => {
+      const next = new Set(prev)
+      if (next.has(hash)) next.delete(hash)
+      else next.add(hash)
+      return next
+    })
+  }
 
   useEffect(() => {
     fetch('/api/qa')
@@ -143,7 +185,9 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
                   textShadow: activeTab === tab ? '0 0 6px rgba(64,232,255,0.60)' : 'none',
                 }}
               >
-                {tab === 'self' ? '■ 自分の回答' : `♡ 友達からの質問${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+                {tab === 'self'
+                  ? `■ 自分の回答${pendingComments.length > 0 ? ` [${pendingComments.length}]` : ''}`
+                  : `♡ 友達からの質問${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
               </button>
             ))}
             {activeTab === 'self' && (
@@ -178,26 +222,65 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
               ) : (
                 answered.map((item, idx) => {
                   const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
+                  const hash = qaHash(item.q)
+                  const itemPending = pendingComments.filter(c => c.question_hash === hash)
+                  const isExpanded = expandedHashes.has(hash)
                   return (
                     <div key={idx} style={{
                       borderBottom: '1px solid rgba(64,232,255,0.10)',
                       borderLeft: '3px solid #38ff78',
                       background: rowBg,
-                      padding: '8px 12px 10px',
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
-                        <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>
-                          {String(idx + 1).padStart(2, '0')}
-                        </span>
-                        <p style={{ ...STYLE, fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
-                          {item.q}
-                        </p>
+                      <div style={{ padding: '8px 12px 10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
+                          <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>
+                            {String(idx + 1).padStart(2, '0')}
+                          </span>
+                          <p style={{ ...STYLE, fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                            {item.q}
+                          </p>
+                        </div>
+                        <div style={{ paddingLeft: 30 }}>
+                          <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+                            <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
+                          </p>
+                        </div>
+                        {/* Pending comments badge */}
+                        {itemPending.length > 0 && (
+                          <button
+                            onClick={() => toggleHashExpand(hash)}
+                            style={{ ...STYLE, fontSize: 9, color: '#ff8830', background: 'rgba(255,136,48,0.10)', border: '1px solid rgba(255,136,48,0.35)', padding: '2px 8px', cursor: 'pointer', marginTop: 6, marginLeft: 30 }}
+                          >
+                            💬 承認待ち {itemPending.length}件 {isExpanded ? '▲' : '▼'}
+                          </button>
+                        )}
                       </div>
-                      <div style={{ paddingLeft: 30 }}>
-                        <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
-                          <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
-                        </p>
-                      </div>
+
+                      {/* Pending approval panel */}
+                      {isExpanded && itemPending.length > 0 && (
+                        <div style={{ borderTop: '1px solid rgba(255,136,48,0.20)', background: 'rgba(4,2,12,0.60)', padding: '8px 12px' }}>
+                          {itemPending.map(c => (
+                            <div key={c.id} style={{ borderLeft: '2px solid rgba(255,136,48,0.35)', paddingLeft: 8, marginBottom: 8 }}>
+                              <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
+                              <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                              <div style={{ display: 'flex', gap: 6, marginTop: 5 }}>
+                                <button
+                                  onClick={() => handleCommentAction(c.id, 'approved')}
+                                  style={{ ...STYLE, fontSize: 9, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '3px 10px', cursor: 'pointer' }}
+                                >
+                                  ✓ 承認
+                                </button>
+                                <button
+                                  onClick={() => handleCommentAction(c.id, 'rejected')}
+                                  style={{ ...STYLE, fontSize: 9, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.40)', padding: '3px 10px', cursor: 'pointer' }}
+                                >
+                                  ✕ 却下
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )
                 })

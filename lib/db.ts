@@ -153,6 +153,22 @@ export async function initSchema() {
       )
     `)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_intro_target ON introductions(target_id)`)
+    await client.query(`ALTER TABLE introductions ADD COLUMN IF NOT EXISTS met_year SMALLINT`)
+    await client.query(`ALTER TABLE introductions ADD COLUMN IF NOT EXISTS met_month SMALLINT`)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS qa_comments (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        target_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        question_hash TEXT NOT NULL,
+        author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        body TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        moderation_flagged BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_target ON qa_comments(target_user_id, question_hash)`)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_status ON qa_comments(target_user_id, status)`)
     // Indices for frequently queried columns
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)

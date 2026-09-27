@@ -6,6 +6,7 @@ import AvatarSVG from '@/components/AvatarSVG'
 import FollowListModal from '@/components/FollowListModal'
 import PixelBackground from '@/components/PixelBackground'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
+import { qaHash } from '@/lib/qa-hash'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -301,7 +302,9 @@ export default function ProfilePage() {
                           <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', padding: '6px 12px', ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
                             ■ Q&amp;A
                           </div>
-                          {user.qaItems.filter(i => i.a.trim()).map((item, idx) => <QARow key={idx} idx={idx} item={item} />)}
+                          {user.qaItems.filter(i => i.a.trim()).map((item, idx) => (
+                            <QARow key={idx} idx={idx} item={item} handle={user.handle ?? ''} isSelf={user.isSelf} />
+                          ))}
                         </div>
                       )}
 
@@ -454,19 +457,123 @@ export default function ProfilePage() {
   )
 }
 
-function QARow({ idx, item }: { idx: number; item: { q: string; a: string } }) {
+type QAComment = { id: string; body: string; created_at: string; author_name: string | null; author_handle: string | null }
+
+function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; a: string }; handle: string; isSelf: boolean }) {
   const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
+  const [expanded, setExpanded] = useState(false)
+  const [comments, setComments] = useState<QAComment[]>([])
+  const [commentsLoaded, setCommentsLoaded] = useState(false)
+  const [commentText, setCommentText] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [flagged, setFlagged] = useState(false)
+
+  const qhash = qaHash(item.q)
+
+  async function loadComments() {
+    try {
+      const r = await fetch(`/api/qa-comments?handle=${encodeURIComponent(handle)}&qhash=${qhash}`)
+      const data = await r.json()
+      if (Array.isArray(data)) setComments(data)
+    } catch { /* silent */ }
+    setCommentsLoaded(true)
+  }
+
+  function toggleExpand() {
+    if (!expanded && !commentsLoaded) loadComments()
+    setExpanded(e => !e)
+  }
+
+  async function submitComment() {
+    if (!commentText.trim() || submitting) return
+    setSubmitting(true)
+    try {
+      const r = await fetch('/api/qa-comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle, qhash, body: commentText }),
+      })
+      const data = await r.json()
+      if (data.ok) {
+        setSubmitted(true)
+        setFlagged(data.flagged ?? false)
+        setCommentText('')
+      }
+    } catch { /* silent */ }
+    setSubmitting(false)
+  }
+
   return (
-    <div style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', borderLeft: '3px solid #38ff78', background: rowBg, padding: '8px 12px 10px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
-        <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>{String(idx + 1).padStart(2, '0')}</span>
-        <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{item.q}</p>
+    <div style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', borderLeft: '3px solid #38ff78', background: rowBg }}>
+      {/* Q&A body */}
+      <div style={{ padding: '8px 12px 10px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
+          <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>{String(idx + 1).padStart(2, '0')}</span>
+          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{item.q}</p>
+        </div>
+        <div style={{ paddingLeft: 30 }}>
+          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+            <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
+          </p>
+        </div>
+        {/* Comment toggle */}
+        <button
+          onClick={toggleExpand}
+          style={{ ...STYLE, fontSize: 9, color: '#604878', background: 'none', border: 'none', cursor: 'pointer', marginTop: 6, paddingLeft: 30 }}
+        >
+          💬 コメント{comments.length > 0 ? ` (${comments.length})` : ''}
+          <span style={{ marginLeft: 4, fontSize: 8 }}>{expanded ? '▲' : '▼'}</span>
+        </button>
       </div>
-      <div style={{ paddingLeft: 30 }}>
-        <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
-          <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
-        </p>
-      </div>
+
+      {/* Comment section */}
+      {expanded && (
+        <div style={{ borderTop: '1px solid rgba(64,232,255,0.08)', background: 'rgba(4,2,12,0.50)', padding: '8px 12px 10px' }}>
+          {!commentsLoaded ? (
+            <p style={{ ...STYLE, fontSize: 9, color: '#504870' }}>読み込み中...</p>
+          ) : comments.length === 0 ? (
+            <p style={{ ...STYLE, fontSize: 9, color: '#504870', marginBottom: 6 }}>まだコメントはありません</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+              {comments.map(c => (
+                <div key={c.id} style={{ borderLeft: '2px solid rgba(64,232,255,0.25)', paddingLeft: 8 }}>
+                  <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
+                  <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>@{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Comment form (non-self only) */}
+          {!isSelf && (
+            submitted ? (
+              <p style={{ ...STYLE, fontSize: 9, color: flagged ? '#ff4060' : '#38ff78' }}>
+                {flagged ? '⚠ このコメントは送信できませんでした' : '✓ コメントを送りました（承認後に表示されます）'}
+              </p>
+            ) : (
+              <div style={{ display: 'flex', gap: 6 }}>
+                <input
+                  type="text"
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); submitComment() } }}
+                  placeholder="コメントを入力..."
+                  maxLength={200}
+                  style={{ ...STYLE, flex: 1, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 8px', outline: 'none' }}
+                />
+                <button
+                  onClick={submitComment}
+                  disabled={submitting || !commentText.trim()}
+                  style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 10px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1, flexShrink: 0 }}
+                >
+                  送信
+                </button>
+              </div>
+            )
+          )}
+        </div>
+      )}
     </div>
   )
 }
