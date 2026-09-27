@@ -169,6 +169,7 @@ export async function initSchema() {
     `)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_target ON qa_comments(target_user_id, question_hash)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_qa_comments_status ON qa_comments(target_user_id, status)`)
+    await client.query(`ALTER TABLE friend_questions ADD COLUMN IF NOT EXISTS anonymous BOOLEAN DEFAULT FALSE`)
     // Indices for frequently queried columns
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)

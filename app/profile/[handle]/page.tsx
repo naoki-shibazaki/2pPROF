@@ -50,6 +50,7 @@ export default function ProfilePage() {
   const [questionText, setQuestionText] = useState('')
   const [qSending, setQSending] = useState(false)
   const [qSent, setQSent] = useState(false)
+  const [questionAnon, setQuestionAnon] = useState(false)
   const qInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Friends list
@@ -135,7 +136,7 @@ export default function ProfilePage() {
     const res = await fetch('/api/qa/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ handle, question: questionText }),
+      body: JSON.stringify({ handle, question: questionText, anonymous: questionAnon }),
     })
     if (res.ok) { setQSent(true); setQuestionText(''); setTimeout(() => { setQSent(false); setShowQuestion(false) }, 2000) }
     setQSending(false)
@@ -344,6 +345,33 @@ export default function ProfilePage() {
                                     rows={3}
                                     style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                                   />
+                                  {/* 公開 / 匿名 トグル */}
+                                  <div style={{ display: 'flex', gap: 6 }}>
+                                    <button
+                                      onClick={() => setQuestionAnon(false)}
+                                      style={{
+                                        ...STYLE, flex: 1, fontSize: 9, padding: '4px 0', cursor: 'pointer',
+                                        color: !questionAnon ? '#38ff78' : '#504870',
+                                        background: !questionAnon ? 'rgba(56,255,120,0.08)' : 'rgba(4,2,12,0.60)',
+                                        border: !questionAnon ? '1px solid rgba(56,255,120,0.50)' : '1px solid rgba(80,72,112,0.30)',
+                                        textShadow: !questionAnon ? '0 0 5px rgba(56,255,120,0.50)' : 'none',
+                                      }}
+                                    >
+                                      👤 公開で送る
+                                    </button>
+                                    <button
+                                      onClick={() => setQuestionAnon(true)}
+                                      style={{
+                                        ...STYLE, flex: 1, fontSize: 9, padding: '4px 0', cursor: 'pointer',
+                                        color: questionAnon ? '#ff8830' : '#504870',
+                                        background: questionAnon ? 'rgba(255,136,48,0.08)' : 'rgba(4,2,12,0.60)',
+                                        border: questionAnon ? '1px solid rgba(255,136,48,0.50)' : '1px solid rgba(80,72,112,0.30)',
+                                        textShadow: questionAnon ? '0 0 5px rgba(255,136,48,0.50)' : 'none',
+                                      }}
+                                    >
+                                      🕶 匿名で送る
+                                    </button>
+                                  </div>
                                   <button
                                     onClick={sendQuestion}
                                     disabled={qSending || !questionText.trim()}
@@ -610,7 +638,9 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
               {comments.map(c => (
                 <div key={c.id} style={{ borderLeft: '2px solid rgba(64,232,255,0.25)', paddingLeft: 8 }}>
                   <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
-                  <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>@{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                  {isSelf && (
+                    <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                  )}
                 </div>
               ))}
             </div>

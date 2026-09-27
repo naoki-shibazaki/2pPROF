@@ -18,6 +18,7 @@ type FriendQuestion = {
   answer: string | null
   answered_at: string | null
   created_at: string
+  anonymous: boolean
   sender_name: string | null
   sender_handle: string | null
 }
@@ -311,7 +312,9 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
                       <div>
                         <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.8 }}>{fq.question}</p>
                         <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>
-                          from @{fq.sender_handle ?? '?'}{fq.sender_name ? ` (${fq.sender_name})` : ''}
+                          {fq.anonymous
+                            ? '👤 匿名'
+                            : `from @${fq.sender_handle ?? '?'}${fq.sender_name ? ` (${fq.sender_name})` : ''}`}
                         </p>
                       </div>
                       <button

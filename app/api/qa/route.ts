@@ -15,7 +15,8 @@ export async function GET() {
       fq.answer,
       fq.answered_at,
       fq.created_at,
-      u.name AS sender_name,
+      fq.anonymous,
+      u.name  AS sender_name,
       u.handle AS sender_handle
     FROM friend_questions fq
     LEFT JOIN users u ON u.id = fq.sender_id

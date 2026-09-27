@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   const senderId = (session?.user as any)?.id
   if (!senderId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { handle, question } = await req.json()
+  const { handle, question, anonymous } = await req.json()
   if (!handle || !question?.trim()) return Response.json({ error: 'handle と question は必須です' }, { status: 400 })
 
   const targets = await sql`SELECT id FROM users WHERE handle = ${handle.replace(/^@/, '')}`
@@ -17,9 +17,11 @@ export async function POST(req: Request) {
   const receiverId = targets[0].id
   if (receiverId === senderId) return Response.json({ error: '自分には送れません' }, { status: 400 })
 
+  const isAnon = anonymous === true
+
   await sql`
-    INSERT INTO friend_questions (sender_id, receiver_id, question)
-    VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()})
+    INSERT INTO friend_questions (sender_id, receiver_id, question, anonymous)
+    VALUES (${senderId}::uuid, ${receiverId}::uuid, ${question.trim()}, ${isAnon})
   `
 
   // 質問受信通知
