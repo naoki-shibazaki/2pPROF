@@ -15,14 +15,28 @@ type Friend = {
   proximity_count: number
 }
 
+type BlockedUser = {
+  id: string
+  user_id: string
+  name: string | null
+  handle: string | null
+  image: string | null
+  created_at: string
+}
+
 export default function FriendsTab({ onCountChange }: { onCountChange?: (n: number) => void }) {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<'friends' | 'blocks'>('friends')
   const [friends, setFriends] = useState<Friend[]>([])
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [handleInput, setHandleInput] = useState('')
   const [addError, setAddError] = useState<string | null>(null)
   const [addLoading, setAddLoading] = useState(false)
+
+  // Block list
+  const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([])
+  const [blocksLoading, setBlocksLoading] = useState(false)
 
   // Count visibility
   const [hideAll, setHideAll] = useState(false)
@@ -62,6 +76,28 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
   }, [onCountChange])
 
   useEffect(() => { load() }, [load])
+
+  function loadBlocks() {
+    setBlocksLoading(true)
+    fetch('/api/blocks')
+      .then(r => r.ok ? r.json() : [])
+      .then(data => { setBlockedUsers(Array.isArray(data) ? data : []); setBlocksLoading(false) })
+      .catch(() => { setBlockedUsers([]); setBlocksLoading(false) })
+  }
+
+  useEffect(() => {
+    if (activeTab === 'blocks') loadBlocks()
+  }, [activeTab])
+
+  async function handleUnblock(handle: string | null) {
+    if (!handle) return
+    await fetch('/api/blocks', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle }),
+    })
+    setBlockedUsers(prev => prev.filter(u => u.handle !== handle))
+  }
 
   async function handleAdd() {
     const h = handleInput.trim()
@@ -113,26 +149,115 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
 
   return (
     <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'calc(100dvh - 180px)' }}>
-      {/* Header */}
-      <div className="px-3 py-2 flex items-center justify-between" style={{
-        background: 'rgba(4,10,22,0.85)',
-        borderBottom: '1px solid rgba(255,64,192,0.30)',
-      }}>
-        <span style={{ ...STYLE, fontSize: 12, color: '#ff40c0', letterSpacing: '0.06em', textShadow: '0 0 7px rgba(255,64,192,0.60)' }}>
-          ともだちリスト
-        </span>
-        <button
-          onClick={() => { setAdding(v => !v); setAddError(null) }}
-          style={{
-            ...STYLE, fontSize: 10, color: '#ffd700',
-            background: 'rgba(8,6,20,0.92)',
-            border: '1px solid rgba(255,215,0,0.50)',
-            padding: '3px 10px', cursor: 'pointer',
-          }}
-        >
-          {adding ? '✕ キャンセル' : '＋ 追加'}
-        </button>
+      {/* Tab header */}
+      <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(255,64,192,0.30)' }}>
+        <div className="flex items-center">
+          <button
+            onClick={() => setActiveTab('friends')}
+            style={{
+              ...STYLE, flex: 1, fontSize: 11, padding: '8px 0', cursor: 'pointer', border: 'none',
+              background: activeTab === 'friends' ? 'rgba(255,64,192,0.15)' : 'transparent',
+              color: activeTab === 'friends' ? '#ff40c0' : '#504870',
+              letterSpacing: '0.06em',
+              textShadow: activeTab === 'friends' ? '0 0 7px rgba(255,64,192,0.60)' : 'none',
+              borderBottom: activeTab === 'friends' ? '2px solid #ff40c0' : '2px solid transparent',
+            }}
+          >
+            ともだち
+          </button>
+          <button
+            onClick={() => setActiveTab('blocks')}
+            style={{
+              ...STYLE, flex: 1, fontSize: 11, padding: '8px 0', cursor: 'pointer', border: 'none',
+              background: activeTab === 'blocks' ? 'rgba(255,64,64,0.12)' : 'transparent',
+              color: activeTab === 'blocks' ? '#ff4060' : '#504870',
+              letterSpacing: '0.06em',
+              textShadow: activeTab === 'blocks' ? '0 0 7px rgba(255,64,64,0.50)' : 'none',
+              borderBottom: activeTab === 'blocks' ? '2px solid #ff4060' : '2px solid transparent',
+            }}
+          >
+            ブロック{blockedUsers.length > 0 ? ` [${blockedUsers.length}]` : ''}
+          </button>
+          {activeTab === 'friends' && (
+            <button
+              onClick={() => { setAdding(v => !v); setAddError(null) }}
+              style={{
+                ...STYLE, fontSize: 10, color: '#ffd700',
+                background: 'rgba(8,6,20,0.92)',
+                border: '1px solid rgba(255,215,0,0.50)',
+                padding: '3px 10px', cursor: 'pointer', margin: '0 8px',
+                flexShrink: 0,
+              }}
+            >
+              {adding ? '✕' : '＋ 追加'}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Block list tab */}
+      {activeTab === 'blocks' && (
+        <div>
+          {blocksLoading ? (
+            <div className="flex justify-center py-8">
+              <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+            </div>
+          ) : blockedUsers.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-10">
+              <span style={{ fontSize: 32 }}>🚫</span>
+              <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center' }}>
+                ブロック中のユーザーはいません
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col">
+              {blockedUsers.map(u => {
+                const blockedAt = new Date(u.created_at)
+                const dateStr = `${blockedAt.getFullYear()}/${String(blockedAt.getMonth() + 1).padStart(2, '0')}/${String(blockedAt.getDate()).padStart(2, '0')} ${String(blockedAt.getHours()).padStart(2, '0')}:${String(blockedAt.getMinutes()).padStart(2, '0')}`
+                return (
+                  <div key={u.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+                    borderBottom: '1px solid rgba(64,232,255,0.10)',
+                    background: 'rgba(4,2,12,0.40)',
+                  }}>
+                    {/* Avatar */}
+                    <div style={{ flexShrink: 0, width: 40, height: 40, overflow: 'hidden' }}>
+                      {u.image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={u.image} alt={u.name ?? ''} width={40} height={40}
+                          style={{ objectFit: 'cover', imageRendering: 'pixelated', display: 'block' }} />
+                      ) : <AvatarSVG size={40} />}
+                    </div>
+                    {/* Name + date */}
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span style={{ ...STYLE, fontSize: 11, color: '#d0c8f0' }} className="truncate">
+                        {u.name ?? u.handle ?? '???'}
+                      </span>
+                      <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>@{u.handle ?? '-'}</span>
+                      <span style={{ ...STYLE, fontSize: 8, color: '#403860', marginTop: 2 }}>{dateStr}</span>
+                    </div>
+                    {/* Unblock button */}
+                    <button
+                      onClick={() => handleUnblock(u.handle)}
+                      style={{
+                        ...STYLE, fontSize: 9, color: '#ff4060',
+                        background: 'rgba(4,2,12,0.90)',
+                        border: '1px solid rgba(255,64,64,0.40)',
+                        padding: '3px 8px', cursor: 'pointer', flexShrink: 0,
+                      }}
+                    >
+                      解除
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Friends tab content */}
+      {activeTab === 'friends' && <>
 
       {/* Global hide toggle */}
       {!loading && friends.length > 0 && (
@@ -315,6 +440,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
           })}
         </div>
       )}
+      </>}
     </div>
   )
 }

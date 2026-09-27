@@ -1,6 +1,28 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
 
+// GET: list users I have blocked
+export async function GET() {
+  const session = await auth()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const myId = (session?.user as any)?.id
+  if (!myId) return Response.json([], { status: 401 })
+
+  try {
+    const rows = await sql`
+      SELECT b.id, b.created_at,
+             u.id AS user_id, u.name, u.handle, u.image
+      FROM blocks b
+      JOIN users u ON u.id = b.blocked_id
+      WHERE b.blocker_id = ${myId}::uuid
+      ORDER BY b.created_at DESC
+    `
+    return Response.json(rows)
+  } catch {
+    return Response.json([])
+  }
+}
+
 async function ensureTable() {
   await sql`
     CREATE TABLE IF NOT EXISTS blocks (
