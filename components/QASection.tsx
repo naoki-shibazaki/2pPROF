@@ -188,7 +188,7 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
               >
                 {tab === 'self'
                   ? `■ 自分の回答${pendingComments.length > 0 ? ` [${pendingComments.length}]` : ''}`
-                  : `♡ 友達からの質問${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+                  : `友達からの質問${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
               </button>
             ))}
             {activeTab === 'self' && (

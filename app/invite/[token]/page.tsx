@@ -116,7 +116,7 @@ export default function InvitePage() {
                   letterSpacing: '0.08em',
                 }}
               >
-                {accepting ? '処理中...' : '♡ フォローする'}
+                {accepting ? '処理中...' : 'フォローする'}
               </button>
             )}
           </div>

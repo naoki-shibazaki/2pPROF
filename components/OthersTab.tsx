@@ -44,7 +44,7 @@ export default function OthersTab() {
           textShadow: '0 0 7px rgba(64,232,255,0.60)',
         }}
       >
-        ♡ ともだちからの紹介文 ♡
+        ともだちからの紹介文
       </div>
 
       {!loaded ? (

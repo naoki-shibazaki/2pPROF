@@ -119,7 +119,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
         borderBottom: '1px solid rgba(255,64,192,0.30)',
       }}>
         <span style={{ ...STYLE, fontSize: 12, color: '#ff40c0', letterSpacing: '0.06em', textShadow: '0 0 7px rgba(255,64,192,0.60)' }}>
-          ♡ ともだちリスト
+          ともだちリスト
         </span>
         <button
           onClick={() => { setAdding(v => !v); setAddError(null) }}
