@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { getUserPlan, LIMITS } from '@/lib/plan'
 
 async function ensureTable() {
   await sql`
@@ -24,32 +25,56 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const handle = searchParams.get('handle')
 
+  const session = await auth()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sessionUserId: string | null = (session?.user as any)?.id ?? null
+
   let targetId: string | null = null
 
   if (handle) {
     const rows = await sql`SELECT id FROM users WHERE handle = ${handle}`.catch(() => [])
     targetId = rows[0]?.id ?? null
-    if (!targetId) return Response.json([])
+    if (!targetId) return Response.json({ items: [], total: 0, locked: false })
   } else {
-    const session = await auth()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    targetId = (session?.user as any)?.id ?? null
-    if (!targetId) return Response.json([])
+    targetId = sessionUserId
+    if (!targetId) return Response.json({ items: [], total: 0, locked: false })
   }
 
+  // フリーミアム制限はターゲット本人がセッションユーザーの場合のみ適用
+  const isSelf = targetId === sessionUserId
+  const plan = isSelf && sessionUserId ? await getUserPlan(sessionUserId) : 'premium'
+  const limit = LIMITS[plan].intros
+
   try {
-    const rows = await sql`
-      SELECT i.id, i.body, i.met_year, i.met_month, i.created_at,
-             u.name AS author_name, u.handle AS author_handle
-      FROM introductions i
-      JOIN users u ON u.id = i.author_id
-      WHERE i.target_id = ${targetId}::uuid
-      ORDER BY i.created_at DESC
+    const totalResult = await sql`
+      SELECT COUNT(*)::int AS count FROM introductions WHERE target_id = ${targetId}::uuid
     `
-    return Response.json(rows)
+    const totalCount: number = totalResult[0]?.count ?? 0
+
+    const rows = limit === Infinity
+      ? await sql`
+          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at,
+                 u.name AS author_name, u.handle AS author_handle
+          FROM introductions i
+          JOIN users u ON u.id = i.author_id
+          WHERE i.target_id = ${targetId}::uuid
+          ORDER BY i.created_at DESC
+        `
+      : await sql`
+          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at,
+                 u.name AS author_name, u.handle AS author_handle
+          FROM introductions i
+          JOIN users u ON u.id = i.author_id
+          WHERE i.target_id = ${targetId}::uuid
+          ORDER BY i.created_at DESC
+          LIMIT ${limit}
+        `
+
+    const locked = plan === 'free' && totalCount > limit
+    return Response.json({ items: rows, total: totalCount, locked })
   } catch {
     await ensureTable().catch(() => {})
-    return Response.json([])
+    return Response.json({ items: [], total: 0, locked: false })
   }
 }
 

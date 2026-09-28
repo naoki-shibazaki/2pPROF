@@ -66,6 +66,8 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
   const [answerDrafts, setAnswerDrafts] = useState<Record<string, string>>({})
   const [answering, setAnswering] = useState<string | null>(null)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [friendQsLocked, setFriendQsLocked] = useState(false)
+  const [friendQsTotal, setFriendQsTotal] = useState(0)
 
   // Load self Q&A from DB
   useEffect(() => {
@@ -110,9 +112,11 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
     fetch('/api/qa')
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) {
-          setFriendQs(data)
-          setUnreadCount(data.filter((q: FriendQuestion) => !q.answer).length)
+        if (data && Array.isArray(data.items)) {
+          setFriendQs(data.items)
+          setUnreadCount(data.items.filter((q: FriendQuestion) => !q.answer).length)
+          setFriendQsLocked(!!data.locked)
+          setFriendQsTotal(data.total ?? data.items.length)
         }
       })
       .catch(() => {})
@@ -293,7 +297,20 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
         {/* Friend questions */}
         {activeTab === 'friends' && (
           <div className="flex flex-col">
-            {friendQs.length === 0 ? (
+            {friendQsLocked && (
+              <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
+                <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
+                  🔒 残り{friendQsTotal - friendQs.length}件あります
+                </p>
+                <p style={{ ...STYLE, fontSize: 9, color: '#a080c0', margin: '4px 0 8px' }}>
+                  ライトプラン(¥300/月)でまとめて見れます
+                </p>
+                <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
+                  プランを見る →
+                </a>
+              </div>
+            )}
+            {friendQs.length === 0 && !friendQsLocked ? (
               <div className="flex flex-col items-center gap-3 py-10">
                 <span style={{ fontSize: 28 }}>💬</span>
                 <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>

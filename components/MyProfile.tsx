@@ -70,9 +70,9 @@ export default function MyProfile() {
       .then((u: UserProfile) => {
         if (!u) return
         setUser(u)
-        const dbName = u.name ?? profileData.name
+        const dbName = u.name ?? null
         setName(dbName)
-        setNameDraft(dbName)
+        setNameDraft(dbName ?? '')
         if (u.hp !== null && u.hp !== undefined) setCurrentHP(Math.min(u.hp, 100))
       })
 
@@ -157,7 +157,6 @@ export default function MyProfile() {
         style={{ borderBottom: '1px solid rgba(255,64,192,0.30)', background: 'rgba(14,6,32,0.60)' }}
       >
         <AvatarUploader />
-        <LevelBadge />
 
         {name === null ? (
           <div style={{ height: 32 }} />
@@ -193,7 +192,7 @@ export default function MyProfile() {
           </button>
         )}
         <p className="text-xs -mt-2" style={{ ...STYLE, color: '#604878' }}>
-          @{user?.handle ?? profileData.handle}
+          @{user?.handle ?? ''}
         </p>
 
         {/* フォロー / フォロワー */}
@@ -291,22 +290,25 @@ export default function MyProfile() {
       <InviteButton />
 
       {/* ── Bio ── */}
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
-        <h3 className="text-xs font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
-          ■ じこしょうかい
-        </h3>
-        <p className="text-xs whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>
-          {user?.bio ?? profileData.bio}
-        </p>
-      </div>
+      {user?.bio && (
+        <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
+          <h3 className="text-xs font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
+            ■ じこしょうかい
+          </h3>
+          <p className="text-xs whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>
+            {user.bio}
+          </p>
+        </div>
+      )}
 
 
 
       {/* ── Hex Status ── */}
       <HexStatus />
+      <LevelBadge />
 
       {/* ── Q&A ── */}
-      <QASection items={profileData.qa} />
+      <QASection items={[]} />
 
       {/* ── ログアウト ── */}
       <div className="px-4 py-4 flex justify-center" style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>

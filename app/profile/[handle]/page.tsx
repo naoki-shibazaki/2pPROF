@@ -30,6 +30,8 @@ type PublicUser = {
   isBlocked: boolean
 }
 
+type Viewer = { id: string; name: string | null; handle: string | null; image: string | null; created_at: string }
+
 export default function ProfilePage() {
   const { handle } = useParams<{ handle: string }>()
   const router = useRouter()
@@ -71,6 +73,12 @@ export default function ProfilePage() {
 
   // Introductions list
   const [intros, setIntros] = useState<IntroItem[]>([])
+  const [introsLocked, setIntrosLocked] = useState(false)
+  const [introsTotal, setIntrosTotal] = useState(0)
+
+  // Visitors (isSelf only)
+  const [viewers, setViewers] = useState<Viewer[]>([])
+  const [viewersLocked, setViewersLocked] = useState(false)
 
   // Introduction write
   const [showIntro, setShowIntro] = useState(false)
@@ -94,13 +102,45 @@ export default function ProfilePage() {
     if (!handle) return
     fetch(`/api/introductions?handle=${handle}`)
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setIntros(data) })
+      .then(data => {
+        if (data && Array.isArray(data.items)) {
+          setIntros(data.items)
+          setIntrosLocked(!!data.locked)
+          setIntrosTotal(data.total ?? data.items.length)
+        } else if (Array.isArray(data)) {
+          setIntros(data)
+        }
+      })
       .catch(() => {})
   }, [handle])
 
   useEffect(() => {
     if (showQuestion) qInputRef.current?.focus()
   }, [showQuestion])
+
+  // Record profile view
+  useEffect(() => {
+    if (!handle) return
+    fetch('/api/profile-views', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle }),
+    }).catch(() => {})
+  }, [handle])
+
+  // Fetch viewers (isSelf only)
+  useEffect(() => {
+    if (!user?.isSelf || !handle) return
+    fetch(`/api/profile-views?handle=${handle}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data && Array.isArray(data.viewers)) {
+          setViewers(data.viewers)
+          setViewersLocked(!!data.locked)
+        }
+      })
+      .catch(() => {})
+  }, [user?.isSelf, handle])
 
   async function toggleBlock() {
     if (!handle || !user || user.isSelf || blockLoading) return
@@ -178,7 +218,7 @@ export default function ProfilePage() {
 
   const tabs: { id: TabType; label: string; badge?: number }[] = [
     { id: 'profile', label: 'プロフィール' },
-    { id: 'intro', label: '他己紹介', badge: intros.length || undefined },
+    { id: 'intro', label: '他己紹介', badge: (introsTotal || intros.length) || undefined },
     { id: 'friends', label: '友達', badge: friends.length || undefined },
   ]
 
@@ -365,6 +405,49 @@ export default function ProfilePage() {
                         </div>
                       )}
 
+                      {/* 訪問者セクション（自分のプロフィールのみ） */}
+                      {user.isSelf && (
+                        <div style={{ borderTop: '1px solid rgba(64,232,255,0.15)', marginTop: 8 }}>
+                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.25)', padding: '6px 12px', ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em' }}>
+                            ■ プロフィール訪問者
+                          </div>
+                          {viewersLocked ? (
+                            <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
+                              <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0 }}>🔒 ライトプランで直近6時間の訪問者が見れます</p>
+                              <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block', marginTop: 8 }}>プランを見る →</a>
+                            </div>
+                          ) : viewers.length === 0 ? (
+                            <div style={{ padding: '10px 12px' }}>
+                              <p style={{ ...STYLE, fontSize: 9, color: '#504870' }}>まだ訪問者はいません</p>
+                            </div>
+                          ) : (
+                            <div style={{ padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                              {viewers.map(v => {
+                                const mins = Math.floor((Date.now() - new Date(v.created_at).getTime()) / 60000)
+                                const timeLabel = mins < 60 ? `${mins}分前` : mins < 1440 ? `${Math.floor(mins / 60)}時間前` : `${Math.floor(mins / 1440)}日前`
+                                return (
+                                  <button
+                                    key={v.id}
+                                    onClick={() => v.handle && router.push(`/profile/${v.handle}`)}
+                                    style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: v.handle ? 'pointer' : 'default', padding: '4px 0', textAlign: 'left' }}
+                                  >
+                                    <div style={{ width: 28, height: 28, flexShrink: 0, overflow: 'hidden' }}>
+                                      {v.image
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        ? <img src={v.image} alt={v.name ?? ''} width={28} height={28} style={{ objectFit: 'cover', imageRendering: 'pixelated', display: 'block' }} />
+                                        : <AvatarSVG size={28} />
+                                      }
+                                    </div>
+                                    <span style={{ ...STYLE, fontSize: 10, color: '#d0c8f0' }}>{v.name ?? v.handle ?? '?'}</span>
+                                    <span style={{ ...STYLE, fontSize: 8, color: '#504870', marginLeft: 'auto' }}>{timeLabel}</span>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* 質問を送る – accordion */}
                       {!user.isSelf && (
                         <div style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>
@@ -467,7 +550,20 @@ export default function ProfilePage() {
                   {/* 他己紹介 tab */}
                   {activeTab === 'intro' && (
                     <div>
-                      {intros.length === 0 ? (
+                      {introsLocked && (
+                        <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
+                          <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
+                            🔒 残り{introsTotal - intros.length}件あります
+                          </p>
+                          <p style={{ ...STYLE, fontSize: 9, color: '#a080c0', margin: '4px 0 8px' }}>
+                            ライトプラン(¥300/月)でまとめて見れます
+                          </p>
+                          <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
+                            プランを見る →
+                          </a>
+                        </div>
+                      )}
+                      {intros.length === 0 && !introsLocked ? (
                         <div className="flex flex-col items-center gap-3 py-10">
                           <span style={{ fontSize: 28 }}>📝</span>
                           <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>まだ紹介文がありません</p>

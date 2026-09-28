@@ -91,10 +91,11 @@
   }
 
   .pixel-tab {
-    padding: 5px 18px;
+    flex: 1;
+    padding: 5px 4px;
     font-family: var(--font-pixel, monospace);
-    font-size: 13px;
-    letter-spacing: 0.05em;
+    font-size: 10px;
+    letter-spacing: 0.03em;
     border: 2px solid rgba(64, 232, 255, 0.28);
     border-bottom: none;
     cursor: pointer;
@@ -103,6 +104,8 @@
     user-select: none;
     background: rgba(6, 4, 14, 0.80);
     color: #403860;
+    white-space: nowrap;
+    text-align: center;
   }
 
   .pixel-tab--active {
