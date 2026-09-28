@@ -3,6 +3,7 @@ import { ReactNode } from 'react'
 interface PixelWindowProps {
   children: ReactNode
   title?: string
+  rightSlot?: ReactNode
 }
 
 /**
@@ -19,7 +20,7 @@ interface PixelWindowProps {
  *
  * Border: 4px #1a1a4e + inset 2px #6060cc glow + 4px offset drop shadow
  */
-export default function PixelWindow({ children, title = '2P PROF' }: PixelWindowProps) {
+export default function PixelWindow({ children, title = '2P PROF', rightSlot }: PixelWindowProps) {
   return (
     <div className="w-full" style={{ maxWidth: 360 }}>
       {/* ── Title bar ── */}
@@ -32,6 +33,7 @@ export default function PixelWindow({ children, title = '2P PROF' }: PixelWindow
         <span className="flex-1 text-center text-pixel-shadow tracking-widest">
           {title}
         </span>
+        {rightSlot && <div style={{ display: 'flex', alignItems: 'center' }}>{rightSlot}</div>}
       </div>
 
       {/* ── Window body ── */}
