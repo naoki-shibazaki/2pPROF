@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import NotifBanner from './NotifBanner'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 const MAX_LEN = 100
@@ -219,7 +220,7 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
 }
 
 // ── メインコンポーネント ───────────────────────────────────────
-export default function HitokotoTab() {
+export default function HitokotoTab({ hasNotif }: { hasNotif?: boolean }) {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [me, setMe] = useState<{ id: string; handle: string | null } | null>(null)
@@ -273,6 +274,7 @@ export default function HitokotoTab() {
 
   return (
     <div>
+      <NotifBanner tab="hitokoto" show={!!hasNotif} />
       {/* Compose box */}
       <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(64,232,255,0.20)', background: 'rgba(4,10,22,0.70)' }}>
         <textarea

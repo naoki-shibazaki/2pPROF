@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import NotifBanner from './NotifBanner'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -14,7 +15,7 @@ type Intro = {
   created_at: string
 }
 
-export default function OthersTab() {
+export default function OthersTab({ hasNotif }: { hasNotif?: boolean }) {
   const [intros, setIntros] = useState<Intro[]>([])
   const [loaded, setLoaded] = useState(false)
 
@@ -31,6 +32,7 @@ export default function OthersTab() {
       className="overflow-y-auto"
       style={{ background: 'transparent', maxHeight: 'calc(100dvh - 180px)' }}
     >
+      <NotifBanner tab="others" show={!!hasNotif} />
       {/* Sub-header */}
       <div
         className="px-3 py-2 text-center"

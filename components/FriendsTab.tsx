@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import AvatarSVG from './AvatarSVG'
+import NotifBanner from './NotifBanner'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -24,7 +25,7 @@ type BlockedUser = {
   created_at: string
 }
 
-export default function FriendsTab({ onCountChange }: { onCountChange?: (n: number) => void }) {
+export default function FriendsTab({ onCountChange, hasNotif }: { onCountChange?: (n: number) => void; hasNotif?: boolean }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'friends' | 'blocks'>('friends')
   const [friends, setFriends] = useState<Friend[]>([])
@@ -149,6 +150,7 @@ export default function FriendsTab({ onCountChange }: { onCountChange?: (n: numb
 
   return (
     <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'calc(100dvh - 180px)' }}>
+      <NotifBanner tab="friends" show={!!hasNotif} />
       {/* Tab header */}
       <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(255,64,192,0.30)' }}>
         <div className="flex items-center">
