@@ -1,20 +1,47 @@
 'use client'
 
-export type Tab = 'my' | 'friends' | 'others'
+export type Tab = 'my' | 'friends' | 'others' | 'hitokoto'
+
+export type NotifCounts = { hitokoto: number; friends: number; others: number }
 
 interface PixelTabBarProps {
   activeTab: Tab
   onTabChange: (tab: Tab) => void
-  friendCount?: number
-  notifCount?: number
+  notifCounts?: NotifCounts
 }
 
-export default function PixelTabBar({ activeTab, onTabChange, friendCount, notifCount }: PixelTabBarProps) {
+function Badge({ count }: { count: number }) {
+  if (!count) return null
+  return (
+    <span style={{
+      position: 'absolute', top: 1, right: 1,
+      minWidth: 14, height: 14,
+      background: '#ff3040', borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 8, fontFamily: 'var(--font-pixel, monospace)',
+      color: '#fff', zIndex: 10,
+      boxShadow: '0 0 5px rgba(255,48,64,0.90)',
+      lineHeight: 1, padding: '0 2px',
+    }}>
+      {count > 99 ? '99+' : count}
+    </span>
+  )
+}
+
+export default function PixelTabBar({ activeTab, onTabChange, notifCounts }: PixelTabBarProps) {
   const tabs: { id: Tab; label: string }[] = [
-    { id: 'my',      label: 'マイページ' },
-    { id: 'friends', label: `友達${friendCount !== undefined ? `(${friendCount})` : ''}` },
-    { id: 'others',  label: '他己紹介' },
+    { id: 'my',       label: 'マイページ' },
+    { id: 'hitokoto', label: 'ひとこと' },
+    { id: 'friends',  label: '友達' },
+    { id: 'others',   label: '他己紹介' },
   ]
+
+  const badgeFor: Record<Tab, number> = {
+    my:       0,
+    hitokoto: notifCounts?.hitokoto ?? 0,
+    friends:  notifCounts?.friends  ?? 0,
+    others:   notifCounts?.others   ?? 0,
+  }
 
   return (
     <div className="pixel-tabbar">
@@ -28,19 +55,7 @@ export default function PixelTabBar({ activeTab, onTabChange, friendCount, notif
           style={{ position: 'relative' }}
         >
           {tab.label}
-          {tab.id === 'others' && notifCount && notifCount > 0 ? (
-            <span style={{
-              position: 'absolute', top: 3, right: 3,
-              minWidth: 16, height: 16,
-              background: '#ff3040', borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 9, fontFamily: 'var(--font-pixel, monospace)',
-              color: '#fff', boxShadow: '0 0 6px rgba(255,48,64,0.80)',
-              lineHeight: 1, padding: '0 3px',
-            }}>
-              {notifCount > 99 ? '99+' : notifCount}
-            </span>
-          ) : null}
+          <Badge count={badgeFor[tab.id]} />
         </button>
       ))}
     </div>

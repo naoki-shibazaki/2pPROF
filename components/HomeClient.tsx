@@ -3,35 +3,39 @@
 import { useState, useEffect, useCallback } from 'react'
 import PixelBackground from '@/components/PixelBackground'
 import PixelWindow from '@/components/PixelWindow'
-import PixelTabBar, { type Tab } from '@/components/PixelTabBar'
+import PixelTabBar, { type Tab, type NotifCounts } from '@/components/PixelTabBar'
 import MyProfile from '@/components/MyProfile'
 import FriendsTab from '@/components/FriendsTab'
 import OthersTab from '@/components/OthersTab'
+import HitokotoTab from '@/components/HitokotoTab'
 
 export default function HomeClient() {
   const [activeTab, setActiveTab] = useState<Tab>('my')
-  const [friendCount, setFriendCount] = useState<number | undefined>(undefined)
-  const [notifCount, setNotifCount] = useState(0)
+  const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
 
   useEffect(() => {
-    fetch('/api/friends')
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setFriendCount(data.length) })
-      .catch(() => setFriendCount(0))
-
     fetch('/api/notifications')
       .then(r => r.json())
-      .then(data => setNotifCount(data?.count ?? 0))
+      .then(data => setNotifCounts({
+        hitokoto: data?.hitokoto ?? 0,
+        friends:  data?.friends  ?? 0,
+        others:   data?.others   ?? 0,
+      }))
       .catch(() => {})
   }, [])
 
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
-    if (tab === 'others' && notifCount > 0) {
-      setNotifCount(0)
-      fetch('/api/notifications', { method: 'POST' }).catch(() => {})
+    const tabsWithNotifs: Tab[] = ['hitokoto', 'friends', 'others']
+    if (tabsWithNotifs.includes(tab)) {
+      setNotifCounts(prev => ({ ...prev, [tab]: 0 }))
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tab }),
+      }).catch(() => {})
     }
-  }, [notifCount])
+  }, [])
 
   return (
     <div className="relative min-h-dvh">
@@ -41,8 +45,8 @@ export default function HomeClient() {
         role="main"
       >
         <PixelWindow>
-          <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} friendCount={friendCount} notifCount={notifCount} />
-          {activeTab === 'my' ? <MyProfile /> : activeTab === 'friends' ? <FriendsTab onCountChange={setFriendCount} /> : <OthersTab />}
+          <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
+          {activeTab === 'my' ? <MyProfile /> : activeTab === 'hitokoto' ? <HitokotoTab /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} /> : <OthersTab />}
           <div className="pixel-statusbar">
             友達と紹介しあおう！
           </div>
