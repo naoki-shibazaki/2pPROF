@@ -48,7 +48,7 @@ export default function HomeClient() {
           <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
           {activeTab === 'my' ? <MyProfile /> : activeTab === 'hitokoto' ? <HitokotoTab /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} /> : <OthersTab />}
           <div className="pixel-statusbar">
-            友達と紹介しあおう！
+            友達と紹介しあおう！ v2
           </div>
         </PixelWindow>
       </main>
