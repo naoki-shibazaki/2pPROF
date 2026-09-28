@@ -11,17 +11,17 @@ import HitokotoTab from '@/components/HitokotoTab'
 
 export default function HomeClient() {
   const [activeTab, setActiveTab] = useState<Tab>('my')
-  const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
+  const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 3, friends: 1, others: 5 })
 
   useEffect(() => {
-    fetch('/api/notifications')
-      .then(r => r.json())
-      .then(data => setNotifCounts({
-        hitokoto: data?.hitokoto ?? 0,
-        friends:  data?.friends  ?? 0,
-        others:   data?.others   ?? 0,
-      }))
-      .catch(() => {})
+    // fetch('/api/notifications')
+    //   .then(r => r.json())
+    //   .then(data => setNotifCounts({
+    //     hitokoto: data?.hitokoto ?? 0,
+    //     friends:  data?.friends  ?? 0,
+    //     others:   data?.others   ?? 0,
+    //   }))
+    //   .catch(() => {})
   }, [])
 
   const handleTabChange = useCallback((tab: Tab) => {
