@@ -1,6 +1,6 @@
 'use client'
 
-export type Tab = 'my' | 'friends' | 'others' | 'hitokoto'
+export type Tab = 'my' | 'friends' | 'others' | 'hitokoto' | 'map'
 
 export type NotifCounts = { hitokoto: number; friends: number; others: number }
 
@@ -34,6 +34,7 @@ export default function PixelTabBar({ activeTab, onTabChange, notifCounts }: Pix
     { id: 'hitokoto', label: 'ひとこと' },
     { id: 'friends',  label: '友達' },
     { id: 'others',   label: '他己紹介' },
+    { id: 'map',      label: 'マップ' },
   ]
 
   const badgeFor: Record<Tab, number> = {
@@ -41,6 +42,7 @@ export default function PixelTabBar({ activeTab, onTabChange, notifCounts }: Pix
     hitokoto: notifCounts?.hitokoto ?? 0,
     friends:  notifCounts?.friends  ?? 0,
     others:   notifCounts?.others   ?? 0,
+    map:      0,
   }
 
   return (
