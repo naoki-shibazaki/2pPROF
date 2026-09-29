@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { type Tab } from './PixelTabBar'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -36,10 +38,21 @@ function typeLabel(type: string, name: string | null, handle: string | null) {
   }
 }
 
+// 通知タイプ → 遷移先
+// followed → /profile/[handle]
+// それ以外 → タブ切り替え
+function getDestination(type: string, handle: string | null): { href: string } | { tab: Tab } {
+  switch (type) {
+    case 'followed':     return { href: handle ? `/profile/${handle}` : '/' }
+    case 'post_comment': return { tab: 'hitokoto' }
+    default:             return { tab: 'others' }
+  }
+}
+
 function timeAgo(iso: string) {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000
-  if (diff < 60)   return `${Math.floor(diff)}秒前`
-  if (diff < 3600) return `${Math.floor(diff / 60)}分前`
+  if (diff < 60)    return `${Math.floor(diff)}秒前`
+  if (diff < 3600)  return `${Math.floor(diff / 60)}分前`
   if (diff < 86400) return `${Math.floor(diff / 3600)}時間前`
   return `${Math.floor(diff / 86400)}日前`
 }
@@ -49,9 +62,11 @@ interface NotifPanelProps {
   onClose: () => void
   hasUnread: boolean
   onMarkAllRead: () => void
+  onTabChange: (tab: Tab) => void
 }
 
-export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead }: NotifPanelProps) {
+export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, onTabChange }: NotifPanelProps) {
+  const router = useRouter()
   const [items, setItems] = useState<NotifItem[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -66,10 +81,27 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead }: 
   }, [open])
 
   function markAllRead() {
-    fetch('/api/notifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tab: 'all' }) })
-      .catch(() => {})
+    fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tab: 'all' }),
+    }).catch(() => {})
     setItems(prev => prev.map(n => ({ ...n, read: true })))
     onMarkAllRead()
+  }
+
+  function handleItemClick(n: NotifItem) {
+    // 既読化（該当1件）
+    setItems(prev => prev.map(item => item.id === n.id ? { ...item, read: true } : item))
+
+    const dest = getDestination(n.type, n.from_handle)
+    onClose()
+
+    if ('href' in dest) {
+      router.push(dest.href)
+    } else {
+      onTabChange(dest.tab)
+    }
   }
 
   if (!open) return null
@@ -77,10 +109,8 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead }: 
   return (
     <>
       {/* Backdrop */}
-      <div
-        onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 200 }}
-      />
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 200 }} />
+
       {/* Panel */}
       <div style={{
         position: 'absolute', top: 42, left: 0, right: 0, zIndex: 201,
@@ -118,12 +148,19 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead }: 
             <p style={{ ...STYLE, fontSize: 9, color: '#403860', padding: '16px', textAlign: 'center' }}>通知はありません</p>
           )}
           {items.map(n => (
-            <div key={n.id} style={{
-              display: 'flex', gap: 8, alignItems: 'flex-start',
-              padding: '8px 10px',
-              borderBottom: '1px solid rgba(255,255,255,0.04)',
-              background: n.read ? 'transparent' : 'rgba(255,64,192,0.06)',
-            }}>
+            <div
+              key={n.id}
+              onClick={() => handleItemClick(n)}
+              style={{
+                display: 'flex', gap: 8, alignItems: 'flex-start',
+                padding: '8px 10px',
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                background: n.read ? 'transparent' : 'rgba(255,64,192,0.06)',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,64,192,0.12)')}
+              onMouseLeave={e => (e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(255,64,192,0.06)')}
+            >
               <span style={{ fontSize: 13, lineHeight: 1, marginTop: 1 }}>{typeIcon(n.type)}</span>
               <div style={{ flex: 1 }}>
                 <p style={{ ...STYLE, fontSize: 9, color: n.read ? '#504870' : '#c8a8e8', lineHeight: 1.6 }}>
@@ -131,6 +168,11 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead }: 
                 </p>
                 <p style={{ ...STYLE, fontSize: 8, color: '#403060', marginTop: 2 }}>
                   {timeAgo(n.created_at)}
+                  {' · '}
+                  <span style={{ color: '#604898' }}>
+                    {n.type === 'followed' ? `@${n.from_handle} のプロフへ →` :
+                     n.type === 'post_comment' ? 'ひとことへ →' : '他己紹介へ →'}
+                  </span>
                 </p>
               </div>
               {!n.read && (

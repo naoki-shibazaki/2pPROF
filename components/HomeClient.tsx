@@ -83,6 +83,7 @@ export default function HomeClient() {
               onClose={() => setPanelOpen(false)}
               hasUnread={totalUnread > 0}
               onMarkAllRead={() => setNotifCounts({ hitokoto: 0, friends: 0, others: 0 })}
+              onTabChange={tab => { setPanelOpen(false); handleTabChange(tab) }}
             />
           </div>
           {activeTab === 'my' ? <MyProfile /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} /> : <OthersTab hasNotif={notifCounts.others > 0} />}
