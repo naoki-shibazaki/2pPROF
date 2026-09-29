@@ -214,6 +214,18 @@ export async function initSchema() {
       )
     `)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_profile_views_viewed ON profile_views(viewed_id, created_at DESC)`)
+    // Location sharing
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS location_share_mode TEXT NOT NULL DEFAULT 'all'`)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS location_shares (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        shared_with_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(user_id, shared_with_id)
+      )
+    `)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_location_shares_user ON location_shares(user_id)`)
     // Indices for frequently queried columns
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)
