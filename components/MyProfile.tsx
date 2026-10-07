@@ -156,7 +156,7 @@ export default function MyProfile() {
         className="flex flex-col items-center py-5 px-4 gap-3"
         style={{ borderBottom: '1px solid rgba(255,64,192,0.30)', background: 'rgba(14,6,32,0.60)' }}
       >
-        <AvatarUploader />
+        <AvatarUploader currentImage={user?.image ?? null} />
 
         {name === null ? (
           <div style={{ height: 32 }} />
