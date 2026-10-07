@@ -12,14 +12,19 @@ export async function GET(req: Request) {
   const postId = searchParams.get('postId')
   if (!postId) return Response.json(null)
 
-  const rows = await sql`
-    SELECT id, body, created_at
-    FROM post_comments
-    WHERE post_id = ${postId}::uuid
-      AND author_id = ${authorId}::uuid
-      AND status = 'pending'
-    LIMIT 1
-  `.catch(() => [])
+  try {
+    const rows = await sql`
+      SELECT id, body, created_at
+      FROM post_comments
+      WHERE post_id = ${postId}::uuid
+        AND author_id = ${authorId}::uuid
+        AND status = 'pending'
+      LIMIT 1
+    `
 
-  return Response.json(rows[0] ?? null)
+    return Response.json(rows[0] ?? null)
+  } catch (e) {
+    console.error('[GET /api/post-comments/my]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

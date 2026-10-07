@@ -8,16 +8,21 @@ export async function GET() {
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json([])
 
-  const rows = await sql`
-    SELECT c.id, c.post_id, c.body, c.created_at,
-           u.name AS author_name, u.handle AS author_handle
-    FROM post_comments c
-    JOIN posts p ON p.id = c.post_id
-    JOIN users u ON u.id = c.author_id
-    WHERE p.user_id = ${userId}::uuid
-      AND c.status = 'pending'
-    ORDER BY c.created_at ASC
-  `.catch(() => [])
+  try {
+    const rows = await sql`
+      SELECT c.id, c.post_id, c.body, c.created_at,
+             u.name AS author_name, u.handle AS author_handle
+      FROM post_comments c
+      JOIN posts p ON p.id = c.post_id
+      JOIN users u ON u.id = c.author_id
+      WHERE p.user_id = ${userId}::uuid
+        AND c.status = 'pending'
+      ORDER BY c.created_at ASC
+    `
 
-  return Response.json(rows)
+    return Response.json(rows)
+  } catch (e) {
+    console.error('[GET /api/post-comments/pending]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

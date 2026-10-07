@@ -7,17 +7,22 @@ export async function PATCH(req: Request) {
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { name, bio, hp, proximity_mode } = await req.json()
+  try {
+    const { name, bio, hp, proximity_mode } = await req.json()
 
-  await sql`
-    UPDATE users
-    SET
-      name           = COALESCE(${name?.trim() ?? null}, name),
-      bio            = COALESCE(${bio?.trim() ?? null}, bio),
-      hp             = COALESCE(${hp ?? null}, hp),
-      proximity_mode = COALESCE(${proximity_mode ?? null}, proximity_mode)
-    WHERE id = ${userId}
-  `
+    await sql`
+      UPDATE users
+      SET
+        name           = COALESCE(${name?.trim() ?? null}, name),
+        bio            = COALESCE(${bio?.trim() ?? null}, bio),
+        hp             = COALESCE(${hp ?? null}, hp),
+        proximity_mode = COALESCE(${proximity_mode ?? null}, proximity_mode)
+      WHERE id = ${userId}
+    `
 
-  return Response.json({ ok: true })
+    return Response.json({ ok: true })
+  } catch (e) {
+    console.error('[PATCH /api/user/profile]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

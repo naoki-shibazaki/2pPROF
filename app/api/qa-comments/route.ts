@@ -42,7 +42,8 @@ export async function GET(req: Request) {
       ORDER BY c.created_at ASC
     `
     return Response.json(rows)
-  } catch {
+  } catch (e) {
+    console.error('[GET /api/qa-comments]', e)
     return Response.json([])
   }
 }
@@ -54,54 +55,59 @@ export async function POST(req: Request) {
   const authorId = (session?.user as any)?.id
   if (!authorId) return Response.json({ ok: false }, { status: 401 })
 
-  const { handle, qhash, body } = await req.json()
-  if (!handle || !qhash || !body?.trim()) return Response.json({ ok: false }, { status: 400 })
-  if (body.trim().length > 200) return Response.json({ ok: false, error: '200字以内で入力してください' }, { status: 400 })
-
-  const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
-  if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
-  const targetId = targets[0].id
-
-  if (targetId === authorId) return Response.json({ ok: false }, { status: 400 })
-
-  // Block check (either direction)
-  const blocked = await sql`
-    SELECT 1 FROM blocks
-    WHERE (blocker_id = ${authorId}::uuid AND blocked_id = ${targetId}::uuid)
-       OR (blocker_id = ${targetId}::uuid AND blocked_id = ${authorId}::uuid)
-    LIMIT 1
-  `.catch(() => [])
-  if (blocked.length > 0) return Response.json({ ok: false }, { status: 403 })
-
-  // OpenAI Moderation (free API)
-  let flagged = false
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-    const modRes = await openai.moderations.create({ input: body.trim() })
-    flagged = modRes.results[0]?.flagged ?? false
-  } catch {
-    // Moderation failure: allow through but mark as not flagged
-    flagged = false
-  }
+    const { handle, qhash, body } = await req.json()
+    if (!handle || !qhash || !body?.trim()) return Response.json({ ok: false }, { status: 400 })
+    if (body.trim().length > 200) return Response.json({ ok: false, error: '200字以内で入力してください' }, { status: 400 })
 
-  // Auto-reject if AI flagged as harmful
-  const status = flagged ? 'rejected' : 'pending'
+    const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
+    if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
+    const targetId = targets[0].id
 
-  try {
-    const inserted = await sql`
-      INSERT INTO qa_comments (target_user_id, question_hash, author_id, body, status, moderation_flagged)
-      VALUES (${targetId}::uuid, ${qhash}, ${authorId}::uuid, ${body.trim()}, ${status}, ${flagged})
-      RETURNING id
-    `
-    if (!flagged) {
-      await sql`
-        INSERT INTO notifications (user_id, type, from_user_id)
-        VALUES (${targetId}::uuid, 'qa_comment', ${authorId}::uuid)
-      `.catch(() => {})
+    if (targetId === authorId) return Response.json({ ok: false }, { status: 400 })
+
+    // Block check (either direction)
+    const blocked = await sql`
+      SELECT 1 FROM blocks
+      WHERE (blocker_id = ${authorId}::uuid AND blocked_id = ${targetId}::uuid)
+         OR (blocker_id = ${targetId}::uuid AND blocked_id = ${authorId}::uuid)
+      LIMIT 1
+    `.catch(() => [])
+    if (blocked.length > 0) return Response.json({ ok: false }, { status: 403 })
+
+    // OpenAI Moderation (free API)
+    let flagged = false
+    try {
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+      const modRes = await openai.moderations.create({ input: body.trim() })
+      flagged = modRes.results[0]?.flagged ?? false
+    } catch {
+      // Moderation failure: allow through but mark as not flagged
+      flagged = false
     }
-    return Response.json({ ok: true, flagged, id: inserted[0]?.id ?? null })
-  } catch {
-    await ensureTable().catch(() => {})
-    return Response.json({ ok: false }, { status: 500 })
+
+    // Auto-reject if AI flagged as harmful
+    const status = flagged ? 'rejected' : 'pending'
+
+    try {
+      const inserted = await sql`
+        INSERT INTO qa_comments (target_user_id, question_hash, author_id, body, status, moderation_flagged)
+        VALUES (${targetId}::uuid, ${qhash}, ${authorId}::uuid, ${body.trim()}, ${status}, ${flagged})
+        RETURNING id
+      `
+      if (!flagged) {
+        await sql`
+          INSERT INTO notifications (user_id, type, from_user_id)
+          VALUES (${targetId}::uuid, 'qa_comment', ${authorId}::uuid)
+        `.catch(() => {})
+      }
+      return Response.json({ ok: true, flagged, id: inserted[0]?.id ?? null })
+    } catch {
+      await ensureTable().catch(() => {})
+      return Response.json({ ok: false }, { status: 500 })
+    }
+  } catch (e) {
+    console.error('[POST /api/qa-comments]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
   }
 }

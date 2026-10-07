@@ -8,17 +8,22 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id } = await params
-  const { answer } = await req.json()
-  if (!answer?.trim()) return Response.json({ error: 'answer は必須です' }, { status: 400 })
+  try {
+    const { id } = await params
+    const { answer } = await req.json()
+    if (!answer?.trim()) return Response.json({ error: 'answer は必須です' }, { status: 400 })
 
-  await sql`
-    UPDATE friend_questions
-    SET answer = ${answer.trim()}, answered_at = NOW()
-    WHERE id = ${id}::uuid AND receiver_id = ${userId}::uuid
-  `
+    await sql`
+      UPDATE friend_questions
+      SET answer = ${answer.trim()}, answered_at = NOW()
+      WHERE id = ${id}::uuid AND receiver_id = ${userId}::uuid
+    `
 
-  return Response.json({ ok: true })
+    return Response.json({ ok: true })
+  } catch (e) {
+    console.error('[PATCH /api/qa/[id]]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }
 
 // DELETE: dismiss question
@@ -28,12 +33,17 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { id } = await params
+  try {
+    const { id } = await params
 
-  await sql`
-    DELETE FROM friend_questions
-    WHERE id = ${id}::uuid AND receiver_id = ${userId}::uuid
-  `
+    await sql`
+      DELETE FROM friend_questions
+      WHERE id = ${id}::uuid AND receiver_id = ${userId}::uuid
+    `
 
-  return Response.json({ ok: true })
+    return Response.json({ ok: true })
+  } catch (e) {
+    console.error('[DELETE /api/qa/[id]]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

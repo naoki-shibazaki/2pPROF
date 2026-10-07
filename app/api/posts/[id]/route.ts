@@ -8,12 +8,17 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ id: 
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json({ ok: false }, { status: 401 })
 
-  const { id } = await params
+  try {
+    const { id } = await params
 
-  await sql`
-    DELETE FROM posts
-    WHERE id = ${id}::uuid AND user_id = ${userId}::uuid
-  `
+    await sql`
+      DELETE FROM posts
+      WHERE id = ${id}::uuid AND user_id = ${userId}::uuid
+    `
 
-  return Response.json({ ok: true })
+    return Response.json({ ok: true })
+  } catch (e) {
+    console.error('[DELETE /api/posts/[id]]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

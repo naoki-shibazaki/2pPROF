@@ -21,49 +21,59 @@ export async function GET(req: NextRequest) {
   const friendIndex = Number(searchParams.get('friendIndex') ?? 0)
   const visitorId   = searchParams.get('visitorId') ?? ''
 
-  await ensureTable()
+  try {
+    await ensureTable()
 
-  const rows = await sql`
-    select reaction, visitor_id
-    from reactions
-    where friend_index = ${friendIndex}
-  `
+    const rows = await sql`
+      select reaction, visitor_id
+      from reactions
+      where friend_index = ${friendIndex}
+    `
 
-  const counts: Record<string, number> = {}
-  const mine: string[] = []
-  for (const row of rows) {
-    counts[row.reaction] = (counts[row.reaction] ?? 0) + 1
-    if (row.visitor_id === visitorId) mine.push(row.reaction)
+    const counts: Record<string, number> = {}
+    const mine: string[] = []
+    for (const row of rows) {
+      counts[row.reaction] = (counts[row.reaction] ?? 0) + 1
+      if (row.visitor_id === visitorId) mine.push(row.reaction)
+    }
+
+    return NextResponse.json({ counts, mine })
+  } catch (e) {
+    console.error('[GET /api/reactions]', e)
+    return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
   }
-
-  return NextResponse.json({ counts, mine })
 }
 
 // POST /api/reactions  { friendIndex, reaction, visitorId }
 export async function POST(req: NextRequest) {
-  const { friendIndex, reaction, visitorId } = await req.json()
-  if (!visitorId || !reaction) {
-    return NextResponse.json({ error: 'missing fields' }, { status: 400 })
-  }
+  try {
+    const { friendIndex, reaction, visitorId } = await req.json()
+    if (!visitorId || !reaction) {
+      return NextResponse.json({ error: 'missing fields' }, { status: 400 })
+    }
 
-  await ensureTable()
+    await ensureTable()
 
-  const existing = await sql`
-    select id from reactions
-    where friend_index = ${friendIndex}
-      and reaction     = ${reaction}
-      and visitor_id   = ${visitorId}
-    limit 1
-  `
-
-  if (existing.length > 0) {
-    await sql`delete from reactions where id = ${existing[0].id}`
-    return NextResponse.json({ action: 'removed' })
-  } else {
-    await sql`
-      insert into reactions (friend_index, reaction, visitor_id)
-      values (${friendIndex}, ${reaction}, ${visitorId})
+    const existing = await sql`
+      select id from reactions
+      where friend_index = ${friendIndex}
+        and reaction     = ${reaction}
+        and visitor_id   = ${visitorId}
+      limit 1
     `
-    return NextResponse.json({ action: 'added' })
+
+    if (existing.length > 0) {
+      await sql`delete from reactions where id = ${existing[0].id}`
+      return NextResponse.json({ action: 'removed' })
+    } else {
+      await sql`
+        insert into reactions (friend_index, reaction, visitor_id)
+        values (${friendIndex}, ${reaction}, ${visitorId})
+      `
+      return NextResponse.json({ action: 'added' })
+    }
+  } catch (e) {
+    console.error('[POST /api/reactions]', e)
+    return NextResponse.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
   }
 }

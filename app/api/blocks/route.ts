@@ -18,8 +18,9 @@ export async function GET() {
       ORDER BY b.created_at DESC
     `
     return Response.json(rows)
-  } catch {
-    return Response.json([])
+  } catch (e) {
+    console.error('[GET /api/blocks]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
   }
 }
 
@@ -42,31 +43,36 @@ export async function POST(req: Request) {
   const myId = (session?.user as any)?.id
   if (!myId) return Response.json({ ok: false }, { status: 401 })
 
-  const { handle } = await req.json()
-  if (!handle) return Response.json({ ok: false }, { status: 400 })
-
-  const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
-  if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
-  const targetId = targets[0].id
-
-  if (targetId === myId) return Response.json({ ok: false }, { status: 400 })
-
   try {
-    await sql`
-      INSERT INTO blocks (blocker_id, blocked_id)
-      VALUES (${myId}::uuid, ${targetId}::uuid)
-      ON CONFLICT DO NOTHING
-    `
-    // Remove follows in both directions
-    await sql`
-      DELETE FROM follows
-      WHERE (follower_id = ${myId}::uuid AND following_id = ${targetId}::uuid)
-         OR (follower_id = ${targetId}::uuid AND following_id = ${myId}::uuid)
-    `
-    return Response.json({ ok: true })
-  } catch {
-    await ensureTable().catch(() => {})
-    return Response.json({ ok: false }, { status: 500 })
+    const { handle } = await req.json()
+    if (!handle) return Response.json({ ok: false }, { status: 400 })
+
+    const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
+    if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
+    const targetId = targets[0].id
+
+    if (targetId === myId) return Response.json({ ok: false }, { status: 400 })
+
+    try {
+      await sql`
+        INSERT INTO blocks (blocker_id, blocked_id)
+        VALUES (${myId}::uuid, ${targetId}::uuid)
+        ON CONFLICT DO NOTHING
+      `
+      // Remove follows in both directions
+      await sql`
+        DELETE FROM follows
+        WHERE (follower_id = ${myId}::uuid AND following_id = ${targetId}::uuid)
+           OR (follower_id = ${targetId}::uuid AND following_id = ${myId}::uuid)
+      `
+      return Response.json({ ok: true })
+    } catch {
+      await ensureTable().catch(() => {})
+      return Response.json({ ok: false }, { status: 500 })
+    }
+  } catch (e) {
+    console.error('[POST /api/blocks]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
   }
 }
 
@@ -77,16 +83,21 @@ export async function DELETE(req: Request) {
   const myId = (session?.user as any)?.id
   if (!myId) return Response.json({ ok: false }, { status: 401 })
 
-  const { handle } = await req.json()
-  if (!handle) return Response.json({ ok: false }, { status: 400 })
+  try {
+    const { handle } = await req.json()
+    if (!handle) return Response.json({ ok: false }, { status: 400 })
 
-  const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
-  if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
-  const targetId = targets[0].id
+    const targets = await sql`SELECT id FROM users WHERE handle = ${handle}`
+    if (!targets[0]) return Response.json({ ok: false }, { status: 404 })
+    const targetId = targets[0].id
 
-  await sql`
-    DELETE FROM blocks
-    WHERE blocker_id = ${myId}::uuid AND blocked_id = ${targetId}::uuid
-  `
-  return Response.json({ ok: true })
+    await sql`
+      DELETE FROM blocks
+      WHERE blocker_id = ${myId}::uuid AND blocked_id = ${targetId}::uuid
+    `
+    return Response.json({ ok: true })
+  } catch (e) {
+    console.error('[DELETE /api/blocks]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }

@@ -9,37 +9,42 @@ export async function GET() {
   const userId = (session?.user as any)?.id
   if (!userId) return Response.json(null, { status: 401 })
 
-  const plan = await getUserPlan(userId)
-  const limit = LIMITS[plan].questions
+  try {
+    const plan = await getUserPlan(userId)
+    const limit = LIMITS[plan].questions
 
-  const total = await sql`
-    SELECT COUNT(*)::int AS count
-    FROM friend_questions
-    WHERE receiver_id = ${userId}::uuid
-  `
-  const totalCount: number = total[0]?.count ?? 0
+    const total = await sql`
+      SELECT COUNT(*)::int AS count
+      FROM friend_questions
+      WHERE receiver_id = ${userId}::uuid
+    `
+    const totalCount: number = total[0]?.count ?? 0
 
-  const rows = limit === Infinity
-    ? await sql`
-        SELECT
-          fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
-          u.name AS sender_name, u.handle AS sender_handle
-        FROM friend_questions fq
-        LEFT JOIN users u ON u.id = fq.sender_id
-        WHERE fq.receiver_id = ${userId}::uuid
-        ORDER BY fq.created_at DESC
-      `
-    : await sql`
-        SELECT
-          fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
-          u.name AS sender_name, u.handle AS sender_handle
-        FROM friend_questions fq
-        LEFT JOIN users u ON u.id = fq.sender_id
-        WHERE fq.receiver_id = ${userId}::uuid
-        ORDER BY fq.created_at DESC
-        LIMIT ${limit}
-      `
+    const rows = limit === Infinity
+      ? await sql`
+          SELECT
+            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
+            u.name AS sender_name, u.handle AS sender_handle
+          FROM friend_questions fq
+          LEFT JOIN users u ON u.id = fq.sender_id
+          WHERE fq.receiver_id = ${userId}::uuid
+          ORDER BY fq.created_at DESC
+        `
+      : await sql`
+          SELECT
+            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
+            u.name AS sender_name, u.handle AS sender_handle
+          FROM friend_questions fq
+          LEFT JOIN users u ON u.id = fq.sender_id
+          WHERE fq.receiver_id = ${userId}::uuid
+          ORDER BY fq.created_at DESC
+          LIMIT ${limit}
+        `
 
-  const locked = plan === 'free' && totalCount > limit
-  return Response.json({ items: rows, total: totalCount, locked })
+    const locked = plan === 'free' && totalCount > limit
+    return Response.json({ items: rows, total: totalCount, locked })
+  } catch (e) {
+    console.error('[GET /api/qa]', e)
+    return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })
+  }
 }
