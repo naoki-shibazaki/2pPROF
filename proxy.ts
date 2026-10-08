@@ -10,6 +10,7 @@ export default auth((req) => {
   const isPublic =
     pathname.startsWith('/login') ||
     pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/privacy') ||
     (pathname === '/' && isDemo)
 
   if (!isLoggedIn && !isPublic) {
