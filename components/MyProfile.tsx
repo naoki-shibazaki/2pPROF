@@ -47,7 +47,7 @@ function StatBar({ label, color, fill, current, max }: {
   )
 }
 
-export default function MyProfile() {
+export default function MyProfile({ demo }: { demo?: boolean }) {
   const [user, setUser] = useState<UserProfile | null>(null)
 
 
@@ -65,6 +65,27 @@ export default function MyProfile() {
 
 
   useEffect(() => {
+    if (demo) {
+      setUser({
+        id: 'demo',
+        name: profileData.name,
+        email: null,
+        image: null,
+        handle: profileData.handle,
+        bio: profileData.bio,
+        onboarded: true,
+        hp: 72,
+        proximity_count: 5,
+        proximity_mode: 'all',
+        following_count: 12,
+        followers_count: 128,
+      })
+      setName(profileData.name)
+      setNameDraft(profileData.name)
+      setCurrentHP(72)
+      return
+    }
+
     fetch('/api/user/me')
       .then(r => r.json())
       .then((u: UserProfile) => {
@@ -123,7 +144,7 @@ export default function MyProfile() {
     }
 
     return () => { if (intervalId) clearInterval(intervalId) }
-  }, [maxHP])
+  }, [demo, maxHP])
 
 
   useEffect(() => {

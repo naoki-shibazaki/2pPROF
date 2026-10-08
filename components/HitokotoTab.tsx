@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import NotifBanner from './NotifBanner'
+import { demoPosts } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 const MAX_LEN = 100
@@ -220,7 +221,7 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
 }
 
 // ── メインコンポーネント ───────────────────────────────────────
-export default function HitokotoTab({ hasNotif }: { hasNotif?: boolean }) {
+export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; demo?: boolean }) {
   const router = useRouter()
   const [posts, setPosts] = useState<Post[]>([])
   const [me, setMe] = useState<{ id: string; handle: string | null } | null>(null)
@@ -231,6 +232,13 @@ export default function HitokotoTab({ hasNotif }: { hasNotif?: boolean }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
+    if (demo) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setPosts(demoPosts.map(p => ({ id: p.id, body: p.body, created_at: p.created_at, user_id: 'demo', name: p.author_name, handle: p.author_handle, image: p.author_image })) as any)
+      setLoading(false)
+      return
+    }
+
     fetch('/api/user/me')
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data?.id) setMe(data) })
@@ -246,7 +254,7 @@ export default function HitokotoTab({ hasNotif }: { hasNotif?: boolean }) {
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setPendingComments(data) })
       .catch(() => {})
-  }, [])
+  }, [demo])
 
   async function submit() {
     if (!text.trim() || sending) return

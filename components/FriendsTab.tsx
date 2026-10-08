@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import AvatarSVG from './AvatarSVG'
 import NotifBanner from './NotifBanner'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
+import { demoFriends } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -25,7 +26,7 @@ type BlockedUser = {
   created_at: string
 }
 
-export default function FriendsTab({ onCountChange, hasNotif }: { onCountChange?: (n: number) => void; hasNotif?: boolean }) {
+export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountChange?: (n: number) => void; hasNotif?: boolean; demo?: boolean }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'friends' | 'blocks'>('friends')
   const [friends, setFriends] = useState<Friend[]>([])
@@ -58,6 +59,12 @@ export default function FriendsTab({ onCountChange, hasNotif }: { onCountChange?
   }
 
   const load = useCallback(() => {
+    if (demo) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setFriends(demoFriends as any)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     const ac = new AbortController()
     const timer = setTimeout(() => ac.abort(), 8000)
@@ -74,7 +81,7 @@ export default function FriendsTab({ onCountChange, hasNotif }: { onCountChange?
         setLoading(false)
       })
       .catch(() => { clearTimeout(timer); setFriends([]); setLoading(false) })
-  }, [onCountChange])
+  }, [demo, onCountChange])
 
   useEffect(() => { load() }, [load])
 

@@ -13,7 +13,7 @@ import NotifPanel from '@/components/NotifPanel'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
-export default function HomeClient() {
+export default function HomeClient({ demo }: { demo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
   const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
   const [panelOpen, setPanelOpen] = useState(false)
@@ -21,6 +21,7 @@ export default function HomeClient() {
   const totalUnread = notifCounts.hitokoto + notifCounts.friends + notifCounts.others
 
   useEffect(() => {
+    if (demo) return
     fetch('/api/notifications')
       .then(r => r.json())
       .then(data => setNotifCounts({
@@ -29,7 +30,7 @@ export default function HomeClient() {
         others:   data?.others   ?? 0,
       }))
       .catch(() => {})
-  }, [])
+  }, [demo])
 
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
@@ -37,13 +38,14 @@ export default function HomeClient() {
     const tabsWithNotifs: Tab[] = ['hitokoto', 'friends', 'others']
     if (tabsWithNotifs.includes(tab)) {
       setNotifCounts(prev => ({ ...prev, [tab]: 0 }))
+      if (demo) return
       fetch('/api/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tab }),
       }).catch(() => {})
     }
-  }, [])
+  }, [demo])
 
   const bellButton = (
     <div style={{ position: 'relative' }}>
@@ -87,7 +89,7 @@ export default function HomeClient() {
               onTabChange={tab => { setPanelOpen(false); handleTabChange(tab) }}
             />
           </div>
-          {activeTab === 'my' ? <MyProfile /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} /> : activeTab === 'map' ? <MapTab /> : <OthersTab hasNotif={notifCounts.others > 0} />}
+          {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : activeTab === 'map' ? <MapTab /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           <div className="pixel-statusbar">
             友達と紹介しあおう！
           </div>

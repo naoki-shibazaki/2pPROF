@@ -3,7 +3,16 @@ import { sql } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import HomeClient from '@/components/HomeClient'
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ demo?: string }>
+}) {
+  const params = await searchParams
+  if (params.demo === '1') {
+    return <HomeClient demo />
+  }
+
   const session = await auth()
   if (!session?.user) redirect('/login')
 

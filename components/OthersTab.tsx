@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import NotifBanner from './NotifBanner'
+import { demoIntros } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -15,17 +16,23 @@ type Intro = {
   created_at: string
 }
 
-export default function OthersTab({ hasNotif }: { hasNotif?: boolean }) {
+export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo?: boolean }) {
   const [intros, setIntros] = useState<Intro[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    if (demo) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setIntros(demoIntros as any)
+      setLoaded(true)
+      return
+    }
     fetch('/api/introductions')
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setIntros(data) })
       .catch(() => {})
       .finally(() => setLoaded(true))
-  }, [])
+  }, [demo])
 
   return (
     <div
