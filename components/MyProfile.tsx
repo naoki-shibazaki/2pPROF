@@ -303,7 +303,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       <LevelBadge />
 
       {/* ── Q&A ── */}
-      <QASection items={[]} />
+      <QASection items={demo ? profileData.qa : []} demo={demo} />
 
       {/* ── ログアウト ── */}
       <div className="px-4 py-4 flex justify-center" style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>

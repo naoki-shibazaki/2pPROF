@@ -10,6 +10,7 @@ export interface QAItem {
 
 interface QASectionProps {
   items: QAItem[]
+  demo?: boolean
 }
 
 type FriendQuestion = {
@@ -48,7 +49,7 @@ type PendingComment = {
   author_handle: string | null
 }
 
-export default function QASection({ items: defaultItems }: QASectionProps) {
+export default function QASection({ items: defaultItems, demo }: QASectionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('self')
 
   // Self Q&A
@@ -71,6 +72,7 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
 
   // Load self Q&A from DB
   useEffect(() => {
+    if (demo) { setQaLoaded(true); return }
     fetch('/api/qa/self')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
@@ -78,7 +80,7 @@ export default function QASection({ items: defaultItems }: QASectionProps) {
         setQaLoaded(true)
       })
       .catch(() => setQaLoaded(true))
-  }, [])
+  }, [demo])
 
   // Load pending comments
   useEffect(() => {
