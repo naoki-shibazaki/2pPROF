@@ -8,7 +8,6 @@ import MyProfile from '@/components/MyProfile'
 import FriendsTab from '@/components/FriendsTab'
 import OthersTab from '@/components/OthersTab'
 import HitokotoTab from '@/components/HitokotoTab'
-import MapTab from '@/components/MapTab'
 import NotifPanel from '@/components/NotifPanel'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -89,7 +88,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
               onTabChange={tab => { setPanelOpen(false); handleTabChange(tab) }}
             />
           </div>
-          {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : activeTab === 'map' ? <MapTab /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
+          {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           <div className="pixel-statusbar">
             友達と紹介しあおう！
           </div>

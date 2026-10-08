@@ -98,33 +98,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       })
 
 
-    // Geolocation polling every 30s
     let intervalId: ReturnType<typeof setInterval> | null = null
-
-    function sendLocation(lat: number, lng: number) {
-      fetch('/api/location', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lat, lng }),
-      }).catch(() => {})
-    }
-
-    function startTracking() {
-      navigator.geolocation.getCurrentPosition(
-        pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
-        () => {},
-        { enableHighAccuracy: true, timeout: 8000 }
-      )
-      intervalId = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(
-          pos => sendLocation(pos.coords.latitude, pos.coords.longitude),
-          () => {},
-          { enableHighAccuracy: true, timeout: 8000 }
-        )
-      }, 30000)
-    }
-
-    if ('geolocation' in navigator) startTracking()
 
     // Battery → HP sync
     type BatteryManager = { level: number }
