@@ -11,6 +11,7 @@ export default auth((req) => {
     pathname.startsWith('/login') ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/privacy') ||
+    pathname.startsWith('/support') ||
     (pathname === '/' && isDemo)
 
   if (!isLoggedIn && !isPublic) {
