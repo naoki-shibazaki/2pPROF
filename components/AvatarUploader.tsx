@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Capacitor } from '@capacitor/core'
-import { Camera, MediaTypeSelection } from '@capacitor/camera'
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import AvatarSVG from './AvatarSVG'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -35,14 +35,20 @@ async function resizeForAvatar(file: Blob): Promise<Blob> {
 }
 
 // iOS アプリではネイティブのカメラ / 写真ライブラリを直接開く。キャンセル時は null
+// 画面は https://2pprof.com から読み込んでいるため、webPath（capacitor://localhost/...）は fetch できない。
+// 画像は data URL で受け取る
 async function pickNative(source: 'camera' | 'library'): Promise<Blob | null> {
   try {
-    const opts = { quality: 85, targetWidth: 1024, targetHeight: 1024, correctOrientation: true }
-    const media = source === 'camera'
-      ? await Camera.takePhoto(opts)
-      : (await Camera.chooseFromGallery({ ...opts, mediaType: MediaTypeSelection.Photo, limit: 1 })).results[0]
-    if (!media?.webPath) return null
-    return await (await fetch(media.webPath)).blob()
+    const photo = await Camera.getPhoto({
+      source: source === 'camera' ? CameraSource.Camera : CameraSource.Photos,
+      resultType: CameraResultType.DataUrl,
+      quality: 85,
+      width: 1024,
+      height: 1024,
+      correctOrientation: true,
+    })
+    if (!photo.dataUrl) return null
+    return await (await fetch(photo.dataUrl)).blob()
   } catch (e) {
     if (/cancel/i.test(String(e))) return null
     throw e
@@ -83,12 +89,22 @@ export default function AvatarUploader({ currentImage }: Props) {
       ;(source === 'camera' ? cameraInputRef : libraryInputRef).current?.click()
       return
     }
+    let blob: Blob | null
     try {
-      const blob = await pickNative(source)
-      if (blob) await upload(blob)
+      blob = await pickNative(source)
     } catch (e) {
       console.error('[avatar] pick failed', e)
-      setError(source === 'camera' ? 'カメラを開けませんでした' : '写真を読み込めませんでした')
+      const reason = e instanceof Error ? e.message : String(e)
+      setError(`${source === 'camera' ? 'カメラを開けませんでした' : '写真を読み込めませんでした'}（${reason}）`)
+      return
+    }
+    if (!blob) return
+    try {
+      await upload(blob)
+    } catch (e) {
+      console.error('[avatar] upload failed', e)
+      setLoading(false)
+      setError('アップロードに失敗しました')
     }
   }
 
