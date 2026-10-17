@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { SignInWithApple } from '@capacitor-community/apple-sign-in'
 import { APP_BUNDLE_ID } from '@/lib/app-id'
+import { nativeOAuthSignIn } from '@/lib/native-oauth'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
@@ -43,6 +44,16 @@ export default function LoginPage() {
       // ユーザーがキャンセルした場合（エラーコード 1001）は何も表示しない
       if (!String(e).includes('1001')) setError('Apple でのサインインに失敗しました')
     }
+    setLoading(false)
+  }
+
+  async function handleOAuth(provider: 'google' | 'line') {
+    if (!isIOSApp) return signIn(provider, { callbackUrl: '/' })
+    setLoading(true)
+    setError('')
+    const result = await nativeOAuthSignIn(provider)
+    if (result === 'success') router.push('/')
+    else if (result === 'error') setError('ログインに失敗しました。もう一度お試しください')
     setLoading(false)
   }
 
@@ -187,7 +198,8 @@ export default function LoginPage() {
                 Apple で{isSignUp ? '新規登録' : 'サインイン'}
               </button>}
               <button
-                onClick={() => signIn('google', { callbackUrl: '/' })}
+                onClick={() => handleOAuth('google')}
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-3 py-3 font-pixel text-sm border-2 transition-none"
                 style={{ background: 'white', borderColor: '#40e8ff', color: '#111', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
@@ -200,7 +212,8 @@ export default function LoginPage() {
                 Google で{isSignUp ? '新規登録' : 'ログイン'}
               </button>
               <button
-                onClick={() => signIn('line', { callbackUrl: '/' })}
+                onClick={() => handleOAuth('line')}
+                disabled={loading}
                 className="w-full flex items-center justify-center gap-3 py-3 font-pixel text-sm border-2 transition-none"
                 style={{ background: '#06C755', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >

@@ -4,6 +4,7 @@ import Credentials from 'next-auth/providers/credentials'
 import PostgresAdapter from '@auth/pg-adapter'
 import { pool, sql } from '@/lib/db'
 import bcrypt from 'bcryptjs'
+import { consumeHandoff } from '@/lib/native-handoff'
 import { APPLE_NONCE_COOKIE, findOrCreateAppleUser, verifyAppleIdentityToken } from '@/lib/apple-auth'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -95,6 +96,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error('[auth/apple]', e)
           return null
         }
+      },
+    }),
+    // iOS アプリでの Google / LINE ログインの引き渡し。流れは lib/native-handoff.ts を参照
+    Credentials({
+      id: 'native-handoff',
+      name: 'Native Handoff',
+      credentials: {
+        token: { label: 'Token', type: 'text' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.token) return null
+        const user = await consumeHandoff(credentials.token as string)
+        return user ? { id: user.id, name: user.name, email: user.email, image: user.image } : null
       },
     }),
     // Phone OTP token (issued after Twilio verify)
