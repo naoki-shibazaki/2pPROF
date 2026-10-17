@@ -68,7 +68,7 @@ export default function PrivacyPage() {
 
       <Section title="8. お問い合わせ">
         プライバシーに関するお問い合わせは以下までご連絡ください。<br />
-        <span style={{ color: '#40e8ff' }}>support@2pprof.com</span>
+        <span style={{ color: '#40e8ff' }}>support@2p-profile.info</span>
       </Section>
 
       <Section title="9. ポリシーの変更">

@@ -65,7 +65,7 @@ export default function SettingsPanel({ open, onClose, demo }: Props) {
 
         <Row>
           <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>お問い合わせ</span>
-          <span style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', userSelect: 'all' }}>support@2pprof.com</span>
+          <span style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', userSelect: 'all' }}>support@2p-profile.info</span>
         </Row>
 
         <button
