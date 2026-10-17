@@ -130,7 +130,7 @@ export default function AvatarUploader({ currentImage }: Props) {
         onClick={() => !loading && setMenuOpen(true)}
         className="pixel-portrait"
         aria-label="プロフィール写真を変更"
-        style={{ cursor: loading ? 'default' : 'pointer', background: 'none', padding: 0, border: 'none', display: 'inline-flex', position: 'relative' }}
+        style={{ cursor: loading ? 'default' : 'pointer', background: 'none', padding: 0, border: 'none', display: 'inline-flex' }}
       >
         {loading ? (
           <div style={{ width: 140, height: 140, background: 'rgba(20,8,40,0.90)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -142,15 +142,6 @@ export default function AvatarUploader({ currentImage }: Props) {
             style={{ imageRendering: 'pixelated', display: 'block', objectFit: 'cover' }} />
         ) : (
           <AvatarSVG size={140} />
-        )}
-        {!loading && (
-          <span style={{
-            position: 'absolute', right: -4, bottom: -4, width: 28, height: 28,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: '#080614', border: '1px solid rgba(64,232,255,0.60)', fontSize: 13,
-          }}>
-            📷
-          </span>
         )}
       </button>
 
