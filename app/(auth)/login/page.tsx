@@ -87,6 +87,7 @@ export default function LoginPage() {
     setError('')
     const result = await nativeOAuthSignIn(provider)
     if (result === 'success') router.push('/')
+    else if (result === 'outdated') setError('アプリを最新バージョンに更新してください')
     else if (result === 'error') setError('ログインに失敗しました。もう一度お試しください')
     setLoading(false)
   }

@@ -1,15 +1,19 @@
 'use client'
 
+import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
 import { Browser } from '@capacitor/browser'
 import { signIn } from 'next-auth/react'
 import { APP_BUNDLE_ID } from '@/lib/app-id'
 
-export type NativeOAuthResult = 'success' | 'error' | 'cancelled'
+export type NativeOAuthResult = 'success' | 'error' | 'cancelled' | 'outdated'
 
 // iOS アプリ内ブラウザで Google / LINE の OAuth を行い、完了したらアプリ側にサインインする
 // サーバー側の流れは lib/native-handoff.ts を参照
 export async function nativeOAuthSignIn(provider: 'google' | 'line'): Promise<NativeOAuthResult> {
+  // アプリ内ブラウザのプラグインがない古いビルド
+  if (!Capacitor.isPluginAvailable('Browser')) return 'outdated'
+
   const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('')
 
   return new Promise(resolve => {
@@ -36,7 +40,8 @@ export async function nativeOAuthSignIn(provider: 'google' | 'line'): Promise<Na
     listeners.push(Browser.addListener('browserFinished', () => { void finish(false) }))
 
     const startUrl = `${window.location.origin}/api/auth/native/start?provider=${provider}&token=${token}`
-    Browser.open({ url: startUrl, presentationStyle: 'popover' }).catch(() => {
+    Browser.open({ url: startUrl, presentationStyle: 'popover' }).catch(e => {
+      console.error('[native-oauth] Browser.open failed', e)
       settled = true
       resolve('error')
     })
