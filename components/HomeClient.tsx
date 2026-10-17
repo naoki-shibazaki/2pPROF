@@ -9,6 +9,7 @@ import FriendsTab from '@/components/FriendsTab'
 import OthersTab from '@/components/OthersTab'
 import HitokotoTab from '@/components/HitokotoTab'
 import NotifPanel from '@/components/NotifPanel'
+import SettingsPanel from '@/components/SettingsPanel'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -16,6 +17,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
   const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
   const [panelOpen, setPanelOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const totalUnread = notifCounts.hitokoto + notifCounts.friends + notifCounts.others
 
@@ -34,6 +36,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
     setPanelOpen(false)
+    setSettingsOpen(false)
     const tabsWithNotifs: Tab[] = ['hitokoto', 'friends', 'others']
     if (tabsWithNotifs.includes(tab)) {
       setNotifCounts(prev => ({ ...prev, [tab]: 0 }))
@@ -46,27 +49,39 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
     }
   }, [demo])
 
-  const bellButton = (
-    <div style={{ position: 'relative' }}>
+  const iconButton = (active: boolean) => ({
+    ...STYLE,
+    background: 'none', border: 'none', cursor: 'pointer',
+    fontSize: 13, lineHeight: 1, padding: '2px 4px',
+    opacity: active ? 1 : 0.75,
+  })
+
+  const headerButtons = (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <div style={{ position: 'relative' }}>
+        <button
+          aria-label="通知"
+          onClick={() => { setSettingsOpen(false); setPanelOpen(v => !v) }}
+          style={iconButton(panelOpen)}
+        >
+          🔔
+        </button>
+        {totalUnread > 0 && !panelOpen && (
+          <span style={{
+            position: 'absolute', top: 0, right: 0,
+            width: 7, height: 7, borderRadius: '50%',
+            background: '#ff3040',
+            boxShadow: '0 0 4px rgba(255,48,64,0.9)',
+          }} />
+        )}
+      </div>
       <button
-        onClick={() => setPanelOpen(v => !v)}
-        style={{
-          ...STYLE,
-          background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 13, lineHeight: 1, padding: '2px 4px',
-          opacity: panelOpen ? 1 : 0.75,
-        }}
+        aria-label="設定"
+        onClick={() => { setPanelOpen(false); setSettingsOpen(v => !v) }}
+        style={iconButton(settingsOpen)}
       >
-        🔔
+        ⚙️
       </button>
-      {totalUnread > 0 && !panelOpen && (
-        <span style={{
-          position: 'absolute', top: 0, right: 0,
-          width: 7, height: 7, borderRadius: '50%',
-          background: '#ff3040',
-          boxShadow: '0 0 4px rgba(255,48,64,0.9)',
-        }} />
-      )}
     </div>
   )
 
@@ -77,7 +92,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
         className="relative z-10 flex justify-center items-start min-h-dvh px-3 py-10"
         role="main"
       >
-        <PixelWindow rightSlot={bellButton}>
+        <PixelWindow rightSlot={headerButtons}>
           <div style={{ position: 'relative' }}>
             <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
             <NotifPanel
@@ -87,6 +102,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
               onMarkAllRead={() => setNotifCounts({ hitokoto: 0, friends: 0, others: 0 })}
               onTabChange={tab => { setPanelOpen(false); handleTabChange(tab) }}
             />
+            <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} demo={demo} />
           </div>
           {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           <div className="pixel-statusbar">
