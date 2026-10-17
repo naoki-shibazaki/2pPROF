@@ -18,7 +18,7 @@ export default function PrivacyPage() {
       <h1 style={{ fontSize: 18, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
         プライバシーポリシー
       </h1>
-      <p style={{ fontSize: 10, color: '#604878', marginBottom: 32 }}>最終更新日：2024年10月</p>
+      <p style={{ fontSize: 10, color: '#604878', marginBottom: 32 }}>最終更新日：2026年10月</p>
 
       <Section title="1. はじめに">
         2P PROF（以下「本アプリ」）は、ユーザーのプライバシーを尊重し、個人情報の適切な取り扱いに努めます。本ポリシーは、本アプリが収集する情報とその利用方法について説明します。
@@ -28,7 +28,8 @@ export default function PrivacyPage() {
         <Item>メールアドレス（アカウント登録時）</Item>
         <Item>表示名・ハンドル名・プロフィール画像</Item>
         <Item>自己紹介文・Q&A・ひとこと投稿などのプロフィール情報</Item>
-        <Item>Google / LINE アカウント情報（OAuth認証を使用した場合）</Item>
+        <Item>Apple / Google / LINE アカウント情報（外部サービスでログインした場合。Apple の「メールを非公開」を選んだ場合は中継用アドレスのみ）</Item>
+        <Item>プロフィール写真（カメラ撮影または写真ライブラリから選択した場合のみ）</Item>
         <Item>アプリの利用状況（エラーログ等）</Item>
       </Section>
 
@@ -50,7 +51,8 @@ export default function PrivacyPage() {
         <Item>Vercel（ホスティング・サーバーレス関数）</Item>
         <Item>Neon（データベース）</Item>
         <Item>Vercel Blob（画像ストレージ）</Item>
-        <Item>Google OAuth / LINE Login（認証）</Item>
+        <Item>Sign in with Apple / Google OAuth / LINE Login（認証）</Item>
+        <Item>RevenueCat（有料プランの購入管理）</Item>
       </Section>
 
       <Section title="6. データの保管・セキュリティ">
@@ -58,7 +60,7 @@ export default function PrivacyPage() {
       </Section>
 
       <Section title="7. アカウント削除">
-        アカウントの削除を希望する場合は、アプリ内の問い合わせ窓口または下記メールアドレスまでご連絡ください。削除後、関連するすべてのデータを消去します。
+        アプリの「マイページ」最下部の「アカウントを削除」からいつでも削除できます。削除すると、プロフィール・写真・投稿・Q&A・フォロー関係など関連するすべてのデータを直ちに消去します。アプリを利用できない場合は下記メールアドレスまでご連絡ください。
       </Section>
 
       <Section title="8. お問い合わせ">

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@auth/pg-adapter": "^1.11.3",
+    "@capacitor-community/apple-sign-in": "^7.1.0",
     "@capacitor/app": "^8.1.1",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",

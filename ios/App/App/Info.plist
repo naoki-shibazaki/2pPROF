@@ -24,6 +24,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>プロフィール写真を撮影して設定するためにカメラを使用します。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>プロフィール写真に使う画像を選択するために写真ライブラリにアクセスします。</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>QRコードなどの画像を写真ライブラリに保存するために使用します。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

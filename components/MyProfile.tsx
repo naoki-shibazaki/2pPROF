@@ -319,6 +319,62 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
           ログアウト
         </button>
       </div>
+      <DeleteAccount />
+    </div>
+  )
+}
+
+function DeleteAccount() {
+  const [step, setStep] = useState<'idle' | 'confirm' | 'deleting'>('idle')
+  const [error, setError] = useState('')
+
+  async function handleDelete() {
+    setStep('deleting')
+    setError('')
+    const res = await fetch('/api/user/me/delete', { method: 'POST' })
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setError(d.error || 'アカウントの削除に失敗しました')
+      setStep('confirm')
+      return
+    }
+    await signOut({ callbackUrl: '/login' })
+  }
+
+  const btn = {
+    ...STYLE, fontSize: 9, background: 'transparent', padding: '4px 16px',
+    cursor: 'pointer', letterSpacing: '0.08em',
+  } as const
+
+  if (step === 'idle') {
+    return (
+      <div className="px-4 pb-6 flex justify-center">
+        <button onClick={() => setStep('confirm')} style={{ ...btn, color: '#804060', border: '1px solid rgba(128,64,96,0.35)' }}>
+          アカウントを削除
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="mx-4 mb-6 p-4 space-y-3" style={{ border: '1px solid #ff4060', background: 'rgba(255,64,96,0.08)' }}>
+      <p style={{ ...STYLE, fontSize: 11, color: '#ff8090', lineHeight: 1.8 }}>
+        アカウントを削除すると、プロフィール・投稿・Q&amp;A・フォロー関係などすべてのデータが完全に削除され、元に戻せません。
+      </p>
+      <p style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', lineHeight: 1.8 }}>
+        有料プランを利用中の場合、サブスクリプションは自動では解約されません。iPhone の「設定」→ Apple ID →「サブスクリプション」から解約してください。
+      </p>
+      {error && <p style={{ ...STYLE, fontSize: 10, color: '#ff4060' }}>⚠ {error}</p>}
+      <div className="flex gap-2 justify-end">
+        <button onClick={() => setStep('idle')} disabled={step === 'deleting'}
+          style={{ ...btn, color: '#b0a8d0', border: '1px solid rgba(176,168,208,0.35)' }}>
+          キャンセル
+        </button>
+        <button onClick={handleDelete} disabled={step === 'deleting'}
+          style={{ ...btn, color: '#fff', background: '#c02040', border: '1px solid #ff4060' }}>
+          {step === 'deleting' ? '削除中...' : '完全に削除する'}
+        </button>
+      </div>
     </div>
   )
 }

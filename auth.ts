@@ -4,6 +4,7 @@ import Credentials from 'next-auth/providers/credentials'
 import PostgresAdapter from '@auth/pg-adapter'
 import { pool, sql } from '@/lib/db'
 import bcrypt from 'bcryptjs'
+import { verifyAppleIdToken } from '@/lib/apple-auth'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,6 +70,48 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         )
         if (!valid) return null
 
+        return { id: user.id, name: user.name, email: user.email, image: user.image }
+      },
+    }),
+    // Sign in with Apple（iOS ネイティブ）: アプリから受け取った identityToken を検証
+    Credentials({
+      id: 'apple-native',
+      name: 'Apple',
+      credentials: {
+        identityToken: { label: 'Identity Token', type: 'text' },
+        fullName: { label: 'Full Name', type: 'text' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.identityToken) return null
+        let apple: { sub: string; email?: string }
+        try {
+          apple = await verifyAppleIdToken(credentials.identityToken as string)
+        } catch (e) {
+          console.error('[apple-native] verify failed', e)
+          return null
+        }
+        const fullName = (credentials.fullName as string | undefined) || null
+
+        let rows = await sql`
+          SELECT u.id, u.name, u.email, u.image FROM users u
+          JOIN accounts a ON a."userId" = u.id AND a.provider = 'apple'
+          WHERE a."providerAccountId" = ${apple.sub}
+        `
+        if (!rows[0] && apple.email) {
+          rows = await sql`SELECT id, name, email, image FROM users WHERE email = ${apple.email}`
+        }
+        if (!rows[0]) {
+          rows = await sql`
+            INSERT INTO users (email, name) VALUES (${apple.email ?? null}, ${fullName})
+            RETURNING id, name, email, image
+          `
+        }
+        const user = rows[0]
+        await sql`
+          INSERT INTO accounts ("userId", type, provider, "providerAccountId")
+          VALUES (${user.id}, 'oidc', 'apple', ${apple.sub})
+          ON CONFLICT (provider, "providerAccountId") DO NOTHING
+        `
         return { id: user.id, name: user.name, email: user.email, image: user.image }
       },
     }),
