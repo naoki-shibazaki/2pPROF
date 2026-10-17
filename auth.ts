@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
+import Line from 'next-auth/providers/line'
 import Credentials from 'next-auth/providers/credentials'
 import PostgresAdapter from '@auth/pg-adapter'
 import { pool, sql } from '@/lib/db'
@@ -20,31 +21,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
     }),
-    // LINE OAuth
-    {
-      id: 'line',
-      name: 'LINE',
-      type: 'oauth',
-      authorization: {
-        url: 'https://access.line.me/oauth2/v2.1/authorize',
-        params: { scope: 'profile openid email' },
-      },
-      token: 'https://api.line.me/oauth2/v2.1/token',
-      userinfo: 'https://api.line.me/v2/profile',
-      clientId: process.env.LINE_CLIENT_ID!,
-      clientSecret: process.env.LINE_CLIENT_SECRET!,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      profile(profile: any) {
-        return {
-          id: profile.userId,
-          name: profile.displayName,
-          email: profile.email ?? null,
-          image: profile.pictureUrl ?? null,
-        }
-      },
+    // LINE ログイン（OpenID Connect。ID トークンは HS256 で署名される）
+    Line({
+      clientId: process.env.LINE_CLIENT_ID,
+      clientSecret: process.env.LINE_CLIENT_SECRET,
+      authorization: { params: { scope: 'profile openid email' } },
       allowDangerousEmailAccountLinking: true,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any,
+    }),
     // Email + Password
     Credentials({
       id: 'email-password',
