@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { del } from '@vercel/blob'
 import { sql } from '@/lib/db'
+import { revokeAppleTokens } from '@/lib/apple-revoke'
 
 // アカウント削除（App Store Review Guideline 5.1.1(v)）
 // users 行を削除すると関連テーブルは ON DELETE CASCADE / SET NULL で消える
@@ -15,6 +16,9 @@ export async function POST() {
     if (user?.image?.includes('blob.vercel-storage.com')) {
       await del(user.image).catch(e => console.error('[blob del]', e))
     }
+
+    // Sign in with Apple の連携解除。失敗しても削除は続ける
+    await revokeAppleTokens(userId).catch(e => console.error('[apple revoke]', e))
 
     await sql`DELETE FROM users WHERE id = ${userId}::uuid`
     return Response.json({ ok: true })

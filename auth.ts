@@ -7,6 +7,7 @@ import { pool, sql } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import { consumeHandoff } from '@/lib/native-handoff'
 import { APPLE_NONCE_COOKIE, findOrCreateAppleUser, verifyAppleIdentityToken } from '@/lib/apple-auth'
+import { storeAppleRefreshToken } from '@/lib/apple-revoke'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -64,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         identityToken: { label: 'Identity Token', type: 'text' },
         fullName: { label: 'Full Name', type: 'text' },
+        authorizationCode: { label: 'Authorization Code', type: 'text' },
       },
       async authorize(credentials, request) {
         const rawNonce = request.headers.get('cookie')
@@ -74,6 +76,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         try {
           const apple = await verifyAppleIdentityToken(credentials.identityToken as string, rawNonce)
           const user = await findOrCreateAppleUser(apple, (credentials.fullName as string) || null)
+          // アカウント削除時の連携解除に使う
+          if (credentials.authorizationCode) {
+            await storeAppleRefreshToken(apple.sub, credentials.authorizationCode as string)
+          }
           return { id: user.id, name: user.name, email: user.email, image: user.image }
         } catch (e) {
           console.error('[auth/apple]', e)

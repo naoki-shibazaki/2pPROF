@@ -69,6 +69,7 @@ export default function LoginPage() {
       const fullName = [response.familyName, response.givenName].filter(Boolean).join(' ')
       const result = await signIn('apple', {
         identityToken: response.identityToken,
+        authorizationCode: response.authorizationCode,
         fullName,
         redirect: false,
       })
