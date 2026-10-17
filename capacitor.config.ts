@@ -4,12 +4,11 @@ import { APP_BUNDLE_ID } from './lib/app-id'
 const config: CapacitorConfig = {
   appId: APP_BUNDLE_ID,
   appName: '2P PROF',
-  // Capacitor はローカルビルドの代わりに Vercel URL を読み込む
+  // Capacitor はローカルビルドの代わりに本番 URL を読み込む
   // → 既存の Next.js / API / 認証がそのまま動く
   webDir: 'out',
   server: {
-    // デプロイ後の本番 URL に変更してください
-    url: 'https://2pprof.vercel.app',
+    url: 'https://2p-profile.info',
     cleartext: false,
   },
   ios: {
