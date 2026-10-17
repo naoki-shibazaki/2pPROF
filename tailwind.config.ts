@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // 高さの低い画面（iPhone SE など）向け: short:〜
+      screens: {
+        short: { raw: '(max-height: 760px)' },
+      },
       fontFamily: {
         pixel: ['"DotGothic16"', 'monospace'],
       },

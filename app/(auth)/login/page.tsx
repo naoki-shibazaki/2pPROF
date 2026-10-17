@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { SignInWithApple } from '@capacitor-community/apple-sign-in'
 import { APP_BUNDLE_ID } from '@/lib/app-id'
@@ -19,6 +19,40 @@ export default function LoginPage() {
   const [isIOSApp, setIsIOSApp] = useState(false)
 
   useEffect(() => { setIsIOSApp(Capacitor.getPlatform() === 'ios') }, [])
+
+  // ログイン画面は固定表示。ページのスクロールと iOS のバウンスを止める
+  useEffect(() => {
+    const root = document.documentElement
+    const prev = { overflow: root.style.overflow, overscroll: root.style.overscrollBehavior }
+    root.style.overflow = 'hidden'
+    root.style.overscrollBehavior = 'none'
+    const block = (e: TouchEvent) => e.preventDefault()
+    document.addEventListener('touchmove', block, { passive: false })
+    return () => {
+      root.style.overflow = prev.overflow
+      root.style.overscrollBehavior = prev.overscroll
+      document.removeEventListener('touchmove', block)
+    }
+  }, [])
+
+  // 画面に収まらない場合（小さい端末・新規登録フォーム）はカードを縮小して収める
+  const screenRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+  useLayoutEffect(() => {
+    const screen = screenRef.current, content = contentRef.current
+    if (!screen || !content) return
+    const fit = () => {
+      const cs = getComputedStyle(screen)
+      const available = screen.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+      setScale(Math.min(1, available / content.offsetHeight))
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(screen)
+    ro.observe(content)
+    return () => ro.disconnect()
+  }, [])
 
   async function handleAppleSignIn() {
     setLoading(true)
@@ -87,17 +121,24 @@ export default function LoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
+      ref={screenRef}
+      className="fixed inset-0 overflow-hidden flex items-center justify-center px-4"
       style={{
+        paddingTop: 'calc(env(safe-area-inset-top) + 12px)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
         background: '#080614',
         backgroundImage:
           'linear-gradient(rgba(255,64,192,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,64,192,0.04) 1px, transparent 1px)',
         backgroundSize: '24px 24px',
       }}
     >
-      <div className="w-full max-w-sm">
+      <div
+        ref={contentRef}
+        className="w-full max-w-sm"
+        style={{ transform: scale < 1 ? `scale(${scale})` : undefined, transformOrigin: 'center' }}
+      >
         {/* Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 short:mb-3">
           <div
             className="font-pixel text-2xl tracking-widest mb-1"
             style={{ color: '#ff40c0', textShadow: '0 0 12px rgba(255,64,192,0.8)' }}
@@ -118,7 +159,7 @@ export default function LoginPage() {
             <span className="ml-2">{isSignUp ? 'REGISTER.EXE' : 'LOGIN.EXE'}</span>
           </div>
 
-          <div className="p-5 space-y-4">
+          <div className="p-5 space-y-4 short:p-4 short:space-y-3">
             {error && (
               <div
                 className="px-3 py-2 font-pixel text-xs border"
@@ -170,7 +211,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="pixel-action-btn w-full justify-center py-3"
+                className="pixel-action-btn w-full justify-center py-3 short:py-2.5"
                 style={{ fontSize: '13px' }}
               >
                 {loading ? '...' : isSignUp ? '▶ アカウントを作成' : '▶ ログイン'}
@@ -189,7 +230,7 @@ export default function LoginPage() {
               {isIOSApp && <button
                 onClick={handleAppleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: '#000', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="white">
@@ -200,7 +241,7 @@ export default function LoginPage() {
               <button
                 onClick={() => handleOAuth('google')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: 'white', borderColor: '#40e8ff', color: '#111', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
@@ -214,7 +255,7 @@ export default function LoginPage() {
               <button
                 onClick={() => handleOAuth('line')}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: '#06C755', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 32 32" fill="white">
@@ -239,7 +280,7 @@ export default function LoginPage() {
           <div className="pixel-statusbar">★ 2P PROF — ともだちと紹介しあおう！ ★</div>
         </div>
 
-        <p className="text-center mt-4 font-pixel" style={{ fontSize: 10, color: '#40e8ff60' }}>
+        <p className="text-center mt-4 short:mt-2 font-pixel" style={{ fontSize: 10, color: '#40e8ff60' }}>
           登録・ログインすると<a href="/privacy" style={{ color: '#40e8ff', textDecoration: 'underline' }}>プライバシーポリシー</a>に同意したものとみなします
         </p>
       </div>
