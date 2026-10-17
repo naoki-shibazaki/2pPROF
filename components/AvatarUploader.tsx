@@ -1,6 +1,8 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Camera, MediaTypeSelection } from '@capacitor/camera'
 import AvatarSVG from './AvatarSVG'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -8,7 +10,7 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 // カメラ写真（数MB）をそのまま送ると遅いので、アップロード前に正方形 512px の JPEG（数十KB）にする
 const AVATAR_SIZE = 512
 
-async function resizeForAvatar(file: File): Promise<Blob> {
+async function resizeForAvatar(file: Blob): Promise<Blob> {
   const url = URL.createObjectURL(file)
   try {
     // <img> は写真の向き（EXIF）を反映して描画される
@@ -32,32 +34,66 @@ async function resizeForAvatar(file: File): Promise<Blob> {
   }
 }
 
+// iOS アプリではネイティブのカメラ / 写真ライブラリを直接開く。キャンセル時は null
+async function pickNative(source: 'camera' | 'library'): Promise<Blob | null> {
+  try {
+    const opts = { quality: 85, targetWidth: 1024, targetHeight: 1024, correctOrientation: true }
+    const media = source === 'camera'
+      ? await Camera.takePhoto(opts)
+      : (await Camera.chooseFromGallery({ ...opts, mediaType: MediaTypeSelection.Photo, limit: 1 })).results[0]
+    if (!media?.webPath) return null
+    return await (await fetch(media.webPath)).blob()
+  } catch (e) {
+    if (/cancel/i.test(String(e))) return null
+    throw e
+  }
+}
+
 type Props = {
   currentImage: string | null
 }
 
 export default function AvatarUploader({ currentImage }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const libraryInputRef = useRef<HTMLInputElement>(null)
   const [image, setImage] = useState<string | null>(currentImage)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function handleFile(file: File) {
+  // プロフィールの読み込みが後から終わるので、届いた画像を反映する
+  useEffect(() => { setImage(currentImage) }, [currentImage])
+
+  async function upload(file: Blob) {
     setLoading(true)
     setError(null)
     const form = new FormData()
     form.append('file', await resizeForAvatar(file).catch(() => file), 'avatar.jpg')
     const res = await fetch('/api/user/avatar', { method: 'PUT', body: form })
-    const data = await res.json()
+    const data = await res.json().catch(() => ({}))
     setLoading(false)
-    if (!res.ok) {
-      setError(data.error ?? 'アップロードに失敗しました')
-    } else {
-      setImage(data.url)
+    if (!res.ok) setError(data.error ?? 'アップロードに失敗しました')
+    else setImage(data.url)
+  }
+
+  async function choose(source: 'camera' | 'library') {
+    setMenuOpen(false)
+    if (!Capacitor.isPluginAvailable('Camera')) {
+      // ブラウザ / 古いビルド: ファイル選択で代用
+      ;(source === 'camera' ? cameraInputRef : libraryInputRef).current?.click()
+      return
+    }
+    try {
+      const blob = await pickNative(source)
+      if (blob) await upload(blob)
+    } catch (e) {
+      console.error('[avatar] pick failed', e)
+      setError(source === 'camera' ? 'カメラを開けませんでした' : '写真を読み込めませんでした')
     }
   }
 
   async function handleDelete() {
+    setMenuOpen(false)
     setLoading(true)
     setError(null)
     const res = await fetch('/api/user/avatar', { method: 'DELETE' })
@@ -66,14 +102,19 @@ export default function AvatarUploader({ currentImage }: Props) {
     else setError('削除に失敗しました')
   }
 
+  const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (f) void upload(f)
+    e.target.value = ''
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-      {/* アバター画像 */}
       <button
-        onClick={() => !loading && inputRef.current?.click()}
+        onClick={() => !loading && setMenuOpen(true)}
         className="pixel-portrait"
+        aria-label="プロフィール写真を変更"
         style={{ cursor: loading ? 'default' : 'pointer', background: 'none', padding: 0, border: 'none', display: 'inline-flex', position: 'relative' }}
-        title="タップして写真を変更"
       >
         {loading ? (
           <div style={{ width: 140, height: 140, background: 'rgba(20,8,40,0.90)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -86,36 +127,79 @@ export default function AvatarUploader({ currentImage }: Props) {
         ) : (
           <AvatarSVG size={140} />
         )}
+        {!loading && (
+          <span style={{
+            position: 'absolute', right: -4, bottom: -4, width: 28, height: 28,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#080614', border: '1px solid rgba(64,232,255,0.60)', fontSize: 13,
+          }}>
+            📷
+          </span>
+        )}
       </button>
 
-      <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }}
-        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }} />
-
-      {/* ボタン */}
-      <div style={{ display: 'flex', gap: 6 }}>
-        <button
-          onClick={() => !loading && inputRef.current?.click()}
-          disabled={loading}
-          style={{ ...STYLE, fontSize: 8, color: '#40e8ff', background: 'transparent', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 10px', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}
-        >
-          📷 写真を変更
-        </button>
-        {image && (
-          <button
-            onClick={handleDelete}
-            disabled={loading}
-            style={{ ...STYLE, fontSize: 8, color: '#ff4060', background: 'transparent', border: '1px solid rgba(255,64,96,0.40)', padding: '4px 10px', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}
-          >
-            🗑 削除
-          </button>
-        )}
-      </div>
+      <input ref={cameraInputRef} type="file" accept="image/*" capture="user" style={{ display: 'none' }} onChange={onInputChange} />
+      <input ref={libraryInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={onInputChange} />
 
       {error && (
-        <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', textAlign: 'center', maxWidth: 160 }}>
+        <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', textAlign: 'center', maxWidth: 200 }}>
           ⚠ {error}
         </p>
       )}
+
+      {menuOpen && (
+        <PhotoMenu
+          hasImage={!!image}
+          onCamera={() => choose('camera')}
+          onLibrary={() => choose('library')}
+          onDelete={handleDelete}
+          onClose={() => setMenuOpen(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function PhotoMenu({ hasImage, onCamera, onLibrary, onDelete, onClose }: {
+  hasImage: boolean
+  onCamera: () => void
+  onLibrary: () => void
+  onDelete: () => void
+  onClose: () => void
+}) {
+  const item = (color: string) => ({
+    ...STYLE, width: '100%', minHeight: 52, fontSize: 14, color, letterSpacing: '0.06em',
+    background: 'transparent', border: 'none', borderBottom: '1px solid rgba(64,232,255,0.15)', cursor: 'pointer',
+  })
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        role="menu"
+        style={{
+          width: '100%', maxWidth: 360, margin: '0 12px',
+          marginBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
+          display: 'flex', flexDirection: 'column', gap: 8,
+        }}
+      >
+        <div style={{ background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(64,232,255,0.45)' }}>
+          <p style={{ ...STYLE, fontSize: 10, color: '#40e8ff80', textAlign: 'center', padding: '10px 0', borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
+            プロフィール写真
+          </p>
+          <button role="menuitem" onClick={onCamera} style={item('#c0f0ff')}>📷 写真を撮る</button>
+          <button role="menuitem" onClick={onLibrary} style={item('#c0f0ff')}>🖼 ライブラリから選ぶ</button>
+          {hasImage && (
+            <button role="menuitem" onClick={onDelete} style={{ ...item('#ff4060'), borderBottom: 'none' }}>🗑 写真を削除</button>
+          )}
+        </div>
+        <button onClick={onClose} style={{ ...item('#b0a8d0'), background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(176,168,208,0.35)' }}>
+          キャンセル
+        </button>
+      </div>
     </div>
   )
 }
