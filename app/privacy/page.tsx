@@ -15,6 +15,9 @@ export default function PrivacyPage() {
       margin: '0 auto',
       ...STYLE,
     }}>
+      <a href="/" style={{ display: 'inline-block', fontSize: 11, color: '#40e8ff', marginBottom: 24 }}>
+        ◀ もどる
+      </a>
       <h1 style={{ fontSize: 18, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
         プライバシーポリシー
       </h1>

@@ -225,6 +225,10 @@ export default function LoginPage() {
 
           <div className="pixel-statusbar">★ 2P PROF — ともだちと紹介しあおう！ ★</div>
         </div>
+
+        <p className="text-center mt-4 font-pixel" style={{ fontSize: 10, color: '#40e8ff60' }}>
+          登録・ログインすると<a href="/privacy" style={{ color: '#40e8ff', textDecoration: 'underline' }}>プライバシーポリシー</a>に同意したものとみなします
+        </p>
       </div>
     </div>
   )

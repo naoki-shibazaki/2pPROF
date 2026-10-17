@@ -306,7 +306,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       <QASection items={demo ? profileData.qa : []} demo={demo} />
 
       {/* ── ログアウト ── */}
-      <div className="px-4 py-4 flex justify-center" style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>
+      <div className="px-4 py-4 flex justify-center items-center gap-2" style={{ borderTop: '1px solid rgba(255,64,192,0.10)' }}>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           style={{
@@ -318,6 +318,9 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
         >
           ログアウト
         </button>
+        <a href="/privacy" style={{ ...STYLE, fontSize: 9, color: '#403860', padding: '4px 16px', letterSpacing: '0.08em' }}>
+          プライバシーポリシー
+        </a>
       </div>
       <DeleteAccount />
     </div>
