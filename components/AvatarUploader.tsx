@@ -35,7 +35,7 @@ async function resizeForAvatar(file: Blob): Promise<Blob> {
 }
 
 // iOS アプリではネイティブのカメラ / 写真ライブラリを直接開く。キャンセル時は null
-// 画面は https://2pprof.com から読み込んでいるため、webPath（capacitor://localhost/...）は fetch できない。
+// 画面は https://2pprof.vercel.app から読み込んでいるため、webPath（capacitor://localhost/...）は fetch できない。
 // 画像は data URL で受け取る
 async function pickNative(source: 'camera' | 'library'): Promise<Blob | null> {
   try {
