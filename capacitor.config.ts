@@ -1,7 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli'
+import { APP_BUNDLE_ID } from './lib/app-id'
 
 const config: CapacitorConfig = {
-  appId: 'com.twopprof.app',
+  appId: APP_BUNDLE_ID,
   appName: '2P PROF',
   // Capacitor はローカルビルドの代わりに Vercel URL を読み込む
   // → 既存の Next.js / API / 認証がそのまま動く

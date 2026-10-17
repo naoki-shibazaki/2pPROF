@@ -1,42 +1,78 @@
-import { createPublicKey, verify, type JsonWebKey } from 'node:crypto'
+import { createHash, randomBytes } from 'node:crypto'
+import { createRemoteJWKSet, jwtVerify } from 'jose'
+import { pool } from '@/lib/db'
+import { APP_BUNDLE_ID } from '@/lib/app-id'
 
-// ネイティブの Sign in with Apple が返す identityToken を Apple の公開鍵で検証する
-// ネイティブのトークンは aud が Bundle ID になる（Web の Services ID ではない）
-const APPLE_BUNDLE_ID = process.env.APPLE_NATIVE_BUNDLE_ID ?? 'com.twopprof.app'
+// Sign in with Apple（iOS ネイティブ）
+// 1. /api/auth/apple/nonce が nonce を発行し、生の値を httpOnly Cookie に保存、ハッシュ値をアプリに返す
+// 2. アプリはハッシュ値を nonce として Apple に渡し、identityToken を受け取る
+// 3. サーバーは identityToken の署名・iss・aud・exp と、nonce が Cookie の値と一致するかを検証する
 
-type AppleJWK = JsonWebKey & { kid: string }
-let jwksCache: { keys: AppleJWK[]; cachedAt: number } | null = null
+export const APPLE_NONCE_COOKIE = 'apple_nonce'
 
-async function getAppleJWKS(): Promise<AppleJWK[]> {
-  if (jwksCache && Date.now() - jwksCache.cachedAt < 3600_000) return jwksCache.keys
-  const res = await fetch('https://appleid.apple.com/auth/keys')
-  if (!res.ok) throw new Error('Failed to fetch Apple JWKS')
-  const data = (await res.json()) as { keys: AppleJWK[] }
-  jwksCache = { keys: data.keys, cachedAt: Date.now() }
-  return data.keys
+const appleJWKS = createRemoteJWKSet(new URL('https://appleid.apple.com/auth/keys'))
+
+export const hashNonce = (raw: string) => createHash('sha256').update(raw).digest('hex')
+
+export function issueNonce(): { raw: string; hashed: string } {
+  const raw = randomBytes(32).toString('base64url')
+  return { raw, hashed: hashNonce(raw) }
 }
 
-export async function verifyAppleIdToken(idToken: string): Promise<{ sub: string; email?: string }> {
-  const parts = idToken.split('.')
-  if (parts.length !== 3) throw new Error('invalid id_token')
+export type AppleIdentity = { sub: string; email: string | null; emailVerified: boolean }
 
-  const header = JSON.parse(Buffer.from(parts[0], 'base64url').toString()) as { kid?: string; alg?: string }
-  if (header.alg !== 'RS256') throw new Error('unexpected alg')
+export async function verifyAppleIdentityToken(token: string, rawNonce: string): Promise<AppleIdentity> {
+  const { payload } = await jwtVerify(token, appleJWKS, {
+    issuer: 'https://appleid.apple.com',
+    audience: APP_BUNDLE_ID,
+    algorithms: ['RS256'],
+    clockTolerance: 30,
+  })
+  if (!payload.sub) throw new Error('sub がありません')
+  if (payload.nonce !== hashNonce(rawNonce)) throw new Error('nonce が一致しません')
 
-  const jwk = (await getAppleJWKS()).find(k => k.kid === header.kid)
-  if (!jwk) throw new Error('no matching JWKS key')
+  // Apple は email_verified を文字列 "true" で返すことがある
+  const emailVerified = payload.email_verified === true || payload.email_verified === 'true'
+  return { sub: payload.sub, email: (payload.email as string | undefined) ?? null, emailVerified }
+}
 
-  const publicKey = createPublicKey({ key: jwk, format: 'jwk' })
-  const valid = verify('SHA256', Buffer.from(`${parts[0]}.${parts[1]}`), publicKey, Buffer.from(parts[2], 'base64url'))
-  if (!valid) throw new Error('invalid signature')
+// Apple の sub に紐づくユーザーを返す。いなければ確認済みメールで既存ユーザーに紐付けるか、新規作成する
+export async function findOrCreateAppleUser(apple: AppleIdentity, fullName: string | null) {
+  const client = await pool.connect()
+  try {
+    await client.query('BEGIN')
 
-  const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString()) as {
-    iss?: string; aud?: string; exp?: number; sub?: string; email?: string
+    const linked = await client.query(
+      `SELECT u.id, u.name, u.email, u.image FROM users u
+       JOIN accounts a ON a."userId" = u.id
+       WHERE a.provider = 'apple' AND a."providerAccountId" = $1`,
+      [apple.sub],
+    )
+    if (linked.rows[0]) {
+      await client.query('COMMIT')
+      return linked.rows[0]
+    }
+
+    let user = apple.email && apple.emailVerified
+      ? (await client.query('SELECT id, name, email, image FROM users WHERE email = $1', [apple.email])).rows[0]
+      : undefined
+    if (!user) {
+      user = (await client.query(
+        'INSERT INTO users (email, name) VALUES ($1, $2) RETURNING id, name, email, image',
+        [apple.email, fullName],
+      )).rows[0]
+    }
+    await client.query(
+      `INSERT INTO accounts ("userId", type, provider, "providerAccountId") VALUES ($1, 'oidc', 'apple', $2)`,
+      [user.id, apple.sub],
+    )
+
+    await client.query('COMMIT')
+    return user
+  } catch (e) {
+    await client.query('ROLLBACK')
+    throw e
+  } finally {
+    client.release()
   }
-  if (payload.iss !== 'https://appleid.apple.com') throw new Error('invalid iss')
-  if (payload.aud !== APPLE_BUNDLE_ID) throw new Error(`invalid aud: ${payload.aud}`)
-  if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) throw new Error('token expired')
-  if (!payload.sub) throw new Error('no sub')
-
-  return { sub: payload.sub, email: payload.email }
 }

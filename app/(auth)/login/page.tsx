@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { SignInWithApple } from '@capacitor-community/apple-sign-in'
+import { APP_BUNDLE_ID } from '@/lib/app-id'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
@@ -22,13 +23,16 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
     try {
+      const { nonce } = await fetch('/api/auth/apple/nonce', { method: 'POST' }).then(r => r.json())
       const { response } = await SignInWithApple.authorize({
-        clientId: 'com.twopprof.app',
+        clientId: APP_BUNDLE_ID,
         redirectURI: '',
         scopes: 'name email',
+        nonce,
       })
+      // 名前は初回の認可時にしか返らない。日本語表記に合わせて姓→名の順にする
       const fullName = [response.familyName, response.givenName].filter(Boolean).join(' ')
-      const result = await signIn('apple-native', {
+      const result = await signIn('apple', {
         identityToken: response.identityToken,
         fullName,
         redirect: false,
