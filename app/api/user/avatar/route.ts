@@ -18,12 +18,18 @@ export async function PUT(req: Request) {
       return Response.json({ error: 'ファイルサイズは5MB以下にしてください' }, { status: 400 })
     }
 
+    const [current] = await sql`SELECT image FROM users WHERE id = ${userId}::uuid`
     const blob = await put(`avatars/${userId}`, file, {
       access: 'public',
       addRandomSuffix: true,
     })
 
     await sql`UPDATE users SET image = ${blob.url} WHERE id = ${userId}::uuid`
+
+    // 差し替え前の画像を削除（残すとストレージに溜まり続ける）
+    if (current?.image?.includes('blob.vercel-storage.com')) {
+      await del(current.image).catch(() => {})
+    }
 
     return Response.json({ url: blob.url })
   } catch (e) {

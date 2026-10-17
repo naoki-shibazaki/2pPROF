@@ -5,6 +5,33 @@ import AvatarSVG from './AvatarSVG'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
+// カメラ写真（数MB）をそのまま送ると遅いので、アップロード前に正方形 512px の JPEG（数十KB）にする
+const AVATAR_SIZE = 512
+
+async function resizeForAvatar(file: File): Promise<Blob> {
+  const url = URL.createObjectURL(file)
+  try {
+    // <img> は写真の向き（EXIF）を反映して描画される
+    const img = new Image()
+    img.src = url
+    await img.decode()
+    const side = Math.min(img.naturalWidth, img.naturalHeight)
+    const size = Math.min(AVATAR_SIZE, side)
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = size
+    // 中央を正方形に切り抜く（表示も object-fit: cover の正方形）
+    canvas.getContext('2d')!.drawImage(
+      img,
+      (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side,
+      0, 0, size, size,
+    )
+    return await new Promise((resolve, reject) =>
+      canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', 0.85))
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
 type Props = {
   currentImage: string | null
 }
@@ -19,7 +46,7 @@ export default function AvatarUploader({ currentImage }: Props) {
     setLoading(true)
     setError(null)
     const form = new FormData()
-    form.append('file', file)
+    form.append('file', await resizeForAvatar(file).catch(() => file), 'avatar.jpg')
     const res = await fetch('/api/user/avatar', { method: 'PUT', body: form })
     const data = await res.json()
     setLoading(false)
