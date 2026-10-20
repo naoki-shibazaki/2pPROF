@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ModerationMenu from './ModerationMenu'
 import { qaHash } from '@/lib/qa-hash'
 
 export interface QAItem {
@@ -270,7 +271,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                             <div key={c.id} style={{ borderLeft: '2px solid rgba(255,136,48,0.35)', paddingLeft: 8, marginBottom: 8 }}>
                               <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
                               <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
-                              <div style={{ display: 'flex', gap: 6, marginTop: 5 }}>
+                              <div style={{ display: 'flex', gap: 6, marginTop: 5, alignItems: 'center' }}>
                                 <button
                                   onClick={() => handleCommentAction(c.id, 'approved')}
                                   style={{ ...STYLE, fontSize: 9, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '3px 10px', cursor: 'pointer' }}
@@ -283,6 +284,13 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                                 >
                                   ✕ 却下
                                 </button>
+                                <ModerationMenu
+                                  target={{ contentType: 'qa_comment', contentId: c.id, handle: c.author_handle }}
+                                  onReported={() => handleCommentAction(c.id, 'rejected')}
+                                  onBlocked={() => setPendingComments(prev => prev.filter(x => x.author_handle !== c.author_handle))}
+                                  demo={demo}
+                                  size={11}
+                                />
                               </div>
                             </div>
                           ))}
@@ -336,12 +344,21 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                             : `from @${fq.sender_handle ?? '?'}${fq.sender_name ? ` (${fq.sender_name})` : ''}`}
                         </p>
                       </div>
-                      <button
-                        onClick={() => dismissQuestion(fq.id)}
-                        style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}
-                      >
-                        ✕
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                        <ModerationMenu
+                          target={{ contentType: 'question', contentId: fq.id, handle: fq.anonymous ? null : fq.sender_handle }}
+                          onReported={() => setFriendQs(prev => prev.filter(q => q.id !== fq.id))}
+                          onBlocked={() => setFriendQs(prev => prev.filter(q => q.id !== fq.id && (fq.anonymous || q.sender_handle !== fq.sender_handle)))}
+                          demo={demo}
+                          size={11}
+                        />
+                        <button
+                          onClick={() => dismissQuestion(fq.id)}
+                          style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
 
                     {fq.answer ? (

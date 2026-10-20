@@ -20,6 +20,19 @@ export default function LoginPage() {
 
   useEffect(() => { setIsIOSApp(Capacitor.getPlatform() === 'ios') }, [])
 
+  // 利用規約への同意（Guideline 1.2）。同意するまでログイン・登録ボタンは押せない。同意はこの端末に記憶する
+  const TERMS_KEY = 'terms_agreed_v1'
+  const [agreed, setAgreed] = useState(false)
+  useEffect(() => {
+    try { setAgreed(localStorage.getItem(TERMS_KEY) === '1') } catch {}
+  }, [])
+  function toggleAgreed() {
+    const next = !agreed
+    setAgreed(next)
+    try { next ? localStorage.setItem(TERMS_KEY, '1') : localStorage.removeItem(TERMS_KEY) } catch {}
+  }
+  const blocked = loading || !agreed
+
   // ログイン画面は固定表示。ページのスクロールと iOS のバウンスを止める
   useEffect(() => {
     const root = document.documentElement
@@ -172,6 +185,14 @@ export default function LoginPage() {
             )}
 
             {/* Email form */}
+            {/* 利用規約への同意 */}
+            <label className="flex items-start gap-2 cursor-pointer" style={{ padding: '8px 10px', border: `1px solid ${agreed ? 'rgba(56,255,120,0.45)' : 'rgba(255,64,192,0.55)'}`, background: agreed ? 'rgba(56,255,120,0.06)' : 'rgba(255,64,192,0.08)' }}>
+              <input type="checkbox" checked={agreed} onChange={toggleAgreed} style={{ width: 18, height: 18, marginTop: 1, accentColor: '#38ff78', flexShrink: 0 }} />
+              <span className="font-pixel" style={{ fontSize: 10, color: '#c0f0ff', lineHeight: 1.8 }}>
+                <a href="/terms" style={{ color: '#40e8ff', textDecoration: 'underline' }}>利用規約</a>と<a href="/privacy" style={{ color: '#40e8ff', textDecoration: 'underline' }}>プライバシーポリシー</a>に同意します。不適切な投稿や迷惑行為は禁止です。
+              </span>
+            </label>
+
             <form onSubmit={handleEmailAuth} className="space-y-3">
               {isSignUp && (
                 <div>
@@ -212,7 +233,7 @@ export default function LoginPage() {
               </div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={blocked}
                 className="pixel-action-btn w-full justify-center py-3 short:py-2.5"
                 style={{ fontSize: '13px' }}
               >
@@ -228,10 +249,10 @@ export default function LoginPage() {
             </div>
 
             {/* OAuth buttons */}
-            <div className="space-y-2">
+            <div className="space-y-2" style={{ opacity: agreed ? 1 : 0.4, transition: 'opacity .15s' }}>
               {isIOSApp && <button
                 onClick={handleAppleSignIn}
-                disabled={loading}
+                disabled={blocked}
                 className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: '#000', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
@@ -242,7 +263,7 @@ export default function LoginPage() {
               </button>}
               <button
                 onClick={() => handleOAuth('google')}
-                disabled={loading}
+                disabled={blocked}
                 className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: 'white', borderColor: '#40e8ff', color: '#111', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
@@ -256,7 +277,7 @@ export default function LoginPage() {
               </button>
               <button
                 onClick={() => handleOAuth('line')}
-                disabled={loading}
+                disabled={blocked}
                 className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
                 style={{ background: '#06C755', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
@@ -282,9 +303,6 @@ export default function LoginPage() {
           <div className="pixel-statusbar">★ 2P PROF — ともだちと紹介しあおう！ ★</div>
         </div>
 
-        <p className="text-center mt-4 short:mt-2 font-pixel" style={{ fontSize: 10, color: '#40e8ff60' }}>
-          登録・ログインすると<a href="/privacy" style={{ color: '#40e8ff', textDecoration: 'underline' }}>プライバシーポリシー</a>に同意したものとみなします
-        </p>
       </div>
     </div>
   )

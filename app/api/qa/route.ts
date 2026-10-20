@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { blockedUserIds } from '@/lib/moderation'
 import { getUserPlan, LIMITS } from '@/lib/plan'
 
 // GET: received questions (inbox)
@@ -23,7 +24,7 @@ export async function GET() {
     const rows = limit === Infinity
       ? await sql`
           SELECT
-            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
+            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous, fq.sender_id,
             u.name AS sender_name, u.handle AS sender_handle
           FROM friend_questions fq
           LEFT JOIN users u ON u.id = fq.sender_id
@@ -32,7 +33,7 @@ export async function GET() {
         `
       : await sql`
           SELECT
-            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous,
+            fq.id, fq.question, fq.answer, fq.answered_at, fq.created_at, fq.anonymous, fq.sender_id,
             u.name AS sender_name, u.handle AS sender_handle
           FROM friend_questions fq
           LEFT JOIN users u ON u.id = fq.sender_id
@@ -42,7 +43,12 @@ export async function GET() {
         `
 
     const locked = plan === 'free' && totalCount > limit
-    return Response.json({ items: rows, total: totalCount, locked })
+    // ブロック関係にあるユーザーからの質問は表示しない。匿名の質問の送信者はクライアントに渡さない
+    const blocked = new Set(await blockedUserIds(userId))
+    const items = rows
+      .filter(r => !blocked.has(r.sender_id))
+      .map(({ sender_id: _senderId, ...r }) => (r.anonymous ? { ...r, sender_name: null, sender_handle: null } : r))
+    return Response.json({ items, total: totalCount, locked })
   } catch (e) {
     console.error('[GET /api/qa]', e)
     return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })

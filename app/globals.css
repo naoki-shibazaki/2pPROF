@@ -165,6 +165,12 @@
     transform: translate(2px, 2px);
   }
 
+  .pixel-action-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+    transform: none;
+  }
+
   /* ── Status bar ── */
   .pixel-statusbar {
     padding: 4px 10px;

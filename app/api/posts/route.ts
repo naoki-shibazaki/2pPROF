@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { blockedUserIds } from '@/lib/moderation'
 
 // GET: フィード（自分＋フォロー中のユーザーの投稿）
 export async function GET() {
@@ -22,8 +23,9 @@ export async function GET() {
       ORDER BY p.created_at DESC
       LIMIT 50
     `
-
-    return Response.json(rows)
+    // ブロック関係にあるユーザーの投稿は表示しない
+    const blocked = new Set(await blockedUserIds(userId))
+    return Response.json(rows.filter(r => !blocked.has(r.user_id)))
   } catch (e) {
     console.error('[GET /api/posts]', e)
     return Response.json({ error: 'サーバーエラーが発生しました' }, { status: 500 })

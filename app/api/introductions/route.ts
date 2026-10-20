@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { blockedUserIds } from '@/lib/moderation'
 import { getUserPlan, LIMITS } from '@/lib/plan'
 
 async function ensureTable() {
@@ -53,7 +54,7 @@ export async function GET(req: Request) {
 
     const rows = limit === Infinity
       ? await sql`
-          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at,
+          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at, i.author_id,
                  u.name AS author_name, u.handle AS author_handle
           FROM introductions i
           JOIN users u ON u.id = i.author_id
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
           ORDER BY i.created_at DESC
         `
       : await sql`
-          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at,
+          SELECT i.id, i.body, i.met_year, i.met_month, i.created_at, i.author_id,
                  u.name AS author_name, u.handle AS author_handle
           FROM introductions i
           JOIN users u ON u.id = i.author_id
@@ -71,7 +72,9 @@ export async function GET(req: Request) {
         `
 
     const locked = plan === 'free' && totalCount > limit
-    return Response.json({ items: rows, total: totalCount, locked })
+    // ブロック関係にあるユーザーの紹介文は表示しない
+    const blocked = new Set(await blockedUserIds(sessionUserId))
+    return Response.json({ items: rows.filter(r => !blocked.has(r.author_id)), total: totalCount, locked })
   } catch {
     await ensureTable().catch(() => {})
     return Response.json({ items: [], total: 0, locked: false })

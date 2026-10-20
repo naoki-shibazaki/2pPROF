@@ -56,6 +56,13 @@ export default function SettingsPanel({ open, onClose, demo }: Props) {
           </Row>
         )}
 
+        <a href="/terms" style={{ textDecoration: 'none', display: 'block' }}>
+          <Row>
+            <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>利用規約</span>
+            <span style={{ ...STYLE, fontSize: 11, color: '#40e8ff80' }}>▶</span>
+          </Row>
+        </a>
+
         <a href="/privacy" style={{ textDecoration: 'none', display: 'block' }}>
           <Row>
             <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>プライバシーポリシー</span>

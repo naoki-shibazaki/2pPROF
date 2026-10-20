@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import NotifBanner from './NotifBanner'
+import ModerationMenu from './ModerationMenu'
 import { demoIntros } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -19,6 +20,7 @@ type Intro = {
 export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo?: boolean }) {
   const [intros, setIntros] = useState<Intro[]>([])
   const [loaded, setLoaded] = useState(false)
+  const hide = (pred: (i: Intro) => boolean) => setIntros(prev => prev.filter(i => !pred(i)))
 
   useEffect(() => {
     if (demo) {
@@ -29,7 +31,7 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
     }
     fetch('/api/introductions')
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setIntros(data) })
+      .then(data => { if (Array.isArray(data?.items)) setIntros(data.items) })
       .catch(() => {})
       .finally(() => setLoaded(true))
   }, [demo])
@@ -85,11 +87,20 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
                   <p style={{ ...STYLE, fontSize: 8, color: '#504870', margin: 0 }}>
                     from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}
                   </p>
-                  {(intro.met_year || intro.met_month) && (
-                    <p style={{ ...STYLE, fontSize: 8, color: '#504878', margin: 0 }}>
-                      {intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜
-                    </p>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {(intro.met_year || intro.met_month) && (
+                      <p style={{ ...STYLE, fontSize: 8, color: '#504878', margin: 0 }}>
+                        {intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜
+                      </p>
+                    )}
+                    <ModerationMenu
+                      target={{ contentType: 'introduction', contentId: intro.id, handle: intro.author_handle }}
+                      onReported={() => hide(i => i.id === intro.id)}
+                      onBlocked={() => hide(i => i.author_handle === intro.author_handle)}
+                      demo={demo}
+                      size={11}
+                    />
+                  </div>
                 </div>
               </div>
             )

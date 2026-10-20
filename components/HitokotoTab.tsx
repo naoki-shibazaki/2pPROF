@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import NotifBanner from './NotifBanner'
+import ModerationMenu from './ModerationMenu'
 import { demoPosts } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -44,12 +45,15 @@ function timeAgo(dateStr: string) {
 }
 
 // ── コメントセクション（ネスト形式） ───────────────────────────
-function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendingAction }: {
+function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendingAction, blockedHandles, onBlocked, demo }: {
   postId: string
   isMine: boolean
   meHandle: string | null
   pendingComments: PendingComment[]
   onPendingAction: (id: string) => void
+  blockedHandles: Set<string>
+  onBlocked: (handle: string) => void
+  demo?: boolean
 }) {
   const [comments, setComments] = useState<PostComment[]>([])
   const [myPending, setMyPending] = useState<{ id: string; body: string } | null>(null)
@@ -62,7 +66,8 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
-  const myPostPending = pendingComments.filter(c => c.post_id === postId)
+  const myPostPending = pendingComments.filter(c => c.post_id === postId && !blockedHandles.has(c.author_handle ?? ''))
+  const visibleComments = comments.filter(c => !blockedHandles.has(c.author_handle ?? ''))
 
   // マウント時に自動ロード
   useEffect(() => {
@@ -123,19 +128,28 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
     if ((await r.json()).ok) onPendingAction(id)
   }
 
-  const totalCount = comments.length + (isMine ? myPostPending.length : (myPending ? 1 : 0))
+  const totalCount = visibleComments.length + (isMine ? myPostPending.length : (myPending ? 1 : 0))
 
   return (
     <div style={{ borderTop: '1px solid rgba(64,232,255,0.10)' }}>
 
       {/* 承認済みコメント（ネスト表示） */}
-      {comments.map(c => (
+      {visibleComments.map(c => (
         <div key={c.id} style={{ display: 'flex', gap: 6, padding: '5px 12px 0' }}>
           <span style={{ ...STYLE, fontSize: 9, color: 'rgba(64,232,255,0.35)', flexShrink: 0, paddingTop: 2 }}>└</span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <span style={{ ...STYLE, fontSize: 8, color: '#6050a0' }}>@{c.author_handle ?? '?'} </span>
             <span style={{ ...STYLE, fontSize: 10, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
           </div>
+          {c.author_handle && c.author_handle !== meHandle && (
+            <ModerationMenu
+              target={{ contentType: 'post_comment', contentId: c.id, handle: c.author_handle }}
+              onReported={() => setComments(prev => prev.filter(x => x.id !== c.id))}
+              onBlocked={() => onBlocked(c.author_handle!)}
+              demo={demo}
+              size={10}
+            />
+          )}
         </div>
       ))}
 
@@ -148,6 +162,13 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
               <span style={{ ...STYLE, fontSize: 8, color: '#ff8830' }}>@{c.author_handle ?? '?'} </span>
               <span style={{ ...STYLE, fontSize: 10, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
             </div>
+            <ModerationMenu
+              target={{ contentType: 'post_comment', contentId: c.id, handle: c.author_handle }}
+              onReported={() => handlePendingAction(c.id, 'rejected')}
+              onBlocked={() => onBlocked(c.author_handle ?? '')}
+              demo={demo}
+              size={10}
+            />
           </div>
           <div style={{ display: 'flex', gap: 6, paddingLeft: 20, marginTop: 4 }}>
             <button onClick={() => handlePendingAction(c.id, 'approved')} style={{ ...STYLE, fontSize: 9, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '2px 8px', cursor: 'pointer' }}>✓ 承認</button>
@@ -229,6 +250,10 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(true)
   const [pendingComments, setPendingComments] = useState<PendingComment[]>([])
+  // 通報・ブロックしたものはその場で非表示にする（サーバー側でも次回から除外される）
+  const [hiddenPostIds, setHiddenPostIds] = useState<Set<string>>(new Set())
+  const [blockedHandles, setBlockedHandles] = useState<Set<string>>(new Set())
+  const blockHandle = (h: string) => setBlockedHandles(prev => new Set(prev).add(h))
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -279,6 +304,7 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
   }
 
   const remaining = MAX_LEN - text.length
+  const visiblePosts = posts.filter(p => !hiddenPostIds.has(p.id) && !blockedHandles.has(p.handle ?? ''))
 
   return (
     <div>
@@ -308,7 +334,7 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
         <div style={{ padding: '20px 12px', textAlign: 'center' }}>
           <span style={{ ...STYLE, fontSize: 9, color: '#504870' }}>読み込み中...</span>
         </div>
-      ) : posts.length === 0 ? (
+      ) : visiblePosts.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-10">
           <span style={{ fontSize: 28 }}>💬</span>
           <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>
@@ -316,7 +342,7 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
           </p>
         </div>
       ) : (
-        posts.map(post => {
+        visiblePosts.map(post => {
           const isMine = !!me && post.user_id === me.id
           return (
             <div key={post.id} style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', background: 'rgba(4,2,12,0.40)' }}>
@@ -328,8 +354,15 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
                 <p style={{ ...STYLE, fontSize: 11, color: '#b0a8d0', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{post.body}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 3 }}>
                   <span style={{ ...STYLE, fontSize: 8, color: '#403860' }}>{timeAgo(post.created_at)}</span>
-                  {isMine && (
+                  {isMine ? (
                     <button onClick={() => deletePost(post.id)} style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>削除</button>
+                  ) : (
+                    <ModerationMenu
+                      target={{ contentType: 'post', contentId: post.id, handle: post.handle }}
+                      onReported={() => setHiddenPostIds(prev => new Set(prev).add(post.id))}
+                      onBlocked={() => post.handle && blockHandle(post.handle)}
+                      demo={demo}
+                    />
                   )}
                 </div>
               </div>
@@ -341,6 +374,9 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
                 meHandle={me?.handle ?? null}
                 pendingComments={pendingComments}
                 onPendingAction={id => setPendingComments(prev => prev.filter(c => c.id !== id))}
+                blockedHandles={blockedHandles}
+                onBlocked={blockHandle}
+                demo={demo}
               />
             </div>
           )

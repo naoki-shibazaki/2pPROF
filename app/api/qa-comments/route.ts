@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { blockedUserIds } from '@/lib/moderation'
 import OpenAI from 'openai'
 
 async function ensureTable() {
@@ -25,6 +26,9 @@ export async function GET(req: Request) {
   const handle = searchParams.get('handle')
   const qhash = searchParams.get('qhash')
   if (!handle || !qhash) return Response.json([])
+  const session = await auth()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const myId = (session?.user as any)?.id ?? null
 
   try {
     const users = await sql`SELECT id FROM users WHERE handle = ${handle}`
@@ -32,7 +36,7 @@ export async function GET(req: Request) {
     const targetId = users[0].id
 
     const rows = await sql`
-      SELECT c.id, c.body, c.created_at,
+      SELECT c.id, c.body, c.created_at, c.author_id,
              u.name AS author_name, u.handle AS author_handle
       FROM qa_comments c
       JOIN users u ON u.id = c.author_id
@@ -41,7 +45,9 @@ export async function GET(req: Request) {
         AND c.status = 'approved'
       ORDER BY c.created_at ASC
     `
-    return Response.json(rows)
+    // ブロック関係にあるユーザーのコメントは表示しない
+    const blocked = new Set(await blockedUserIds(myId))
+    return Response.json(rows.filter(r => !blocked.has(r.author_id)))
   } catch (e) {
     console.error('[GET /api/qa-comments]', e)
     return Response.json([])

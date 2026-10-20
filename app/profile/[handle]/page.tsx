@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
 import FollowListModal from '@/components/FollowListModal'
+import ModerationMenu from '@/components/ModerationMenu'
 import PixelBackground from '@/components/PixelBackground'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { qaHash } from '@/lib/qa-hash'
@@ -303,7 +304,13 @@ export default function ProfilePage() {
                         {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
                       </button>
 
-                      {/* Block button */}
+                      {/* Report / Block (Guideline 1.2) */}
+                      <ModerationMenu
+                        target={{ contentType: 'profile', handle: user.handle }}
+                        reportOnly
+                        label="🚩 このユーザーを通報"
+                        labelStyle={{ width: '100%', fontSize: 9, color: '#ff8090', background: 'transparent', border: '1px solid rgba(255,128,144,0.30)', padding: '4px 0', letterSpacing: '0.06em' }}
+                      />
                       {!showBlockConfirm ? (
                         <button
                           onClick={() => isBlocked ? toggleBlock() : setShowBlockConfirm(true)}
@@ -576,9 +583,19 @@ export default function ProfilePage() {
                               <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>{intro.body}</p>
                               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                                 <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}</span>
-                                {(intro.met_year || intro.met_month) && (
-                                  <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>{intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜</span>
-                                )}
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                  {(intro.met_year || intro.met_month) && (
+                                    <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>{intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜</span>
+                                  )}
+                                  {intro.author_handle && (
+                                    <ModerationMenu
+                                      target={{ contentType: 'introduction', contentId: intro.id, handle: intro.author_handle }}
+                                      onReported={() => setIntros(prev => prev.filter(i => i.id !== intro.id))}
+                                      onBlocked={() => setIntros(prev => prev.filter(i => i.author_handle !== intro.author_handle))}
+                                      size={11}
+                                    />
+                                  )}
+                                </span>
                               </div>
                             </div>
                           )
@@ -772,8 +789,16 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {comments.map(c => (
-                <div key={c.id} style={{ borderLeft: '2px solid rgba(64,232,255,0.25)', paddingLeft: 8 }}>
-                  <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
+                <div key={c.id} style={{ borderLeft: '2px solid rgba(64,232,255,0.25)', paddingLeft: 8, position: 'relative' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
+                    <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap', flex: 1 }}>{c.body}</p>
+                    <ModerationMenu
+                      target={{ contentType: 'qa_comment', contentId: c.id, handle: c.author_handle }}
+                      onReported={() => setComments(prev => prev.filter(x => x.id !== c.id))}
+                      onBlocked={() => setComments(prev => prev.filter(x => x.author_handle !== c.author_handle))}
+                      size={10}
+                    />
+                  </div>
                   {isSelf && (
                     <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
                   )}
