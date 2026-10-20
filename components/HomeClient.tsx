@@ -10,14 +10,17 @@ import OthersTab from '@/components/OthersTab'
 import HitokotoTab from '@/components/HitokotoTab'
 import NotifPanel from '@/components/NotifPanel'
 import SettingsPanel from '@/components/SettingsPanel'
+import SharePanel from '@/components/SharePanel'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
 export default function HomeClient({ demo }: { demo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
   const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
-  const [panelOpen, setPanelOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
+  // ヘッダーのドロップダウンは同時に1つだけ開く
+  const [openPanel, setOpenPanel] = useState<'notif' | 'share' | 'settings' | null>(null)
+  const togglePanel = (p: 'notif' | 'share' | 'settings') => setOpenPanel(cur => (cur === p ? null : p))
+  const closePanel = () => setOpenPanel(null)
 
   const totalUnread = notifCounts.hitokoto + notifCounts.friends + notifCounts.others
 
@@ -35,8 +38,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
 
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
-    setPanelOpen(false)
-    setSettingsOpen(false)
+    setOpenPanel(null)
     const tabsWithNotifs: Tab[] = ['hitokoto', 'friends', 'others']
     if (tabsWithNotifs.includes(tab)) {
       setNotifCounts(prev => ({ ...prev, [tab]: 0 }))
@@ -61,12 +63,12 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
       <div style={{ position: 'relative' }}>
         <button
           aria-label="通知"
-          onClick={() => { setSettingsOpen(false); setPanelOpen(v => !v) }}
-          style={iconButton(panelOpen)}
+          onClick={() => togglePanel('notif')}
+          style={iconButton(openPanel === 'notif')}
         >
           🔔
         </button>
-        {totalUnread > 0 && !panelOpen && (
+        {totalUnread > 0 && openPanel !== 'notif' && (
           <span style={{
             position: 'absolute', top: 0, right: 0,
             width: 7, height: 7, borderRadius: '50%',
@@ -76,9 +78,16 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
         )}
       </div>
       <button
+        aria-label="シェア"
+        onClick={() => togglePanel('share')}
+        style={iconButton(openPanel === 'share')}
+      >
+        🔗
+      </button>
+      <button
         aria-label="設定"
-        onClick={() => { setPanelOpen(false); setSettingsOpen(v => !v) }}
-        style={iconButton(settingsOpen)}
+        onClick={() => togglePanel('settings')}
+        style={iconButton(openPanel === 'settings')}
       >
         ⚙️
       </button>
@@ -96,13 +105,14 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
           <div style={{ position: 'relative' }}>
             <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
             <NotifPanel
-              open={panelOpen}
-              onClose={() => setPanelOpen(false)}
+              open={openPanel === 'notif'}
+              onClose={closePanel}
               hasUnread={totalUnread > 0}
               onMarkAllRead={() => setNotifCounts({ hitokoto: 0, friends: 0, others: 0 })}
-              onTabChange={tab => { setPanelOpen(false); handleTabChange(tab) }}
+              onTabChange={tab => { closePanel(); handleTabChange(tab) }}
             />
-            <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} demo={demo} />
+            <SharePanel open={openPanel === 'share'} onClose={closePanel} demo={demo} />
+            <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} />
           </div>
           {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           <div className="pixel-statusbar">

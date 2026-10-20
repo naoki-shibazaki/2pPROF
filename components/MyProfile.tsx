@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
-import QRModal from './QRModal'
+import { useState, useEffect, useRef } from 'react'
 import FollowListModal from './FollowListModal'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
@@ -58,8 +57,6 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
   const maxHP = 100
   const [currentHP, setCurrentHP] = useState(maxHP)
 
-  const [showQR, setShowQR] = useState(false)
-  const [shareCopied, setShareCopied] = useState(false)
   const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
 
 
@@ -225,53 +222,6 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
 
       </div>
 
-      {/* ── シェア系ボタン ── */}
-      {user?.handle && (
-        <div className="px-4 py-2 flex flex-col gap-2" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
-          {/* 1行目: QR + シェア */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowQR(true)}
-              style={{
-                ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0',
-                background: 'rgba(8,6,20,0.92)',
-                border: '1px solid rgba(255,64,192,0.45)',
-                padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em',
-              }}
-            >
-              📱 QRコード
-            </button>
-            <button
-              onClick={async () => {
-                const url = `${window.location.origin}/profile/${user.handle}`
-                if (navigator.share) {
-                  await navigator.share({ title: `${user.name ?? user.handle} のプロフ`, url })
-                } else {
-                  await navigator.clipboard.writeText(url).catch(() => {})
-                  setShareCopied(true)
-                  setTimeout(() => setShareCopied(false), 2500)
-                }
-              }}
-              style={{
-                ...STYLE, flex: 1, fontSize: 10,
-                color: shareCopied ? '#38ff78' : '#ffd700',
-                background: 'rgba(8,6,20,0.92)',
-                border: `1px solid ${shareCopied ? 'rgba(56,255,120,0.50)' : 'rgba(255,215,0,0.45)'}`,
-                padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em',
-              }}
-            >
-              {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
-            </button>
-          </div>
-        </div>
-      )}
-      {showQR && user?.handle && (
-        <QRModal
-          url={`${typeof window !== 'undefined' ? window.location.origin : ''}/profile/${user.handle}`}
-          name={user.name ?? user.handle}
-          onClose={() => setShowQR(false)}
-        />
-      )}
       {followListType && user?.handle && (
         <FollowListModal
           handle={user.handle}
@@ -279,9 +229,6 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
           onClose={() => setFollowListType(null)}
         />
       )}
-
-      {/* ── 招待リンク ── */}
-      <InviteButton />
 
       {/* ── Bio ── */}
       {user?.bio && (
@@ -304,44 +251,6 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       {/* ── Q&A ── */}
       <QASection items={demo ? profileData.qa : []} demo={demo} />
 
-    </div>
-  )
-}
-
-function InviteButton() {
-  const [copied, setCopied] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
-
-  const generate = useCallback(async () => {
-    setLoading(true)
-    const res = await fetch('/api/invite', { method: 'POST' })
-    const data = await res.json()
-    if (data.token) {
-      const url = `${window.location.origin}/invite/${data.token}`
-      await navigator.clipboard.writeText(url).catch(() => {})
-      setCopied(true)
-      setTimeout(() => setCopied(false), 3000)
-    }
-    setLoading(false)
-  }, [])
-
-  return (
-    <div className="px-4 py-2 flex justify-center" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
-      <button
-        onClick={generate}
-        disabled={loading}
-        style={{
-          ...STYLE, fontSize: 10,
-          color: copied ? '#38ff78' : '#ffd700',
-          background: 'rgba(8,6,20,0.92)',
-          border: `1px solid ${copied ? 'rgba(56,255,120,0.50)' : 'rgba(255,215,0,0.50)'}`,
-          padding: '5px 16px', cursor: loading ? 'default' : 'pointer',
-          opacity: loading ? 0.6 : 1, letterSpacing: '0.08em',
-        }}
-      >
-        {copied ? '✓ コピーしました！' : loading ? '生成中...' : '🔗 招待リンクを作成'}
-      </button>
     </div>
   )
 }
