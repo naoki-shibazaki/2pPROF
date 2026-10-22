@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { Capacitor } from '@capacitor/core'
+import { Device } from '@capacitor/device'
 import FollowListModal from './FollowListModal'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
@@ -25,6 +27,21 @@ type UserProfile = {
 }
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
+
+// バッテリー残量（0〜1）。読めなければ null
+async function readBatteryLevel(): Promise<number | null> {
+  if (Capacitor.isPluginAvailable('Device')) {
+    const { batteryLevel } = await Device.getBatteryInfo().catch(() => ({ batteryLevel: undefined }))
+    // シミュレーターなどでは -1 が返る
+    return typeof batteryLevel === 'number' && batteryLevel >= 0 ? batteryLevel : null
+  }
+  type BatteryManager = { level: number }
+  if ('getBattery' in navigator) {
+    const battery = await (navigator as Navigator & { getBattery: () => Promise<BatteryManager> }).getBattery().catch(() => null)
+    return battery ? battery.level : null
+  }
+  return null
+}
 
 
 function StatBar({ label, color, fill, current, max }: {
@@ -97,23 +114,31 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
     let intervalId: ReturnType<typeof setInterval> | null = null
 
     // Battery → HP sync
-    type BatteryManager = { level: number }
-    if ('getBattery' in navigator) {
-      ;(navigator as Navigator & { getBattery: () => Promise<BatteryManager> })
-        .getBattery()
-        .then(battery => {
-          const hp = Math.round(battery.level * maxHP)
-          setCurrentHP(hp)
-          fetch('/api/user/profile', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ hp }),
-          }).catch(() => {})
-        })
-        .catch(() => {})
+    // iOS の WebView には navigator.getBattery が無いので、アプリでは Device プラグインで読む
+    let lastSaved: number | null = null
+    const syncBattery = async () => {
+      const level = await readBatteryLevel()
+      if (level === null) return
+      const hp = Math.round(level * maxHP)
+      setCurrentHP(hp)
+      if (hp === lastSaved) return
+      lastSaved = hp
+      fetch('/api/user/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hp }),
+      }).catch(() => {})
     }
+    void syncBattery()
+    // アプリに戻ったときと、開いている間は 1 分ごとに更新する
+    const onVisible = () => { if (document.visibilityState === 'visible') void syncBattery() }
+    document.addEventListener('visibilitychange', onVisible)
+    intervalId = setInterval(() => { if (document.visibilityState === 'visible') void syncBattery() }, 60_000)
 
-    return () => { if (intervalId) clearInterval(intervalId) }
+    return () => {
+      if (intervalId) clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [demo, maxHP])
 
 
