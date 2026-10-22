@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DotGothic16 } from 'next/font/google'
 import './globals.css'
+import HpGate from '@/components/HpGate'
 
 // DotGothic16: pixel font covering Latin + Japanese
 const pixelFont = DotGothic16({
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja" className={pixelFont.variable}>
       <body className={`${pixelFont.className} min-h-screen overflow-x-hidden`}>
         {children}
+        <HpGate />
       </body>
     </html>
   )

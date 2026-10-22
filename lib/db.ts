@@ -73,6 +73,10 @@ export async function initSchema() {
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded BOOLEAN DEFAULT FALSE`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp INTEGER DEFAULT 100`)
+    // HP = その日（日本時間）にアプリを開ける残り回数（lib/hp.ts）
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_day DATE`)
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_opens INTEGER DEFAULT 0`)
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_last_open TIMESTAMPTZ`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS proximity_count INTEGER DEFAULT 0`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS proximity_mode TEXT DEFAULT 'on'`)
 

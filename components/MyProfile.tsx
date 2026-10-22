@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Capacitor } from '@capacitor/core'
-import { Device } from '@capacitor/device'
+import { HP_MAX } from '@/lib/hp-max'
 import FollowListModal from './FollowListModal'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
@@ -27,22 +26,6 @@ type UserProfile = {
 }
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
-
-// バッテリー残量（0〜1）。読めなければ null
-async function readBatteryLevel(): Promise<number | null> {
-  if (Capacitor.isPluginAvailable('Device')) {
-    const { batteryLevel } = await Device.getBatteryInfo().catch(() => ({ batteryLevel: undefined }))
-    // シミュレーターなどでは -1 が返る
-    return typeof batteryLevel === 'number' && batteryLevel >= 0 ? batteryLevel : null
-  }
-  type BatteryManager = { level: number }
-  if ('getBattery' in navigator) {
-    const battery = await (navigator as Navigator & { getBattery: () => Promise<BatteryManager> }).getBattery().catch(() => null)
-    return battery ? battery.level : null
-  }
-  return null
-}
-
 
 function StatBar({ label, color, fill, current, max }: {
   label: string; color: string; fill: number; current: number; max: number
@@ -71,7 +54,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
   const [nameDraft, setNameDraft] = useState('')
   const nameInputRef = useRef<HTMLInputElement>(null)
 
-  const maxHP = 100
+  const maxHP = HP_MAX
   const [currentHP, setCurrentHP] = useState(maxHP)
 
   const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
@@ -87,7 +70,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
         handle: profileData.handle,
         bio: profileData.bio,
         onboarded: true,
-        hp: 72,
+        hp: 7,
         proximity_count: 5,
         proximity_mode: 'all',
         following_count: 12,
@@ -95,7 +78,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       })
       setName(profileData.name)
       setNameDraft(profileData.name)
-      setCurrentHP(72)
+      setCurrentHP(7)
       return
     }
 
@@ -107,38 +90,15 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
         const dbName = u.name ?? null
         setName(dbName)
         setNameDraft(dbName ?? '')
-        if (u.hp !== null && u.hp !== undefined) setCurrentHP(Math.min(u.hp, 100))
+        // HpGate の値と前後しても、1 日の中で HP は減るだけなので小さいほうを採る
+        if (u.hp !== null && u.hp !== undefined) setCurrentHP(prev => Math.min(prev, u.hp as number))
       })
 
 
-    let intervalId: ReturnType<typeof setInterval> | null = null
-
-    // Battery → HP sync
-    // iOS の WebView には navigator.getBattery が無いので、アプリでは Device プラグインで読む
-    let lastSaved: number | null = null
-    const syncBattery = async () => {
-      const level = await readBatteryLevel()
-      if (level === null) return
-      const hp = Math.round(level * maxHP)
-      setCurrentHP(hp)
-      if (hp === lastSaved) return
-      lastSaved = hp
-      fetch('/api/user/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hp }),
-      }).catch(() => {})
-    }
-    void syncBattery()
-    // アプリに戻ったときと、開いている間は 1 分ごとに更新する
-    const onVisible = () => { if (document.visibilityState === 'visible') void syncBattery() }
-    document.addEventListener('visibilitychange', onVisible)
-    intervalId = setInterval(() => { if (document.visibilityState === 'visible') void syncBattery() }, 60_000)
-
-    return () => {
-      if (intervalId) clearInterval(intervalId)
-      document.removeEventListener('visibilitychange', onVisible)
-    }
+    // HP = 今日アプリを開ける残り回数。起動・復帰で減った値を HpGate から受け取る
+    const onHp = (e: Event) => setCurrentHP((e as CustomEvent<number>).detail)
+    window.addEventListener('hp-update', onHp)
+    return () => window.removeEventListener('hp-update', onHp)
   }, [demo, maxHP])
 
 

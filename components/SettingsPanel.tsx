@@ -113,7 +113,7 @@ function Row({ children, last }: { children: React.ReactNode; last?: boolean }) 
   )
 }
 
-function DeleteAccount({ onCancel }: { onCancel: () => void }) {
+export function DeleteAccount({ onCancel }: { onCancel: () => void }) {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
 
