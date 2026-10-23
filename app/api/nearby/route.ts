@@ -1,5 +1,5 @@
 import { auth } from '@/auth'
-import { findNearbyFriends, saveLocation } from '@/lib/encounters'
+import { findNearbyFriends, placeDemoFriendsNearby, saveLocation } from '@/lib/encounters'
 
 // POST: 今の位置を保存して、近くにいる友達を返す（「近くの友達をさがす」ボタン）
 // 返すのは距離だけで、相手の位置は返さない
@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
   try {
     await saveLocation(userId, lat, lng)
+    await placeDemoFriendsNearby(session?.user?.email, lat, lng)
     return Response.json({ items: await findNearbyFriends(userId) })
   } catch (e) {
     console.error('[POST /api/nearby]', e)

@@ -55,6 +55,19 @@ export async function saveLocation(userId: string, lat: number, lng: number) {
   await sql`DELETE FROM user_locations WHERE updated_at < NOW() - make_interval(mins => ${LOCATION_TTL_MINUTES})`
 }
 
+// App Review 用: デモアカウントが「さがす」を押したら、デモの友達も同じ場所にいることにする
+// （審査は 1 台の端末で行われるため。相手側の確認はデモの友達でログインし直して試してもらう）
+export async function placeDemoFriendsNearby(email: string | null | undefined, lat: number, lng: number) {
+  const demoEmails = (process.env.DEMO_NEARBY_ACCOUNTS ?? 'review@2pprof.com').split(',').map(s => s.trim().toLowerCase())
+  if (!email || !demoEmails.includes(email.toLowerCase())) return
+  const handles = (process.env.DEMO_NEARBY_FRIENDS ?? 'takashi_test').split(',').map(s => s.trim())
+  await sql`
+    INSERT INTO user_locations (user_id, lat, lng, updated_at)
+    SELECT id, ${lat + 0.0003}, ${lng}, NOW() FROM users WHERE handle = ANY(${handles}::text[])
+    ON CONFLICT (user_id) DO UPDATE SET lat = EXCLUDED.lat, lng = EXCLUDED.lng, updated_at = NOW()
+  `
+}
+
 export async function countedToday(a: string, b: string) {
   const [row] = await sql`
     SELECT 1 FROM proximity_events
