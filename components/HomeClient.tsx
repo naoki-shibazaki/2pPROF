@@ -11,6 +11,7 @@ import HitokotoTab from '@/components/HitokotoTab'
 import NotifPanel from '@/components/NotifPanel'
 import SettingsPanel from '@/components/SettingsPanel'
 import SharePanel from '@/components/SharePanel'
+import EncounterPrompt from '@/components/EncounterPrompt'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -120,6 +121,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
           </div>
         </PixelWindow>
       </main>
+      {!demo && <EncounterPrompt />}
     </div>
   )
 }

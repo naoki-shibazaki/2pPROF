@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import AvatarSVG from './AvatarSVG'
 import NotifBanner from './NotifBanner'
+import NearbySection from './NearbySection'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { demoFriends } from '@/data/profileData'
 
@@ -84,6 +85,12 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
   }, [demo, onCountChange])
 
   useEffect(() => { load() }, [load])
+
+  // 「会った！」で回数が増えたら一覧を読み直す
+  useEffect(() => {
+    window.addEventListener('encounter-updated', load)
+    return () => window.removeEventListener('encounter-updated', load)
+  }, [load])
 
   function loadBlocks() {
     setBlocksLoading(true)
@@ -267,6 +274,8 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
 
       {/* Friends tab content */}
       {activeTab === 'friends' && <>
+
+      {!demo && <NearbySection />}
 
       {/* Global hide toggle */}
       {!loading && friends.length > 0 && (

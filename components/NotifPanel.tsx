@@ -22,6 +22,8 @@ function typeIcon(type: string) {
     case 'introduction':  return '✉'
     case 'question':      return '❓'
     case 'qa_comment':    return '💬'
+    case 'encounter_request':   return '📍'
+    case 'encounter_confirmed': return '⚔️'
     default:              return '🔔'
   }
 }
@@ -34,6 +36,8 @@ function typeLabel(type: string, name: string | null, handle: string | null) {
     case 'introduction':  return `${who} から他己紹介が届きました`
     case 'question':      return `${who} から質問が届きました`
     case 'qa_comment':    return `${who} がQAにコメントしました`
+    case 'encounter_request':   return `${who} から「会った？」が届きました`
+    case 'encounter_confirmed': return `${who} と会った回数が増えました`
     default:              return `${who} から通知が届きました`
   }
 }
@@ -45,6 +49,8 @@ function getDestination(type: string, handle: string | null): { href: string } |
   switch (type) {
     case 'followed':     return { href: handle ? `/profile/${handle}` : '/' }
     case 'post_comment': return { tab: 'hitokoto' }
+    case 'encounter_request':
+    case 'encounter_confirmed': return { tab: 'friends' }
     default:             return { tab: 'others' }
   }
 }
@@ -171,7 +177,8 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
                   {' · '}
                   <span style={{ color: '#604898' }}>
                     {n.type === 'followed' ? `@${n.from_handle} のプロフへ →` :
-                     n.type === 'post_comment' ? 'ひとことへ →' : '他己紹介へ →'}
+                     n.type === 'post_comment' ? 'ひとことへ →' :
+                     n.type.startsWith('encounter_') ? '友達へ →' : '他己紹介へ →'}
                   </span>
                 </p>
               </div>

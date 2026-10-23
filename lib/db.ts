@@ -234,6 +234,18 @@ export async function initSchema() {
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_proximity_pair ON proximity_events(user_a_id, user_b_id)`)
+    // 「会った？」の確認依頼（lib/encounters.ts）。相手が「会った」と答えると proximity_events に 1 件入る
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS encounter_requests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        from_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        to_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        status TEXT NOT NULL DEFAULT 'pending',
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        responded_at TIMESTAMPTZ
+      )
+    `)
+    await client.query(`CREATE INDEX IF NOT EXISTS idx_encounter_to ON encounter_requests(to_user_id, status)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_friend_q_receiver ON friend_questions(receiver_id)`)
     await client.query(`CREATE INDEX IF NOT EXISTS idx_users_handle ON users(handle)`)
   } finally {
