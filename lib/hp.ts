@@ -8,9 +8,9 @@ const DEBOUNCE_SECONDS = 30
 
 export type HpState = { hp: number; max: number; locked: boolean; resetAt: string }
 
-// App Review のデモアカウントは HP が 0 になっても締め出さない（審査中に使えなくなるため）
+// App Review のデモアカウント（とデモの友達）は HP が 0 になっても締め出さない（審査中に使えなくなるため）
 function isExempt(email: string | null | undefined) {
-  const list = (process.env.HP_EXEMPT_EMAILS ?? 'review@2pprof.com').split(',').map(s => s.trim().toLowerCase())
+  const list = (process.env.HP_EXEMPT_EMAILS ?? 'review@2pprof.com,friend1@2pprof.com').split(',').map(s => s.trim().toLowerCase())
   return !!email && list.includes(email.toLowerCase())
 }
 
