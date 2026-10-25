@@ -83,12 +83,12 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
           style={iconButton(openPanel === 'notif')}
         >
           <span className={totalUnread > 0 && openPanel !== 'notif' ? 'bell-ring' : undefined} style={{ display: 'block' }}>
-            <PixelIcon name="bell" color="#ffd700" />
+            <PixelIcon name="bell" color="#ffd700" size={20} />
           </span>
         </button>
         {totalUnread > 0 && openPanel !== 'notif' && (
           <span aria-hidden style={{
-            position: 'absolute', top: 2, right: 6,
+            position: 'absolute', top: 4, right: 8,
             width: 6, height: 6,
             background: '#ff3040',
             boxShadow: '0 0 4px rgba(255,48,64,0.9)',
@@ -100,14 +100,14 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
         onClick={() => togglePanel('share')}
         style={iconButton(openPanel === 'share')}
       >
-        <PixelIcon name="share" color="#40e8ff" />
+        <PixelIcon name="share" color="#40e8ff" size={20} />
       </button>
       <button
         aria-label="設定"
         onClick={() => togglePanel('settings')}
         style={iconButton(openPanel === 'settings')}
       >
-        <PixelIcon name="gear" color="#ff40c0" />
+        <PixelIcon name="gear" color="#ff40c0" size={20} />
       </button>
     </div>
   )
