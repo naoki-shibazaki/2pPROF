@@ -163,7 +163,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
   }
 
   return (
-    <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'calc(100dvh - 180px)' }}>
+    <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'calc(100dvh - 205px)' }}>
       <NotifBanner tab="friends" show={!!hasNotif} />
       {/* Tab header */}
       <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(255,64,192,0.30)' }}>

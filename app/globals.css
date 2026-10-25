@@ -15,11 +15,14 @@
   html {
     font-size: 18px;
     height: 100%;
+    /* iPhone で画面全体がびよーんと伸び縮みして（ラバーバンド）カクつくのを止める */
+    overscroll-behavior: none;
   }
 
   body {
     height: 100%;
     overflow-x: hidden;
+    overscroll-behavior: none;
     font-family: var(--font-pixel, 'DotGothic16', monospace);
     background: #080614; /* cyberpunk dark fallback behind bg.png */
   }
@@ -297,4 +300,10 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .bell-ring { animation: none; }
+}
+
+/* リストの端まで行っても、画面全体のスクロールに連鎖させない */
+.overflow-y-auto {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
