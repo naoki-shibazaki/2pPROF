@@ -3,6 +3,7 @@ import { DotGothic16 } from 'next/font/google'
 import './globals.css'
 import HpGate from '@/components/HpGate'
 import DeepLinkHandler from '@/components/DeepLinkHandler'
+import NavTracker from '@/components/NavTracker'
 
 // DotGothic16: pixel font covering Latin + Japanese
 const pixelFont = DotGothic16({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <HpGate />
         <DeepLinkHandler />
+        <NavTracker />
       </body>
     </html>
   )

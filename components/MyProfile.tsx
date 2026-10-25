@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { HP_MAX } from '@/lib/hp-max'
-import FollowListModal from './FollowListModal'
+import { useRouter } from 'next/navigation'
 import AvatarUploader from './AvatarUploader'
 import QASection from './QASection'
 import HexStatus from './HexStatus'
@@ -57,7 +57,8 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
   const maxHP = HP_MAX
   const [currentHP, setCurrentHP] = useState(maxHP)
 
-  const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
+  const router = useRouter()
+  const openFollows = (tab: 'following' | 'followers') => { if (user?.handle) router.push(`/profile/${user.handle}/follows?tab=${tab}`) }
 
 
   useEffect(() => {
@@ -175,14 +176,14 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
         {user?.handle && (
           <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
             <button
-              onClick={() => setFollowListType('following')}
+              onClick={() => openFollows('following')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
             >
               <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.following_count ?? 0}</span>
               <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロー</span>
             </button>
             <button
-              onClick={() => setFollowListType('followers')}
+              onClick={() => openFollows('followers')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
             >
               <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followers_count ?? 0}</span>
@@ -207,13 +208,6 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
 
       </div>
 
-      {followListType && user?.handle && (
-        <FollowListModal
-          handle={user.handle}
-          type={followListType}
-          onClose={() => setFollowListType(null)}
-        />
-      )}
 
       {/* ── Bio ── */}
       {user?.bio && (

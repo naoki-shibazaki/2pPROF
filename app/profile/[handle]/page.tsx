@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
-import FollowListModal from '@/components/FollowListModal'
 import ModerationMenu from '@/components/ModerationMenu'
 import PixelBackground from '@/components/PixelBackground'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
@@ -52,7 +51,6 @@ export default function ProfilePage() {
 
   // Share
   const [shareCopied, setShareCopied] = useState(false)
-  const [followListType, setFollowListType] = useState<'following' | 'followers' | null>(null)
 
   // Question sending
   const [showQuestion, setShowQuestion] = useState(false)
@@ -278,11 +276,11 @@ export default function ProfilePage() {
                   <p className="text-sm -mt-2" style={{ ...STYLE, color: '#8a7aa8' }}>@{user.handle}</p>
 
                   <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
-                    <button onClick={() => setFollowListType('following')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
+                    <button onClick={() => user?.handle && router.push(`/profile/${user.handle}/follows?tab=following`)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
                       <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followingCount ?? 0}</span>
                       <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロー</span>
                     </button>
-                    <button onClick={() => setFollowListType('followers')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
+                    <button onClick={() => user?.handle && router.push(`/profile/${user.handle}/follows?tab=followers`)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
                       <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followersCount ?? 0}</span>
                       <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロワー</span>
                     </button>
@@ -654,9 +652,6 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      {followListType && user?.handle && (
-        <FollowListModal handle={user.handle} type={followListType} onClose={() => setFollowListType(null)} />
-      )}
     </div>
   )
 }
