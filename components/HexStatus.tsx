@@ -139,7 +139,7 @@ export default function HexStatus() {
           }}
         >
           <h3 style={{
-            ...STYLE, fontSize: 12, color: '#40e8ff',
+            ...STYLE, fontSize: 15, color: '#40e8ff',
             letterSpacing: '0.10em', textShadow: '0 0 8px rgba(64,232,255,0.75)',
           }}>
             ■ ステータス
@@ -147,7 +147,7 @@ export default function HexStatus() {
           <button
             onClick={openEdit}
             style={{
-              ...STYLE, fontSize: 10, color: '#ffd700',
+              ...STYLE, fontSize: 13, color: '#ffd700',
               background: 'transparent', border: '1px solid rgba(255,215,0,0.40)',
               padding: '1px 8px', cursor: 'pointer',
               textShadow: '0 0 5px rgba(255,215,0,0.50)',
@@ -168,7 +168,7 @@ export default function HexStatus() {
             {stats.map((s, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <span style={{
-                  ...STYLE, fontSize: 9, color: '#40e8ff',
+                  ...STYLE, fontSize: 12, color: '#40e8ff',
                   minWidth: 38, letterSpacing: '0.02em',
                   textShadow: '0 0 4px rgba(64,232,255,0.50)',
                 }}>
@@ -185,7 +185,7 @@ export default function HexStatus() {
                   }} />
                 </div>
                 <span style={{
-                  ...STYLE, fontSize: 9, color: '#40e8ff',
+                  ...STYLE, fontSize: 12, color: '#40e8ff',
                   minWidth: 12, textAlign: 'right', opacity: 0.75,
                 }}>
                   {s.value}
@@ -218,7 +218,7 @@ export default function HexStatus() {
               ...STYLE,
               background: 'linear-gradient(90deg, #18042e 0%, #2e0860 50%, #18042e 100%)',
               borderBottom: '2px solid #40e8ff',
-              color: '#40e8ff', fontSize: 13,
+              color: '#40e8ff', fontSize: 16,
               padding: '5px 10px', letterSpacing: '0.10em',
               textShadow: '0 0 8px rgba(64,232,255,0.70)',
             }}>
@@ -230,8 +230,8 @@ export default function HexStatus() {
               className="flex items-center px-3 py-1"
               style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}
             >
-              <span style={{ ...STYLE, fontSize: 9, color: '#403860', width: 66 }}>名前</span>
-              <span style={{ ...STYLE, fontSize: 9, color: '#403860', flex: 1, textAlign: 'center' }}>値 (1〜10)</span>
+              <span style={{ ...STYLE, fontSize: 12, color: '#6a6090', width: 66 }}>名前</span>
+              <span style={{ ...STYLE, fontSize: 12, color: '#6a6090', flex: 1, textAlign: 'center' }}>値 (1〜10)</span>
             </div>
 
             {/* Stat rows */}
@@ -244,7 +244,7 @@ export default function HexStatus() {
                     onChange={e => changeName(i, e.target.value)}
                     maxLength={5}
                     style={{
-                      ...STYLE, fontSize: 11, color: '#d0c8f0',
+                      ...STYLE, fontSize: 14, color: '#d0c8f0',
                       background: 'rgba(4, 2, 12, 0.80)',
                       border: '1px solid rgba(64,232,255,0.35)',
                       padding: '2px 6px', width: 62, outline: 'none',
@@ -254,7 +254,7 @@ export default function HexStatus() {
                   <button
                     onClick={() => changeValue(i, -1)}
                     style={{
-                      ...STYLE, fontSize: 14, color: '#40e8ff',
+                      ...STYLE, fontSize: 16, color: '#40e8ff',
                       background: 'rgba(8, 6, 20, 0.90)',
                       border: '1px solid rgba(64,232,255,0.40)',
                       width: 24, height: 24, cursor: 'pointer',
@@ -266,7 +266,7 @@ export default function HexStatus() {
                   </button>
 
                   <span style={{
-                    ...STYLE, fontSize: 13, color: '#ffd700',
+                    ...STYLE, fontSize: 16, color: '#ffd700',
                     textShadow: '0 0 6px rgba(255,215,0,0.55)',
                     minWidth: 18, textAlign: 'center',
                   }}>
@@ -276,7 +276,7 @@ export default function HexStatus() {
                   <button
                     onClick={() => changeValue(i, +1)}
                     style={{
-                      ...STYLE, fontSize: 14, color: '#40e8ff',
+                      ...STYLE, fontSize: 16, color: '#40e8ff',
                       background: 'rgba(8, 6, 20, 0.90)',
                       border: '1px solid rgba(64,232,255,0.40)',
                       width: 24, height: 24, cursor: 'pointer',
@@ -307,7 +307,7 @@ export default function HexStatus() {
               <button
                 onClick={save}
                 style={{
-                  ...STYLE, flex: 1, fontSize: 11,
+                  ...STYLE, flex: 1, fontSize: 14,
                   color: '#38ff78',
                   background: 'rgba(4, 2, 12, 0.90)',
                   border: '2px solid #38ff78',
@@ -321,7 +321,7 @@ export default function HexStatus() {
               <button
                 onClick={() => setEditing(false)}
                 style={{
-                  ...STYLE, flex: 1, fontSize: 11, color: '#504870',
+                  ...STYLE, flex: 1, fontSize: 14, color: '#7a70a0',
                   background: 'rgba(4, 2, 12, 0.90)',
                   border: '1px solid rgba(80,72,112,0.40)',
                   padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em',

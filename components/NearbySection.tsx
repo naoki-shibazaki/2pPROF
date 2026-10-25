@@ -40,8 +40,8 @@ export default function NearbySection() {
   if (needsUpdate) {
     return (
       <section aria-label="近くにいる人" style={{ borderBottom: '1px solid rgba(64,232,255,0.20)', background: 'rgba(4,10,22,0.70)', padding: '10px 12px' }}>
-        <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.08em' }}>■ 近くにいる人</span>
-        <p style={{ ...STYLE, fontSize: 9, color: '#605888', marginTop: 6, lineHeight: 1.8 }}>
+        <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff', letterSpacing: '0.08em' }}>■ 近くにいる人</span>
+        <p style={{ ...STYLE, fontSize: 12, color: '#8a80b0', marginTop: 6, lineHeight: 1.8 }}>
           App Store でアプリを最新版にアップデートすると使えます。
         </p>
       </section>
@@ -90,12 +90,12 @@ export default function NearbySection() {
   return (
     <section aria-label="近くにいる人" style={{ borderBottom: '1px solid rgba(64,232,255,0.20)', background: 'rgba(4,10,22,0.70)', padding: '10px 12px' }}>
       <div className="flex items-center justify-between gap-2">
-        <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.08em' }}>■ 近くにいる人</span>
+        <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff', letterSpacing: '0.08em' }}>■ 近くにいる人</span>
         <button
           onClick={search}
           disabled={status === 'locating'}
           style={{
-            ...STYLE, fontSize: 10, color: '#38ff78', background: 'rgba(4,2,12,0.90)',
+            ...STYLE, fontSize: 13, color: '#38ff78', background: 'rgba(4,2,12,0.90)',
             border: '1px solid rgba(56,255,120,0.50)', padding: '0 12px', minHeight: 36, cursor: 'pointer',
             opacity: status === 'locating' ? 0.5 : 1,
           }}
@@ -105,22 +105,22 @@ export default function NearbySection() {
       </div>
 
       {status === 'idle' && (
-        <p style={{ ...STYLE, fontSize: 8, color: '#605888', marginTop: 6, lineHeight: 1.8 }}>
+        <p style={{ ...STYLE, fontSize: 11, color: '#8a80b0', marginTop: 6, lineHeight: 1.8 }}>
           一緒にいる友達も同じボタンを押すと、ここに表示されます。位置はボタンを押したときだけ使います。
         </p>
       )}
       {status === 'denied' && (
-        <p role="alert" style={{ ...STYLE, fontSize: 9, color: '#ff8090', marginTop: 6, lineHeight: 1.8 }}>
+        <p role="alert" style={{ ...STYLE, fontSize: 12, color: '#ff8090', marginTop: 6, lineHeight: 1.8 }}>
           位置情報がオフになっています。iPhone の「設定」→「2P PROF」→「位置情報」で「使用中のみ」にしてください。
         </p>
       )}
       {status === 'error' && (
-        <p role="alert" style={{ ...STYLE, fontSize: 9, color: '#ff8090', marginTop: 6 }}>
+        <p role="alert" style={{ ...STYLE, fontSize: 12, color: '#ff8090', marginTop: 6 }}>
           位置を取得できませんでした。電波のよい場所でもう一度お試しください。
         </p>
       )}
       {status === 'done' && items.length === 0 && (
-        <p style={{ ...STYLE, fontSize: 9, color: '#605888', marginTop: 6, lineHeight: 1.8 }}>
+        <p style={{ ...STYLE, fontSize: 12, color: '#8a80b0', marginTop: 6, lineHeight: 1.8 }}>
           {NEARBY_RADIUS_M}m 以内に友達は見つかりませんでした。相手にもこのボタンを押してもらってください。
         </p>
       )}
@@ -136,23 +136,23 @@ export default function NearbySection() {
                 ) : <AvatarSVG size={36} />}
               </div>
               <div className="flex flex-col flex-1 min-w-0">
-                <span className="truncate" style={{ ...STYLE, fontSize: 11, color: '#d0c8f0' }}>{f.name ?? f.handle}</span>
-                <span style={{ ...STYLE, fontSize: 8, color: '#605888' }}>@{f.handle} ・ 約{Math.max(10, Math.round(f.distance_m / 10) * 10)}m</span>
+                <span className="truncate" style={{ ...STYLE, fontSize: 14, color: '#d0c8f0' }}>{f.name ?? f.handle}</span>
+                <span style={{ ...STYLE, fontSize: 11, color: '#8a80b0' }}>@{f.handle} ・ 約{Math.max(10, Math.round(f.distance_m / 10) * 10)}m</span>
                 {message?.handle === f.handle && (
-                  <span role="status" style={{ ...STYLE, fontSize: 8, color: message.ok ? '#38ff78' : '#ff8090', marginTop: 2 }}>{message.text}</span>
+                  <span role="status" style={{ ...STYLE, fontSize: 11, color: message.ok ? '#38ff78' : '#ff8090', marginTop: 2 }}>{message.text}</span>
                 )}
               </div>
               {f.counted_today ? (
-                <span style={{ ...STYLE, fontSize: 9, color: '#ffd700', flexShrink: 0 }}>今日は会った！</span>
+                <span style={{ ...STYLE, fontSize: 12, color: '#ffd700', flexShrink: 0 }}>今日は会った！</span>
               ) : f.requested ? (
-                <span style={{ ...STYLE, fontSize: 9, color: '#605888', flexShrink: 0 }}>返事待ち</span>
+                <span style={{ ...STYLE, fontSize: 12, color: '#8a80b0', flexShrink: 0 }}>返事待ち</span>
               ) : (
                 <button
                   onClick={() => sendMet(f)}
                   disabled={sending === f.handle}
                   aria-label={`@${f.handle} に会ったことを送る`}
                   style={{
-                    ...STYLE, fontSize: 10, color: '#ffd700', background: 'rgba(4,2,12,0.90)',
+                    ...STYLE, fontSize: 13, color: '#ffd700', background: 'rgba(4,2,12,0.90)',
                     border: '1px solid rgba(255,215,0,0.55)', padding: '0 10px', minHeight: 36, cursor: 'pointer', flexShrink: 0,
                     opacity: sending === f.handle ? 0.5 : 1,
                   }}

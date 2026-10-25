@@ -53,7 +53,7 @@ function LockScreen({ resetAt }: { resetAt: string }) {
   useEffect(() => { if (mins === 0) window.location.reload() }, [mins])
 
   const btn = {
-    ...STYLE, width: '100%', minHeight: 44, fontSize: 11, background: 'transparent', cursor: 'pointer', letterSpacing: '0.08em',
+    ...STYLE, width: '100%', minHeight: 44, fontSize: 14, background: 'transparent', cursor: 'pointer', letterSpacing: '0.08em',
   } as const
 
   return (
@@ -64,12 +64,12 @@ function LockScreen({ resetAt }: { resetAt: string }) {
     }}>
       <div style={{ width: '100%', maxWidth: 360, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
         <p style={{ ...STYLE, fontSize: 40, color: '#ff4060', textShadow: '0 0 16px rgba(255,64,96,0.6)' }}>HP 0</p>
-        <h1 style={{ ...STYLE, fontSize: 15, color: '#ff40c0', letterSpacing: '0.08em' }}>今日のHPがなくなりました</h1>
-        <p style={{ ...STYLE, fontSize: 11, color: '#b0a8d0', lineHeight: 2 }}>
+        <h1 style={{ ...STYLE, fontSize: 17, color: '#ff40c0', letterSpacing: '0.08em' }}>今日のHPがなくなりました</h1>
+        <p style={{ ...STYLE, fontSize: 14, color: '#b0a8d0', lineHeight: 2 }}>
           アプリを開けるのは1日{HP_MAX}回までです。<br />
           明日 0:00 に全回復します。
         </p>
-        <p style={{ ...STYLE, fontSize: 12, color: '#40e8ff' }}>
+        <p style={{ ...STYLE, fontSize: 15, color: '#40e8ff' }}>
           回復まであと {Math.floor(mins / 60)}時間{mins % 60}分
         </p>
 
@@ -83,7 +83,7 @@ function LockScreen({ resetAt }: { resetAt: string }) {
           {deleteOpen ? (
             <div style={{ textAlign: 'left' }}><DeleteAccount onCancel={() => setDeleteOpen(false)} /></div>
           ) : (
-            <button onClick={() => setDeleteOpen(true)} style={{ ...btn, fontSize: 10, color: '#804060', border: 'none' }}>
+            <button onClick={() => setDeleteOpen(true)} style={{ ...btn, fontSize: 13, color: '#804060', border: 'none' }}>
               アカウントを削除
             </button>
           )}

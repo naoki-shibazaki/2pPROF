@@ -32,13 +32,13 @@ function StatBar({ label, color, fill, current, max }: {
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span style={{ ...STYLE, fontSize: 10, color, minWidth: 30, textShadow: `0 0 5px ${color}`, letterSpacing: '0.05em' }}>
+      <span style={{ ...STYLE, fontSize: 13, color, minWidth: 30, textShadow: `0 0 5px ${color}`, letterSpacing: '0.05em' }}>
         {label}
       </span>
       <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.06)', border: `1px solid ${color}44` }}>
         <div style={{ width: `${fill * 100}%`, height: '100%', background: color, boxShadow: `0 0 6px ${color}` }} />
       </div>
-      <span style={{ ...STYLE, fontSize: 9, color, minWidth: 60, textAlign: 'right', opacity: 0.85 }}>
+      <span style={{ ...STYLE, fontSize: 12, color, minWidth: 60, textAlign: 'right', opacity: 0.85 }}>
         {current} / {max}
       </span>
     </div>
@@ -167,7 +167,7 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
             {name} ✎
           </button>
         )}
-        <p className="text-xs -mt-2" style={{ ...STYLE, color: '#604878' }}>
+        <p className="text-sm -mt-2" style={{ ...STYLE, color: '#8a7aa8' }}>
           @{user?.handle ?? ''}
         </p>
 
@@ -178,15 +178,15 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
               onClick={() => setFollowListType('following')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
             >
-              <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.following_count ?? 0}</span>
-              <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロー</span>
+              <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.following_count ?? 0}</span>
+              <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロー</span>
             </button>
             <button
               onClick={() => setFollowListType('followers')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}
             >
-              <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.followers_count ?? 0}</span>
-              <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロワー</span>
+              <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followers_count ?? 0}</span>
+              <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロワー</span>
             </button>
           </div>
         )}
@@ -218,10 +218,10 @@ export default function MyProfile({ demo }: { demo?: boolean }) {
       {/* ── Bio ── */}
       {user?.bio && (
         <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
-          <h3 className="text-xs font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
+          <h3 className="text-sm font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
             ■ じこしょうかい
           </h3>
-          <p className="text-xs whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>
+          <p className="text-sm whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>
             {user.bio}
           </p>
         </div>

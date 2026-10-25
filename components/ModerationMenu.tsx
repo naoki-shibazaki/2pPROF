@@ -77,7 +77,7 @@ export default function ModerationMenu({ target, onReported, onBlocked, demo, si
   }
 
   const item = (color = '#c0f0ff') => ({
-    ...STYLE, width: '100%', minHeight: 48, fontSize: 12, color, background: 'transparent', border: 'none',
+    ...STYLE, width: '100%', minHeight: 48, fontSize: 15, color, background: 'transparent', border: 'none',
     borderBottom: '1px solid rgba(64,232,255,0.15)', cursor: 'pointer', textAlign: 'left' as const, padding: '0 16px',
   })
 
@@ -86,7 +86,7 @@ export default function ModerationMenu({ target, onReported, onBlocked, demo, si
       <button
         aria-label="通報・ブロック"
         onClick={e => { e.stopPropagation(); setStep(reportOnly ? 'reason' : 'menu'); setOpen(true) }}
-        style={label ? { ...STYLE, cursor: 'pointer', ...labelStyle } : { ...STYLE, fontSize: size + 2, lineHeight: 1, color: '#a898d8', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}
+        style={label ? { ...STYLE, cursor: 'pointer', ...labelStyle } : { ...STYLE, fontSize: size + 4, lineHeight: 1, color: '#a898d8', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px' }}
       >
         {label ?? '⋯'}
       </button>
@@ -110,7 +110,7 @@ export default function ModerationMenu({ target, onReported, onBlocked, demo, si
               )}
               {step === 'reason' && (
                 <>
-                  <p style={{ ...STYLE, fontSize: 10, color: '#40e8ff80', padding: '10px 16px', borderBottom: '1px solid rgba(64,232,255,0.15)' }}>通報の理由を選んでください</p>
+                  <p style={{ ...STYLE, fontSize: 13, color: '#40e8ff80', padding: '10px 16px', borderBottom: '1px solid rgba(64,232,255,0.15)' }}>通報の理由を選んでください</p>
                   {REASONS.map(([key, label]) => (
                     <button key={key} disabled={busy} onClick={() => report(key)} style={item()}>{label}</button>
                   ))}
@@ -118,18 +118,18 @@ export default function ModerationMenu({ target, onReported, onBlocked, demo, si
               )}
               {step === 'confirmBlock' && (
                 <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9 }}>
+                  <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', lineHeight: 1.9 }}>
                     ブロックすると、お互いの投稿・コメント・紹介文が表示されなくなり、フォローも解除されます。運営にも報告されます。
                   </p>
-                  <button disabled={busy} onClick={block} style={{ ...STYLE, fontSize: 12, color: '#fff', background: '#c02040', border: '1px solid #ff4060', padding: '12px', cursor: 'pointer' }}>
+                  <button disabled={busy} onClick={block} style={{ ...STYLE, fontSize: 15, color: '#fff', background: '#c02040', border: '1px solid #ff4060', padding: '12px', cursor: 'pointer' }}>
                     {busy ? '処理中...' : 'ブロックする'}
                   </button>
                 </div>
               )}
               {step === 'done' && (
-                <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', padding: 16, lineHeight: 1.9 }}>✓ {doneText}</p>
+                <p style={{ ...STYLE, fontSize: 14, color: '#38ff78', padding: 16, lineHeight: 1.9 }}>✓ {doneText}</p>
               )}
-              {error && <p style={{ ...STYLE, fontSize: 10, color: '#ff4060', padding: '8px 16px' }}>⚠ {error}</p>}
+              {error && <p style={{ ...STYLE, fontSize: 13, color: '#ff4060', padding: '8px 16px' }}>⚠ {error}</p>}
             </div>
             <button onClick={close} style={{ ...item('#b0a8d0'), textAlign: 'center', background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(176,168,208,0.35)' }}>
               {step === 'done' ? 'とじる' : 'キャンセル'}

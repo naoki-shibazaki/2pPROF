@@ -36,8 +36,8 @@ function Badge({
       onClick={onClick}
       style={{
         ...STYLE,
-        fontSize: 9,
-        color: value ? color : '#403060',
+        fontSize: 12,
+        color: value ? color : '#6a6090',
         background: 'rgba(4,2,12,0.80)',
         border: `1px solid ${value ? color + '88' : 'rgba(64,48,96,0.40)'}`,
         padding: '1px 7px',
@@ -113,7 +113,7 @@ export default function PersonalityBadges() {
               background: 'linear-gradient(90deg,#18042e 0%,#2e0860 50%,#18042e 100%)',
               borderBottom: `2px solid ${open === 'mbti' ? '#40e8ff' : open === 'animal' ? '#ff8830' : '#ff40c0'}`,
               color: open === 'mbti' ? '#40e8ff' : open === 'animal' ? '#ff8830' : '#ff40c0',
-              fontSize: 13, padding: '5px 10px', letterSpacing: '0.10em',
+              fontSize: 16, padding: '5px 10px', letterSpacing: '0.10em',
             }}>
               ■ {open === 'mbti' ? 'MBTI タイプ' : open === 'animal' ? '動物占い' : '恋愛診断'}
             </div>
@@ -127,8 +127,8 @@ export default function PersonalityBadges() {
                       key={t}
                       onClick={() => select('mbti', t)}
                       style={{
-                        ...STYLE, fontSize: 11, padding: '4px 0',
-                        color: draft.mbti === t ? '#40e8ff' : '#504870',
+                        ...STYLE, fontSize: 14, padding: '4px 0',
+                        color: draft.mbti === t ? '#40e8ff' : '#7a70a0',
                         background: draft.mbti === t ? 'rgba(64,232,255,0.12)' : 'rgba(4,2,12,0.80)',
                         border: `1px solid ${draft.mbti === t ? '#40e8ff' : 'rgba(64,232,255,0.20)'}`,
                         boxShadow: draft.mbti === t ? '0 0 6px rgba(64,232,255,0.30)' : 'none',
@@ -150,8 +150,8 @@ export default function PersonalityBadges() {
                       key={a}
                       onClick={() => select('animal', a)}
                       style={{
-                        ...STYLE, fontSize: 11, padding: '5px 0',
-                        color: draft.animal === a ? '#ff8830' : '#504870',
+                        ...STYLE, fontSize: 14, padding: '5px 0',
+                        color: draft.animal === a ? '#ff8830' : '#7a70a0',
                         background: draft.animal === a ? 'rgba(255,136,48,0.12)' : 'rgba(4,2,12,0.80)',
                         border: `1px solid ${draft.animal === a ? '#ff8830' : 'rgba(255,136,48,0.20)'}`,
                         boxShadow: draft.animal === a ? '0 0 6px rgba(255,136,48,0.30)' : 'none',
@@ -173,8 +173,8 @@ export default function PersonalityBadges() {
                       key={l}
                       onClick={() => select('love', l)}
                       style={{
-                        ...STYLE, fontSize: 11, padding: '5px 0',
-                        color: draft.love === l ? '#ff40c0' : '#504870',
+                        ...STYLE, fontSize: 14, padding: '5px 0',
+                        color: draft.love === l ? '#ff40c0' : '#7a70a0',
                         background: draft.love === l ? 'rgba(255,64,192,0.12)' : 'rgba(4,2,12,0.80)',
                         border: `1px solid ${draft.love === l ? '#ff40c0' : 'rgba(255,64,192,0.20)'}`,
                         boxShadow: draft.love === l ? '0 0 6px rgba(255,64,192,0.30)' : 'none',
@@ -193,7 +193,7 @@ export default function PersonalityBadges() {
                 <button
                   onClick={save}
                   style={{
-                    ...STYLE, flex: 1, fontSize: 11, color: '#38ff78',
+                    ...STYLE, flex: 1, fontSize: 14, color: '#38ff78',
                     background: 'rgba(4,2,12,0.90)',
                     border: '2px solid #38ff78',
                     boxShadow: '0 0 8px rgba(56,255,120,0.30)',
@@ -206,7 +206,7 @@ export default function PersonalityBadges() {
                 <button
                   onClick={() => setOpen(null)}
                   style={{
-                    ...STYLE, flex: 1, fontSize: 11, color: '#504870',
+                    ...STYLE, flex: 1, fontSize: 14, color: '#7a70a0',
                     background: 'rgba(4,2,12,0.90)',
                     border: '1px solid rgba(80,72,112,0.40)',
                     padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em',

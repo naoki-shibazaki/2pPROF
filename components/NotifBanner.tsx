@@ -43,11 +43,11 @@ export default function NotifBanner({ tab, show }: { tab: string; show: boolean 
       background: 'rgba(20,14,4,0.90)',
       padding: '6px 8px',
     }}>
-      <p style={{ ...STYLE, fontSize: 8, color: '#ffd040', marginBottom: 4, letterSpacing: '0.06em' }}>
+      <p style={{ ...STYLE, fontSize: 11, color: '#ffd040', marginBottom: 4, letterSpacing: '0.06em' }}>
         ▶ 新着通知
       </p>
       {items.map((n, i) => (
-        <p key={i} style={{ ...STYLE, fontSize: 9, color: '#c8b880', lineHeight: '1.7', letterSpacing: '0.03em' }}>
+        <p key={i} style={{ ...STYLE, fontSize: 12, color: '#c8b880', lineHeight: '1.7', letterSpacing: '0.03em' }}>
           · {label(n.type, n.from_name, n.from_handle)}
         </p>
       ))}

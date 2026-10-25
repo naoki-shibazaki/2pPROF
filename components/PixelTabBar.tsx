@@ -18,7 +18,7 @@ function Badge({ count }: { count: number }) {
       minWidth: 14, height: 14,
       background: '#ff3040', borderRadius: '50%',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 8, fontFamily: 'var(--font-pixel, monospace)',
+      fontSize: 11, fontFamily: 'var(--font-pixel, monospace)',
       color: '#fff', zIndex: 10,
       boxShadow: '0 0 5px rgba(255,48,64,0.90)',
       lineHeight: 1, padding: '0 2px',

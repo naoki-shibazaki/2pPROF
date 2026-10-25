@@ -160,7 +160,7 @@ export default function LoginPage() {
           >
             2P PROF
           </div>
-          <div className="font-pixel text-xs tracking-widest" style={{ color: '#40e8ff80' }}>
+          <div className="font-pixel text-sm tracking-widest" style={{ color: '#40e8ff80' }}>
             {isSignUp ? '▶ NEW ACCOUNT ◀' : '▶ USER LOGIN ◀'}
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function LoginPage() {
           <div className="p-5 space-y-4 short:p-4 short:space-y-3">
             {error && (
               <div
-                className="px-3 py-2 font-pixel text-xs border"
+                className="px-3 py-2 font-pixel text-sm border"
                 style={{ borderColor: '#ff4060', background: 'rgba(255,64,96,0.12)', color: '#ff8090' }}
               >
                 ⚠ {error}
@@ -188,7 +188,7 @@ export default function LoginPage() {
             {/* 利用規約への同意 */}
             <label className="flex items-start gap-2 cursor-pointer" style={{ padding: '8px 10px', border: `1px solid ${agreed ? 'rgba(56,255,120,0.45)' : 'rgba(255,64,192,0.55)'}`, background: agreed ? 'rgba(56,255,120,0.06)' : 'rgba(255,64,192,0.08)' }}>
               <input type="checkbox" checked={agreed} onChange={toggleAgreed} style={{ width: 18, height: 18, marginTop: 1, accentColor: '#38ff78', flexShrink: 0 }} />
-              <span className="font-pixel" style={{ fontSize: 10, color: '#c0f0ff', lineHeight: 1.8 }}>
+              <span className="font-pixel" style={{ fontSize: 13, color: '#c0f0ff', lineHeight: 1.8 }}>
                 <a href="/terms" style={{ color: '#40e8ff', textDecoration: 'underline' }}>利用規約</a>と<a href="/privacy" style={{ color: '#40e8ff', textDecoration: 'underline' }}>プライバシーポリシー</a>に同意します。不適切な投稿や迷惑行為は禁止です。
               </span>
             </label>
@@ -196,37 +196,37 @@ export default function LoginPage() {
             <form onSubmit={handleEmailAuth} className="space-y-3">
               {isSignUp && (
                 <div>
-                  <label className="block font-pixel text-xs mb-1" style={{ color: '#40e8ff80' }}>▶ NAME</label>
+                  <label className="block font-pixel text-sm mb-1" style={{ color: '#40e8ff80' }}>▶ NAME</label>
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
-                    className="w-full bg-transparent font-pixel text-sm px-3 py-2 outline-none"
+                    className="w-full bg-transparent font-pixel text-base px-3 py-2 outline-none"
                     style={{ border: '1px solid rgba(64,232,255,0.35)', color: '#c0f0ff' }}
                     placeholder="your name"
                   />
                 </div>
               )}
               <div>
-                <label className="block font-pixel text-xs mb-1" style={{ color: '#40e8ff80' }}>▶ EMAIL</label>
+                <label className="block font-pixel text-sm mb-1" style={{ color: '#40e8ff80' }}>▶ EMAIL</label>
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  className="w-full bg-transparent font-pixel text-sm px-3 py-2 outline-none"
+                  className="w-full bg-transparent font-pixel text-base px-3 py-2 outline-none"
                   style={{ border: '1px solid rgba(64,232,255,0.35)', color: '#c0f0ff' }}
                   placeholder="user@example.com"
                 />
               </div>
               <div>
-                <label className="block font-pixel text-xs mb-1" style={{ color: '#40e8ff80' }}>▶ PASSWORD</label>
+                <label className="block font-pixel text-sm mb-1" style={{ color: '#40e8ff80' }}>▶ PASSWORD</label>
                 <input
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   required
-                  className="w-full bg-transparent font-pixel text-sm px-3 py-2 outline-none"
+                  className="w-full bg-transparent font-pixel text-base px-3 py-2 outline-none"
                   style={{ border: '1px solid rgba(64,232,255,0.35)', color: '#c0f0ff' }}
                   placeholder="••••••••"
                 />
@@ -235,7 +235,7 @@ export default function LoginPage() {
                 type="submit"
                 disabled={blocked}
                 className="pixel-action-btn w-full justify-center py-3 short:py-2.5"
-                style={{ fontSize: '13px' }}
+                style={{ fontSize: '16px' }}
               >
                 {loading ? '...' : isSignUp ? '▶ アカウントを作成' : '▶ ログイン'}
               </button>
@@ -244,7 +244,7 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="flex items-center gap-3">
               <div style={{ flex: 1, height: 1, background: 'rgba(64,232,255,0.20)' }} />
-              <span className="font-pixel text-xs" style={{ color: '#40e8ff40' }}>または</span>
+              <span className="font-pixel text-sm" style={{ color: '#40e8ff40' }}>または</span>
               <div style={{ flex: 1, height: 1, background: 'rgba(64,232,255,0.20)' }} />
             </div>
 
@@ -253,7 +253,7 @@ export default function LoginPage() {
               {isIOSApp && <button
                 onClick={handleAppleSignIn}
                 disabled={blocked}
-                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-base border-2 transition-none"
                 style={{ background: '#000', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="white">
@@ -264,7 +264,7 @@ export default function LoginPage() {
               <button
                 onClick={() => handleOAuth('google')}
                 disabled={blocked}
-                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-base border-2 transition-none"
                 style={{ background: 'white', borderColor: '#40e8ff', color: '#111', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
@@ -278,7 +278,7 @@ export default function LoginPage() {
               <button
                 onClick={() => handleOAuth('line')}
                 disabled={blocked}
-                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-sm border-2 transition-none"
+                className="w-full flex items-center justify-center gap-3 py-3 short:py-2.5 font-pixel text-base border-2 transition-none"
                 style={{ background: '#06C755', borderColor: '#40e8ff', color: 'white', boxShadow: '0 0 10px rgba(64,232,255,0.3)' }}
               >
                 <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 32 32" fill="white">
@@ -292,7 +292,7 @@ export default function LoginPage() {
             <div className="text-center pt-1">
               <button
                 onClick={() => { setIsSignUp(v => !v); setError('') }}
-                className="font-pixel text-xs"
+                className="font-pixel text-sm"
                 style={{ color: '#ff40c0', background: 'none', border: 'none', cursor: 'pointer', textShadow: '0 0 6px rgba(255,64,192,0.50)' }}
               >
                 {isSignUp ? 'ログインはこちら →' : '新規登録はこちら →'}

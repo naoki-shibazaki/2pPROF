@@ -9,9 +9,10 @@ type Props = {
   open: boolean
   onClose: () => void
   demo?: boolean
+  onShowHowTo?: () => void
 }
 
-export default function SettingsPanel({ open, onClose, demo }: Props) {
+export default function SettingsPanel({ open, onClose, demo, onShowHowTo }: Props) {
   const [email, setEmail] = useState<string | null>(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
 
@@ -42,37 +43,49 @@ export default function SettingsPanel({ open, onClose, demo }: Props) {
           padding: '6px 10px',
           borderBottom: '1px solid rgba(64,232,255,0.25)',
         }}>
-          <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff', letterSpacing: '0.08em' }}>
+          <span style={{ ...STYLE, fontSize: 12, color: '#40e8ff', letterSpacing: '0.08em' }}>
             ⚙ 設定
           </span>
         </div>
 
         {email && (
           <Row>
-            <span style={{ ...STYLE, fontSize: 9, color: '#604878' }}>ログイン中</span>
-            <span style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
+            <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8' }}>ログイン中</span>
+            <span style={{ ...STYLE, fontSize: 13, color: '#b0a8d0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '70%' }}>
               {email}
             </span>
           </Row>
         )}
 
+        {onShowHowTo && (
+          <button
+            onClick={onShowHowTo}
+            style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
+          >
+            <Row>
+              <span style={{ ...STYLE, fontSize: 14, color: '#c0f0ff' }}>使い方</span>
+              <span style={{ ...STYLE, fontSize: 14, color: '#40e8ff80' }}>▶</span>
+            </Row>
+          </button>
+        )}
+
         <a href="/terms" style={{ textDecoration: 'none', display: 'block' }}>
           <Row>
-            <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>利用規約</span>
-            <span style={{ ...STYLE, fontSize: 11, color: '#40e8ff80' }}>▶</span>
+            <span style={{ ...STYLE, fontSize: 14, color: '#c0f0ff' }}>利用規約</span>
+            <span style={{ ...STYLE, fontSize: 14, color: '#40e8ff80' }}>▶</span>
           </Row>
         </a>
 
         <a href="/privacy" style={{ textDecoration: 'none', display: 'block' }}>
           <Row>
-            <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>プライバシーポリシー</span>
-            <span style={{ ...STYLE, fontSize: 11, color: '#40e8ff80' }}>▶</span>
+            <span style={{ ...STYLE, fontSize: 14, color: '#c0f0ff' }}>プライバシーポリシー</span>
+            <span style={{ ...STYLE, fontSize: 14, color: '#40e8ff80' }}>▶</span>
           </Row>
         </a>
 
         <Row>
-          <span style={{ ...STYLE, fontSize: 11, color: '#c0f0ff' }}>お問い合わせ</span>
-          <span style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', userSelect: 'all' }}>support@2p-profile.info</span>
+          <span style={{ ...STYLE, fontSize: 14, color: '#c0f0ff' }}>お問い合わせ</span>
+          <span style={{ ...STYLE, fontSize: 13, color: '#b0a8d0', userSelect: 'all' }}>support@2p-profile.info</span>
         </Row>
 
         <button
@@ -80,7 +93,7 @@ export default function SettingsPanel({ open, onClose, demo }: Props) {
           style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
         >
           <Row>
-            <span style={{ ...STYLE, fontSize: 11, color: '#ff40c0' }}>ログアウト</span>
+            <span style={{ ...STYLE, fontSize: 14, color: '#ff40c0' }}>ログアウト</span>
           </Row>
         </button>
 
@@ -92,7 +105,7 @@ export default function SettingsPanel({ open, onClose, demo }: Props) {
             style={{ width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left' }}
           >
             <Row last>
-              <span style={{ ...STYLE, fontSize: 10, color: '#804060' }}>アカウントを削除</span>
+              <span style={{ ...STYLE, fontSize: 13, color: '#804060' }}>アカウントを削除</span>
             </Row>
           </button>
         )}
@@ -131,19 +144,19 @@ export function DeleteAccount({ onCancel }: { onCancel: () => void }) {
   }
 
   const btn = {
-    ...STYLE, fontSize: 10, background: 'transparent', padding: '8px 14px',
+    ...STYLE, fontSize: 13, background: 'transparent', padding: '8px 14px',
     cursor: 'pointer', letterSpacing: '0.08em',
   } as const
 
   return (
     <div className="m-3 p-3 space-y-3" style={{ border: '1px solid #ff4060', background: 'rgba(255,64,96,0.08)' }}>
-      <p style={{ ...STYLE, fontSize: 11, color: '#ff8090', lineHeight: 1.8 }}>
+      <p style={{ ...STYLE, fontSize: 14, color: '#ff8090', lineHeight: 1.8 }}>
         アカウントを削除すると、プロフィール・投稿・Q&amp;A・フォロー関係などすべてのデータが完全に削除され、元に戻せません。
       </p>
-      <p style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', lineHeight: 1.8 }}>
+      <p style={{ ...STYLE, fontSize: 13, color: '#b0a8d0', lineHeight: 1.8 }}>
         有料プランを利用中の場合、サブスクリプションは自動では解約されません。iPhone の「設定」→ Apple ID →「サブスクリプション」から解約してください。
       </p>
-      {error && <p style={{ ...STYLE, fontSize: 10, color: '#ff4060' }}>⚠ {error}</p>}
+      {error && <p style={{ ...STYLE, fontSize: 13, color: '#ff4060' }}>⚠ {error}</p>}
       <div className="flex gap-2 justify-end">
         <button onClick={onCancel} disabled={deleting}
           style={{ ...btn, color: '#b0a8d0', border: '1px solid rgba(176,168,208,0.35)' }}>

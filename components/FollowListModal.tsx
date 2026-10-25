@@ -81,12 +81,12 @@ export default function FollowListModal({
           padding: '10px 14px',
           borderBottom: '1px solid rgba(255,64,192,0.30)',
         }}>
-          <span style={{ ...STYLE, fontSize: 11, color: '#ff40c0', letterSpacing: '0.10em', textShadow: '0 0 6px rgba(255,64,192,0.60)' }}>
+          <span style={{ ...STYLE, fontSize: 14, color: '#ff40c0', letterSpacing: '0.10em', textShadow: '0 0 6px rgba(255,64,192,0.60)' }}>
             ■ {type === 'following' ? 'フォロー中' : 'フォロワー'}
           </span>
           <button
             onClick={onClose}
-            style={{ ...STYLE, fontSize: 10, color: '#504870', background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ ...STYLE, fontSize: 13, color: '#7a70a0', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             ✕
           </button>
@@ -96,12 +96,12 @@ export default function FollowListModal({
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
-              <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+              <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
             </div>
           ) : users.length === 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: 32 }}>
               <span style={{ fontSize: 28 }}>👥</span>
-              <p style={{ ...STYLE, fontSize: 10, color: '#504870' }}>まだいません</p>
+              <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0' }}>まだいません</p>
             </div>
           ) : (
             users.map(u => (
@@ -125,10 +125,10 @@ export default function FollowListModal({
 
                 {/* Name */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {u.name ?? u.handle ?? '???'}
                   </p>
-                  <p style={{ ...STYLE, fontSize: 9, color: '#504870', margin: 0 }}>@{u.handle ?? '-'}</p>
+                  <p style={{ ...STYLE, fontSize: 12, color: '#7a70a0', margin: 0 }}>@{u.handle ?? '-'}</p>
                 </div>
 
                 {/* Follow button */}
@@ -136,7 +136,7 @@ export default function FollowListModal({
                   <button
                     onClick={e => { e.stopPropagation(); toggleFollow(u) }}
                     style={{
-                      ...STYLE, fontSize: 9,
+                      ...STYLE, fontSize: 12,
                       color: followStates[u.id] ? '#38ff78' : '#ff40c0',
                       background: 'rgba(4,2,12,0.80)',
                       border: `1px solid ${followStates[u.id] ? 'rgba(56,255,120,0.45)' : 'rgba(255,64,192,0.45)'}`,

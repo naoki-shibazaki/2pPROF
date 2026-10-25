@@ -89,18 +89,18 @@ export default function QRScanner({ onClose }: { onClose: () => void }) {
           width: '90%', maxWidth: 320,
         }}
       >
-        <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.10em' }}>■ QRコードを読み込む</span>
+        <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff', letterSpacing: '0.10em' }}>■ QRコードを読み込む</span>
         <div style={{ position: 'relative', width: '100%', aspectRatio: '1', background: '#000', overflow: 'hidden' }}>
           <video ref={videoRef} playsInline muted style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           {/* 読み取り枠 */}
           <div style={{ position: 'absolute', inset: '15%', border: '2px solid rgba(64,232,255,0.8)', boxShadow: '0 0 0 999px rgba(0,0,0,0.35)' }} />
         </div>
-        <span style={{ ...STYLE, fontSize: 9, color: error || unknown ? '#ff8090' : '#604878', textAlign: 'center', lineHeight: 1.8 }}>
+        <span style={{ ...STYLE, fontSize: 12, color: error || unknown ? '#ff8090' : '#8a7aa8', textAlign: 'center', lineHeight: 1.8 }}>
           {error ?? (unknown ? '2P PROF の QR コードではありません' : 'ともだちの QR コードを枠に合わせてください')}
         </span>
         <button
           onClick={onClose}
-          style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', background: 'transparent', border: '1px solid rgba(176,168,208,0.35)', padding: '6px 20px', cursor: 'pointer' }}
+          style={{ ...STYLE, fontSize: 13, color: '#b0a8d0', background: 'transparent', border: '1px solid rgba(176,168,208,0.35)', padding: '6px 20px', cursor: 'pointer' }}
         >
           とじる
         </button>

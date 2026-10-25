@@ -49,7 +49,7 @@ export default function EncounterPrompt() {
 
   if (!current && !result) return null
 
-  const btn = { ...STYLE, flex: 1, minHeight: 48, fontSize: 12, cursor: 'pointer', letterSpacing: '0.08em' } as const
+  const btn = { ...STYLE, flex: 1, minHeight: 48, fontSize: 15, cursor: 'pointer', letterSpacing: '0.08em' } as const
 
   return (
     <div role="dialog" aria-modal="true" aria-labelledby="encounter-title" style={{
@@ -63,12 +63,12 @@ export default function EncounterPrompt() {
       }}>
         {result ? (
           <>
-            <p id="encounter-title" style={{ ...STYLE, fontSize: 16, color: '#ffd700', textShadow: '0 0 10px rgba(255,215,0,0.6)' }}>⚔️ ENCOUNT!</p>
-            <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 2 }}>
+            <p id="encounter-title" style={{ ...STYLE, fontSize: 18, color: '#ffd700', textShadow: '0 0 10px rgba(255,215,0,0.6)' }}>⚔️ ENCOUNT!</p>
+            <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', lineHeight: 2 }}>
               {result.name} と会った回数<br />
               <span style={{ fontSize: 28, color: '#ffd700' }}>{result.count}</span> 回
             </p>
-            <p style={{ ...STYLE, fontSize: 11, color: getProximityTitle(result.count).color }}>
+            <p style={{ ...STYLE, fontSize: 14, color: getProximityTitle(result.count).color }}>
               「{getProximityTitle(result.count).title}」
             </p>
             <button onClick={() => setResult(null)} style={{ ...btn, width: '100%', color: '#c0f0ff', background: 'transparent', border: '1px solid rgba(64,232,255,0.5)' }}>
@@ -83,11 +83,11 @@ export default function EncounterPrompt() {
                 <img src={current.image} alt="" width={64} height={64} style={{ objectFit: 'cover', imageRendering: 'pixelated', display: 'block' }} />
               ) : <AvatarSVG size={64} />}
             </div>
-            <p id="encounter-title" style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', lineHeight: 1.9 }}>
+            <p id="encounter-title" style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1.9 }}>
               {current.name ?? current.handle}<br />
-              <span style={{ fontSize: 9, color: '#605888' }}>@{current.handle}</span>
+              <span style={{ fontSize: 12, color: '#8a80b0' }}>@{current.handle}</span>
             </p>
-            <p style={{ ...STYLE, fontSize: 14, color: '#ff40c0' }}>一緒に会いましたか？</p>
+            <p style={{ ...STYLE, fontSize: 16, color: '#ff40c0' }}>一緒に会いましたか？</p>
             <div style={{ display: 'flex', gap: 8, width: '100%' }}>
               <button onClick={() => answer(false)} disabled={busy} style={{ ...btn, color: '#b0a8d0', background: 'transparent', border: '1px solid rgba(176,168,208,0.4)', opacity: busy ? 0.5 : 1 }}>
                 会ってない

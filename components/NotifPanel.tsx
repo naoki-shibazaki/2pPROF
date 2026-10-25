@@ -132,13 +132,13 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
           padding: '6px 10px',
           borderBottom: '1px solid rgba(255,64,192,0.25)',
         }}>
-          <span style={{ ...STYLE, fontSize: 9, color: '#ff40c0', letterSpacing: '0.08em' }}>
+          <span style={{ ...STYLE, fontSize: 12, color: '#ff40c0', letterSpacing: '0.08em' }}>
             🔔 通知
           </span>
           {hasUnread && (
             <button
               onClick={markAllRead}
-              style={{ ...STYLE, fontSize: 8, color: '#604878', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ ...STYLE, fontSize: 11, color: '#8a7aa8', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               すべて既読
             </button>
@@ -148,10 +148,10 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
         {/* List */}
         <div style={{ overflowY: 'auto', flex: 1 }}>
           {loading && (
-            <p style={{ ...STYLE, fontSize: 9, color: '#604878', padding: '12px', textAlign: 'center' }}>読み込み中...</p>
+            <p style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', padding: '12px', textAlign: 'center' }}>読み込み中...</p>
           )}
           {!loading && items.length === 0 && (
-            <p style={{ ...STYLE, fontSize: 9, color: '#403860', padding: '16px', textAlign: 'center' }}>通知はありません</p>
+            <p style={{ ...STYLE, fontSize: 12, color: '#6a6090', padding: '16px', textAlign: 'center' }}>通知はありません</p>
           )}
           {items.map(n => (
             <div
@@ -167,12 +167,12 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,64,192,0.12)')}
               onMouseLeave={e => (e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(255,64,192,0.06)')}
             >
-              <span style={{ fontSize: 13, lineHeight: 1, marginTop: 1 }}>{typeIcon(n.type)}</span>
+              <span style={{ fontSize: 16, lineHeight: 1, marginTop: 1 }}>{typeIcon(n.type)}</span>
               <div style={{ flex: 1 }}>
-                <p style={{ ...STYLE, fontSize: 9, color: n.read ? '#504870' : '#c8a8e8', lineHeight: 1.6 }}>
+                <p style={{ ...STYLE, fontSize: 12, color: n.read ? '#7a70a0' : '#c8a8e8', lineHeight: 1.6 }}>
                   {typeLabel(n.type, n.from_name, n.from_handle)}
                 </p>
-                <p style={{ ...STYLE, fontSize: 8, color: '#403060', marginTop: 2 }}>
+                <p style={{ ...STYLE, fontSize: 11, color: '#6a6090', marginTop: 2 }}>
                   {timeAgo(n.created_at)}
                   {' · '}
                   <span style={{ color: '#604898' }}>

@@ -116,19 +116,19 @@ function ShareSettingsPanel({ onClose }: { onClose: () => void }) {
         padding: '10px 14px',
         borderBottom: '1px solid rgba(255,64,192,0.25)',
       }}>
-        <span style={{ ...STYLE, fontSize: 10, color: '#ff40c0', letterSpacing: '0.08em' }}>
+        <span style={{ ...STYLE, fontSize: 13, color: '#ff40c0', letterSpacing: '0.08em' }}>
           📍 位置共有の設定
         </span>
-        <button onClick={onClose} style={{ ...STYLE, fontSize: 11, color: '#604878', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+        <button onClick={onClose} style={{ ...STYLE, fontSize: 14, color: '#8a7aa8', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px' }}>
         {loading ? (
-          <p style={{ ...STYLE, fontSize: 9, color: '#604878', textAlign: 'center', marginTop: 20 }}>読み込み中...</p>
+          <p style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', textAlign: 'center', marginTop: 20 }}>読み込み中...</p>
         ) : (
           <>
             {/* モード選択 */}
-            <p style={{ ...STYLE, fontSize: 8, color: '#40e8ff', marginBottom: 8, letterSpacing: '0.06em' }}>■ 共有範囲</p>
+            <p style={{ ...STYLE, fontSize: 11, color: '#40e8ff', marginBottom: 8, letterSpacing: '0.06em' }}>■ 共有範囲</p>
             {modeOptions.map(opt => (
               <button
                 key={opt.value}
@@ -142,12 +142,12 @@ function ShareSettingsPanel({ onClose }: { onClose: () => void }) {
                   cursor: 'pointer', textAlign: 'left',
                 }}
               >
-                <span style={{ fontSize: 12, color: mode === opt.value ? '#ff40c0' : '#403060' }}>
+                <span style={{ fontSize: 15, color: mode === opt.value ? '#ff40c0' : '#6a6090' }}>
                   {mode === opt.value ? '◉' : '○'}
                 </span>
                 <div>
-                  <p style={{ fontSize: 9, color: mode === opt.value ? '#d0a8e8' : '#504870', margin: 0 }}>{opt.label}</p>
-                  <p style={{ fontSize: 7, color: '#403060', margin: '2px 0 0' }}>{opt.desc}</p>
+                  <p style={{ fontSize: 12, color: mode === opt.value ? '#d0a8e8' : '#7a70a0', margin: 0 }}>{opt.label}</p>
+                  <p style={{ fontSize: 11, color: '#6a6090', margin: '2px 0 0' }}>{opt.desc}</p>
                 </div>
               </button>
             ))}
@@ -155,7 +155,7 @@ function ShareSettingsPanel({ onClose }: { onClose: () => void }) {
             {/* 友達リスト（selected モード時） */}
             {mode === 'selected' && friends.length > 0 && (
               <>
-                <p style={{ ...STYLE, fontSize: 8, color: '#40e8ff', margin: '16px 0 8px', letterSpacing: '0.06em' }}>■ 共有する友達を選ぶ</p>
+                <p style={{ ...STYLE, fontSize: 11, color: '#40e8ff', margin: '16px 0 8px', letterSpacing: '0.06em' }}>■ 共有する友達を選ぶ</p>
                 {friends.map(f => {
                   const on = selected.has(f.id)
                   return (
@@ -171,17 +171,17 @@ function ShareSettingsPanel({ onClose }: { onClose: () => void }) {
                         cursor: 'pointer',
                       }}
                     >
-                      <span style={{ fontSize: 9, color: on ? '#c8e8f8' : '#504870' }}>
+                      <span style={{ fontSize: 12, color: on ? '#c8e8f8' : '#7a70a0' }}>
                         @{f.handle}{f.name ? ` · ${f.name}` : ''}
                       </span>
-                      <span style={{ fontSize: 10, color: on ? '#40e8ff' : '#403060' }}>
+                      <span style={{ fontSize: 13, color: on ? '#40e8ff' : '#6a6090' }}>
                         {on ? '✓' : '＋'}
                       </span>
                     </button>
                   )
                 })}
                 {friends.length === 0 && (
-                  <p style={{ ...STYLE, fontSize: 9, color: '#403060', textAlign: 'center' }}>友達がいません</p>
+                  <p style={{ ...STYLE, fontSize: 12, color: '#6a6090', textAlign: 'center' }}>友達がいません</p>
                 )}
               </>
             )}
@@ -225,7 +225,7 @@ export default function MapView() {
 
   if (geoError) return (
     <div style={{ padding: '40px 24px', textAlign: 'center' }}>
-      <p style={{ ...STYLE, fontSize: 10, color: '#604878', lineHeight: 2 }}>
+      <p style={{ ...STYLE, fontSize: 13, color: '#8a7aa8', lineHeight: 2 }}>
         位置情報が許可されていません。<br />ブラウザの設定から許可してください。
       </p>
     </div>
@@ -233,7 +233,7 @@ export default function MapView() {
 
   if (!myPos) return (
     <div style={{ padding: '40px 24px', textAlign: 'center' }}>
-      <p style={{ ...STYLE, fontSize: 10, color: '#604878' }}>位置情報を取得中...</p>
+      <p style={{ ...STYLE, fontSize: 13, color: '#8a7aa8' }}>位置情報を取得中...</p>
     </div>
   )
 
@@ -249,18 +249,18 @@ export default function MapView() {
           <Recenter lat={myPos.lat} lng={myPos.lng} />
 
           <Marker position={[myPos.lat, myPos.lng]} icon={myIcon}>
-            <Popup><span style={{ ...STYLE, fontSize: 9 }}>あなたの現在地</span></Popup>
+            <Popup><span style={{ ...STYLE, fontSize: 12 }}>あなたの現在地</span></Popup>
           </Marker>
 
           {friends.map(f => (
             <Marker key={f.handle} position={[f.lat, f.lng]} icon={makeIcon('#40e8ff', `@${f.handle}`)}>
               <Popup>
-                <div style={{ ...STYLE, fontSize: 9, lineHeight: 1.8 }}>
+                <div style={{ ...STYLE, fontSize: 12, lineHeight: 1.8 }}>
                   <strong>@{f.handle}</strong><br />
                   {f.name && <>{f.name}<br /></>}
                   {timeAgo(f.updated_at)}<br />
                   <button onClick={() => router.push(`/profile/${f.handle}`)}
-                    style={{ ...STYLE, fontSize: 8, marginTop: 4, cursor: 'pointer', color: '#40e8ff', background: 'none', border: 'none', padding: 0 }}>
+                    style={{ ...STYLE, fontSize: 11, marginTop: 4, cursor: 'pointer', color: '#40e8ff', background: 'none', border: 'none', padding: 0 }}>
                     プロフィールを見る →
                   </button>
                 </div>
@@ -275,7 +275,7 @@ export default function MapView() {
         <button
           onClick={() => setShowSettings(true)}
           style={{
-            ...STYLE, flex: 1, fontSize: 9,
+            ...STYLE, flex: 1, fontSize: 12,
             color: '#40e8ff',
             background: 'rgba(4,14,28,0.80)',
             border: '1px solid rgba(64,232,255,0.35)',
@@ -285,7 +285,7 @@ export default function MapView() {
           📍 共有設定
         </button>
         {friends.length > 0 && (
-          <div style={{ display: 'flex', alignItems: 'center', ...STYLE, fontSize: 8, color: '#504878', paddingRight: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', ...STYLE, fontSize: 11, color: '#504878', paddingRight: 4 }}>
             {friends.length}人が近くにいます
           </div>
         )}

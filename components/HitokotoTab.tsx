@@ -136,10 +136,10 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
       {/* 承認済みコメント（ネスト表示） */}
       {visibleComments.map(c => (
         <div key={c.id} style={{ display: 'flex', gap: 6, padding: '5px 12px 0' }}>
-          <span style={{ ...STYLE, fontSize: 9, color: 'rgba(64,232,255,0.35)', flexShrink: 0, paddingTop: 2 }}>└</span>
+          <span style={{ ...STYLE, fontSize: 12, color: 'rgba(64,232,255,0.35)', flexShrink: 0, paddingTop: 2 }}>└</span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <span style={{ ...STYLE, fontSize: 8, color: '#6050a0' }}>@{c.author_handle ?? '?'} </span>
-            <span style={{ ...STYLE, fontSize: 10, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
+            <span style={{ ...STYLE, fontSize: 11, color: '#6050a0' }}>@{c.author_handle ?? '?'} </span>
+            <span style={{ ...STYLE, fontSize: 13, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
           </div>
           {c.author_handle && c.author_handle !== meHandle && (
             <ModerationMenu
@@ -157,10 +157,10 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
       {isMine && myPostPending.map(c => (
         <div key={c.id} style={{ padding: '5px 12px 0' }}>
           <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ ...STYLE, fontSize: 9, color: 'rgba(255,136,48,0.55)', flexShrink: 0, paddingTop: 2 }}>└</span>
+            <span style={{ ...STYLE, fontSize: 12, color: 'rgba(255,136,48,0.55)', flexShrink: 0, paddingTop: 2 }}>└</span>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <span style={{ ...STYLE, fontSize: 8, color: '#ff8830' }}>@{c.author_handle ?? '?'} </span>
-              <span style={{ ...STYLE, fontSize: 10, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
+              <span style={{ ...STYLE, fontSize: 11, color: '#ff8830' }}>@{c.author_handle ?? '?'} </span>
+              <span style={{ ...STYLE, fontSize: 13, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{c.body}</span>
             </div>
             <ModerationMenu
               target={{ contentType: 'post_comment', contentId: c.id, handle: c.author_handle }}
@@ -171,8 +171,8 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
             />
           </div>
           <div style={{ display: 'flex', gap: 6, paddingLeft: 20, marginTop: 4 }}>
-            <button onClick={() => handlePendingAction(c.id, 'approved')} style={{ ...STYLE, fontSize: 9, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '2px 8px', cursor: 'pointer' }}>✓ 承認</button>
-            <button onClick={() => handlePendingAction(c.id, 'rejected')} style={{ ...STYLE, fontSize: 9, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.40)', padding: '2px 8px', cursor: 'pointer' }}>✕ 却下</button>
+            <button onClick={() => handlePendingAction(c.id, 'approved')} style={{ ...STYLE, fontSize: 12, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '2px 8px', cursor: 'pointer' }}>✓ 承認</button>
+            <button onClick={() => handlePendingAction(c.id, 'rejected')} style={{ ...STYLE, fontSize: 12, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.40)', padding: '2px 8px', cursor: 'pointer' }}>✕ 却下</button>
           </div>
         </div>
       ))}
@@ -181,23 +181,23 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
       {!isMine && myPending && (
         <div style={{ padding: '5px 12px 0' }}>
           <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ ...STYLE, fontSize: 9, color: 'rgba(255,136,48,0.55)', flexShrink: 0, paddingTop: 2 }}>└</span>
+            <span style={{ ...STYLE, fontSize: 12, color: 'rgba(255,136,48,0.55)', flexShrink: 0, paddingTop: 2 }}>└</span>
             <div style={{ flex: 1, minWidth: 0 }}>
               {editingPending ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <textarea value={editText} onChange={e => setEditText(e.target.value)} maxLength={200} rows={2}
-                    style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,136,48,0.40)', padding: '3px 6px', outline: 'none', resize: 'none', lineHeight: 1.7, width: '100%' }} />
-                  {editError && <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', margin: 0 }}>{editError}</p>}
+                    style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,136,48,0.40)', padding: '3px 6px', outline: 'none', resize: 'none', lineHeight: 1.7, width: '100%' }} />
+                  {editError && <p style={{ ...STYLE, fontSize: 12, color: '#ff4060', margin: 0 }}>{editError}</p>}
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <button onClick={saveEdit} disabled={editSaving || !editText.trim()} style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '2px 8px', cursor: 'pointer', opacity: editSaving ? 0.5 : 1 }}>{editSaving ? '保存中...' : '保存'}</button>
-                    <button onClick={() => { setEditingPending(false); setEditError(null) }} style={{ ...STYLE, fontSize: 9, color: '#8070a8', background: 'transparent', border: '1px solid rgba(80,72,112,0.40)', padding: '2px 8px', cursor: 'pointer' }}>キャンセル</button>
+                    <button onClick={saveEdit} disabled={editSaving || !editText.trim()} style={{ ...STYLE, fontSize: 12, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '2px 8px', cursor: 'pointer', opacity: editSaving ? 0.5 : 1 }}>{editSaving ? '保存中...' : '保存'}</button>
+                    <button onClick={() => { setEditingPending(false); setEditError(null) }} style={{ ...STYLE, fontSize: 12, color: '#8070a8', background: 'transparent', border: '1px solid rgba(80,72,112,0.40)', padding: '2px 8px', cursor: 'pointer' }}>キャンセル</button>
                   </div>
                 </div>
               ) : (
                 <div>
-                  <span style={{ ...STYLE, fontSize: 10, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{myPending.body}</span>
-                  <span style={{ ...STYLE, fontSize: 8, color: '#ff8830', marginLeft: 6 }}>承認待ち</span>
-                  <button onClick={() => { setEditText(myPending.body); setEditingPending(true) }} style={{ ...STYLE, fontSize: 8, color: '#ff8830', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 6px' }}>[編集]</button>
+                  <span style={{ ...STYLE, fontSize: 13, color: '#c0b8e0', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{myPending.body}</span>
+                  <span style={{ ...STYLE, fontSize: 11, color: '#ff8830', marginLeft: 6 }}>承認待ち</span>
+                  <button onClick={() => { setEditText(myPending.body); setEditingPending(true) }} style={{ ...STYLE, fontSize: 11, color: '#ff8830', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 0 6px' }}>[編集]</button>
                 </div>
               )}
             </div>
@@ -208,15 +208,15 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
       {/* フッター行：常に表示 */}
       <div style={{ padding: '5px 12px 7px', display: 'flex', alignItems: 'center', gap: 8 }}>
         {totalCount > 0 && (
-          <span style={{ ...STYLE, fontSize: 8, color: '#6050a0' }}>💬 {totalCount}件</span>
+          <span style={{ ...STYLE, fontSize: 11, color: '#6050a0' }}>💬 {totalCount}件</span>
         )}
         {!myPending && (
           submitFlagged ? (
-            <span style={{ ...STYLE, fontSize: 9, color: '#ff4060' }}>⚠ 送信できませんでした</span>
+            <span style={{ ...STYLE, fontSize: 12, color: '#ff4060' }}>⚠ 送信できませんでした</span>
           ) : showForm ? null : (
             <button
               onClick={() => setShowForm(true)}
-              style={{ ...STYLE, fontSize: 9, color: '#8868c8', background: 'none', border: '1px solid rgba(136,104,200,0.35)', padding: '2px 10px', cursor: 'pointer' }}
+              style={{ ...STYLE, fontSize: 12, color: '#8868c8', background: 'none', border: '1px solid rgba(136,104,200,0.35)', padding: '2px 10px', cursor: 'pointer' }}
             >
               💬 コメントする
             </button>
@@ -228,12 +228,12 @@ function PostCommentSection({ postId, isMine, meHandle, pendingComments, onPendi
       {showForm && (
         <div style={{ padding: '0 12px 10px', display: 'flex', flexDirection: 'column', gap: 4 }}>
           <textarea value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="コメントを入力..." maxLength={200} rows={2}
-            style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(136,104,200,0.40)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7, width: '100%' }} />
+            style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(136,104,200,0.40)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7, width: '100%' }} />
           <div style={{ display: 'flex', gap: 6 }}>
-            <button onClick={submit} disabled={submitting || !commentText.trim()} style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '3px 12px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1 }}>
+            <button onClick={submit} disabled={submitting || !commentText.trim()} style={{ ...STYLE, fontSize: 12, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '3px 12px', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1 }}>
               {submitting ? '送信中...' : '送信'}
             </button>
-            <button onClick={() => { setShowForm(false); setCommentText('') }} style={{ ...STYLE, fontSize: 9, color: '#8070a8', background: 'transparent', border: '1px solid rgba(80,72,112,0.40)', padding: '3px 8px', cursor: 'pointer' }}>キャンセル</button>
+            <button onClick={() => { setShowForm(false); setCommentText('') }} style={{ ...STYLE, fontSize: 12, color: '#8070a8', background: 'transparent', border: '1px solid rgba(80,72,112,0.40)', padding: '3px 8px', cursor: 'pointer' }}>キャンセル</button>
           </div>
         </div>
       )}
@@ -319,11 +319,11 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
           placeholder="いまどうしてる？"
           maxLength={MAX_LEN}
           rows={2}
-          style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '6px 8px', outline: 'none', resize: 'none', lineHeight: 1.8, width: '100%', display: 'block' }}
+          style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '6px 8px', outline: 'none', resize: 'none', lineHeight: 1.8, width: '100%', display: 'block' }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-          <span style={{ ...STYLE, fontSize: 8, color: remaining <= 20 ? '#ff4060' : '#504870' }}>{remaining}</span>
-          <button onClick={submit} disabled={sending || !text.trim()} style={{ ...STYLE, fontSize: 10, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.45)', padding: '4px 16px', cursor: sending || !text.trim() ? 'default' : 'pointer', opacity: sending || !text.trim() ? 0.45 : 1 }}>
+          <span style={{ ...STYLE, fontSize: 11, color: remaining <= 20 ? '#ff4060' : '#7a70a0' }}>{remaining}</span>
+          <button onClick={submit} disabled={sending || !text.trim()} style={{ ...STYLE, fontSize: 13, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.45)', padding: '4px 16px', cursor: sending || !text.trim() ? 'default' : 'pointer', opacity: sending || !text.trim() ? 0.45 : 1 }}>
             {sending ? '送信中...' : 'つぶやく'}
           </button>
         </div>
@@ -332,12 +332,12 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
       {/* Feed */}
       {loading ? (
         <div style={{ padding: '20px 12px', textAlign: 'center' }}>
-          <span style={{ ...STYLE, fontSize: 9, color: '#504870' }}>読み込み中...</span>
+          <span style={{ ...STYLE, fontSize: 12, color: '#7a70a0' }}>読み込み中...</span>
         </div>
       ) : visiblePosts.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-10">
           <span style={{ fontSize: 28 }}>💬</span>
-          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>
+          <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>
             まだつぶやきがありません<br />最初のひとことを投稿しよう
           </p>
         </div>
@@ -348,14 +348,14 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
             <div key={post.id} style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', background: 'rgba(4,2,12,0.40)' }}>
               {/* Post body */}
               <div style={{ padding: '9px 12px 6px' }}>
-                <button onClick={() => post.handle && router.push(`/profile/${post.handle}`)} style={{ ...STYLE, fontSize: 9, color: '#504870', background: 'none', border: 'none', cursor: post.handle ? 'pointer' : 'default', padding: 0, marginBottom: 3 }}>
+                <button onClick={() => post.handle && router.push(`/profile/${post.handle}`)} style={{ ...STYLE, fontSize: 12, color: '#7a70a0', background: 'none', border: 'none', cursor: post.handle ? 'pointer' : 'default', padding: 0, marginBottom: 3 }}>
                   @{post.handle}
                 </button>
-                <p style={{ ...STYLE, fontSize: 11, color: '#b0a8d0', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{post.body}</p>
+                <p style={{ ...STYLE, fontSize: 14, color: '#b0a8d0', lineHeight: 1.8, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{post.body}</p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 3 }}>
-                  <span style={{ ...STYLE, fontSize: 8, color: '#403860' }}>{timeAgo(post.created_at)}</span>
+                  <span style={{ ...STYLE, fontSize: 11, color: '#6a6090' }}>{timeAgo(post.created_at)}</span>
                   {isMine ? (
-                    <button onClick={() => deletePost(post.id)} style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>削除</button>
+                    <button onClick={() => deletePost(post.id)} style={{ ...STYLE, fontSize: 11, color: '#6a6090', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>削除</button>
                   ) : (
                     <ModerationMenu
                       target={{ contentType: 'post', contentId: post.id, handle: post.handle }}

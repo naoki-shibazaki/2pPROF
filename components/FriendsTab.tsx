@@ -171,9 +171,9 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
           <button
             onClick={() => setActiveTab('friends')}
             style={{
-              ...STYLE, flex: 1, fontSize: 11, padding: '8px 0', cursor: 'pointer', border: 'none',
+              ...STYLE, flex: 1, fontSize: 14, padding: '8px 0', cursor: 'pointer', border: 'none',
               background: activeTab === 'friends' ? 'rgba(255,64,192,0.15)' : 'transparent',
-              color: activeTab === 'friends' ? '#ff40c0' : '#504870',
+              color: activeTab === 'friends' ? '#ff40c0' : '#7a70a0',
               letterSpacing: '0.06em',
               textShadow: activeTab === 'friends' ? '0 0 7px rgba(255,64,192,0.60)' : 'none',
               borderBottom: activeTab === 'friends' ? '2px solid #ff40c0' : '2px solid transparent',
@@ -184,9 +184,9 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
           <button
             onClick={() => setActiveTab('blocks')}
             style={{
-              ...STYLE, flex: 1, fontSize: 11, padding: '8px 0', cursor: 'pointer', border: 'none',
+              ...STYLE, flex: 1, fontSize: 14, padding: '8px 0', cursor: 'pointer', border: 'none',
               background: activeTab === 'blocks' ? 'rgba(255,64,64,0.12)' : 'transparent',
-              color: activeTab === 'blocks' ? '#ff4060' : '#504870',
+              color: activeTab === 'blocks' ? '#ff4060' : '#7a70a0',
               letterSpacing: '0.06em',
               textShadow: activeTab === 'blocks' ? '0 0 7px rgba(255,64,64,0.50)' : 'none',
               borderBottom: activeTab === 'blocks' ? '2px solid #ff4060' : '2px solid transparent',
@@ -198,7 +198,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
             <button
               onClick={() => { setAdding(v => !v); setAddError(null) }}
               style={{
-                ...STYLE, fontSize: 10, color: '#ffd700',
+                ...STYLE, fontSize: 13, color: '#ffd700',
                 background: 'rgba(8,6,20,0.92)',
                 border: '1px solid rgba(255,215,0,0.50)',
                 padding: '3px 10px', cursor: 'pointer', margin: '0 8px',
@@ -216,12 +216,12 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
         <div>
           {blocksLoading ? (
             <div className="flex justify-center py-8">
-              <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+              <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
             </div>
           ) : blockedUsers.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-10">
               <span style={{ fontSize: 32 }}>🚫</span>
-              <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center' }}>
+              <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center' }}>
                 ブロック中のユーザーはいません
               </p>
             </div>
@@ -246,17 +246,17 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
                     </div>
                     {/* Name + date */}
                     <div className="flex flex-col flex-1 min-w-0">
-                      <span style={{ ...STYLE, fontSize: 11, color: '#d0c8f0' }} className="truncate">
+                      <span style={{ ...STYLE, fontSize: 14, color: '#d0c8f0' }} className="truncate">
                         {u.name ?? u.handle ?? '???'}
                       </span>
-                      <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>@{u.handle ?? '-'}</span>
-                      <span style={{ ...STYLE, fontSize: 8, color: '#403860', marginTop: 2 }}>{dateStr}</span>
+                      <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>@{u.handle ?? '-'}</span>
+                      <span style={{ ...STYLE, fontSize: 11, color: '#6a6090', marginTop: 2 }}>{dateStr}</span>
                     </div>
                     {/* Unblock button */}
                     <button
                       onClick={() => handleUnblock(u.handle)}
                       style={{
-                        ...STYLE, fontSize: 9, color: '#ff4060',
+                        ...STYLE, fontSize: 12, color: '#ff4060',
                         background: 'rgba(4,2,12,0.90)',
                         border: '1px solid rgba(255,64,64,0.40)',
                         padding: '3px 8px', cursor: 'pointer', flexShrink: 0,
@@ -286,8 +286,8 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
           <button
             onClick={() => { setHideAll(v => !v); setHiddenIds(new Set()) }}
             style={{
-              ...STYLE, fontSize: 9,
-              color: hideAll ? '#38ff78' : '#504870',
+              ...STYLE, fontSize: 12,
+              color: hideAll ? '#38ff78' : '#7a70a0',
               background: 'transparent', border: 'none', cursor: 'pointer',
               letterSpacing: '0.06em',
             }}
@@ -300,7 +300,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
       {/* Add friend input */}
       {adding && (
         <div className="px-3 py-3 flex flex-col gap-2" style={{ borderBottom: '1px solid rgba(255,215,0,0.20)', background: 'rgba(8,6,20,0.80)' }}>
-          <span style={{ ...STYLE, fontSize: 10, color: '#ffd700', letterSpacing: '0.06em' }}>ハンドルで検索</span>
+          <span style={{ ...STYLE, fontSize: 13, color: '#ffd700', letterSpacing: '0.06em' }}>ハンドルで検索</span>
           <div className="flex gap-2">
             <input
               type="text"
@@ -309,7 +309,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
               placeholder="@handle"
               style={{
-                ...STYLE, flex: 1, fontSize: 12, color: '#d0c8f0',
+                ...STYLE, flex: 1, fontSize: 15, color: '#d0c8f0',
                 background: 'rgba(4,2,12,0.90)',
                 border: '1px solid rgba(208,200,240,0.40)',
                 padding: '5px 8px', outline: 'none',
@@ -319,7 +319,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
               onClick={handleAdd}
               disabled={addLoading}
               style={{
-                ...STYLE, fontSize: 10, color: '#38ff78',
+                ...STYLE, fontSize: 13, color: '#38ff78',
                 background: 'rgba(4,2,12,0.90)',
                 border: '1px solid rgba(56,255,120,0.50)',
                 padding: '5px 12px', cursor: 'pointer',
@@ -330,7 +330,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
             </button>
           </div>
           {addError && (
-            <p style={{ ...STYLE, fontSize: 9, color: '#ff4060' }}>⚠ {addError}</p>
+            <p style={{ ...STYLE, fontSize: 12, color: '#ff4060' }}>⚠ {addError}</p>
           )}
         </div>
       )}
@@ -338,12 +338,12 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
       {/* Friends list */}
       {loading ? (
         <div className="flex justify-center py-8">
-          <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+          <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
         </div>
       ) : friends.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-10">
           <span style={{ fontSize: 32 }}>👥</span>
-          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>
+          <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>
             まだフォローしていません<br />「＋ 追加」でともだちを登録しよう
           </p>
         </div>
@@ -378,10 +378,10 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
 
                   {/* Name + handle */}
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span style={{ ...STYLE, fontSize: 12, color: '#d0c8f0', letterSpacing: '0.06em' }} className="truncate">
+                    <span style={{ ...STYLE, fontSize: 15, color: '#d0c8f0', letterSpacing: '0.06em' }} className="truncate">
                       {f.name ?? f.handle ?? '???'}
                     </span>
-                    <span style={{ ...STYLE, fontSize: 9, color: '#504870' }}>@{f.handle ?? '-'}</span>
+                    <span style={{ ...STYLE, fontSize: 12, color: '#7a70a0' }}>@{f.handle ?? '-'}</span>
                   </div>
 
                   {/* Proximity count — tap to toggle */}
@@ -390,21 +390,21 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
                     style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
                   >
                     {isCountHidden
-                      ? <span style={{ ...STYLE, fontSize: 18, color: '#403860', lineHeight: 1 }}>—</span>
-                      : <span style={{ ...STYLE, fontSize: 18, color: '#ffd700', textShadow: '0 0 8px rgba(255,215,0,0.55)', lineHeight: 1 }}>{f.proximity_count}</span>
+                      ? <span style={{ ...STYLE, fontSize: 20, color: '#6a6090', lineHeight: 1 }}>—</span>
+                      : <span style={{ ...STYLE, fontSize: 20, color: '#ffd700', textShadow: '0 0 8px rgba(255,215,0,0.55)', lineHeight: 1 }}>{f.proximity_count}</span>
                     }
-                    <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>回</span>
+                    <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>回</span>
                   </button>
                 </div>
 
                 {/* 称号 + action buttons */}
                 <div className="px-3 pb-2 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span style={{ ...STYLE, fontSize: 10, color: pt.color, textShadow: `0 0 6px ${pt.color}88`, letterSpacing: '0.08em', flexShrink: 0 }}>
+                    <span style={{ ...STYLE, fontSize: 13, color: pt.color, textShadow: `0 0 6px ${pt.color}88`, letterSpacing: '0.08em', flexShrink: 0 }}>
                       ⚔️ {isCountHidden ? '???' : pt.title}
                     </span>
                     {!isCountHidden && next && (
-                      <span style={{ ...STYLE, fontSize: 8, color: '#504870' }} className="truncate">
+                      <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }} className="truncate">
                         次: {next.min - f.proximity_count}回で「{next.title}」
                       </span>
                     )}
@@ -412,13 +412,13 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); setQuestionOpenId(questionOpenId === f.id ? null : f.id); setQuestionText('') }}
-                      style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.40)', padding: '2px 8px', cursor: 'pointer' }}
+                      style={{ ...STYLE, fontSize: 12, color: '#ff40c0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.40)', padding: '2px 8px', cursor: 'pointer' }}
                     >
                       💬
                     </button>
                     <button
                       onClick={(e) => handleUnfollow(e, f.id)}
-                      style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      style={{ ...STYLE, fontSize: 11, color: '#6a6090', background: 'transparent', border: 'none', cursor: 'pointer' }}
                     >
                       解除
                     </button>
@@ -429,7 +429,7 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
                 {questionOpenId === f.id && (
                   <div style={{ margin: '0 12px 10px', background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(255,64,192,0.35)', padding: 8 }}>
                     {qSentId === f.id ? (
-                      <p style={{ ...STYLE, fontSize: 10, color: '#38ff78', textAlign: 'center', padding: '4px 0' }}>✓ 質問を送りました！</p>
+                      <p style={{ ...STYLE, fontSize: 13, color: '#38ff78', textAlign: 'center', padding: '4px 0' }}>✓ 質問を送りました！</p>
                     ) : (
                       <div className="flex gap-2">
                         <input
@@ -440,12 +440,12 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
                           onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); sendQuestion(f.handle) } }}
                           placeholder="質問を入力..."
                           maxLength={100}
-                          style={{ ...STYLE, flex: 1, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '4px 8px', outline: 'none' }}
+                          style={{ ...STYLE, flex: 1, fontSize: 14, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '4px 8px', outline: 'none' }}
                         />
                         <button
                           onClick={() => sendQuestion(f.handle)}
                           disabled={qSending || !questionText.trim()}
-                          style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '4px 10px', cursor: 'pointer', opacity: qSending ? 0.5 : 1, flexShrink: 0 }}
+                          style={{ ...STYLE, fontSize: 12, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '4px 10px', cursor: 'pointer', opacity: qSending ? 0.5 : 1, flexShrink: 0 }}
                         >
                           送信
                         </button>

@@ -13,7 +13,7 @@
   }
 
   html {
-    font-size: 16px;
+    font-size: 18px;
     height: 100%;
   }
 
@@ -57,7 +57,7 @@
     font-family: var(--font-pixel, monospace);
     color: #ffd700;
     letter-spacing: 0.1em;
-    font-size: 13px;
+    font-size: 16px;
     user-select: none;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.70);
   }
@@ -94,7 +94,7 @@
     flex: 1;
     padding: 5px 4px;
     font-family: var(--font-pixel, monospace);
-    font-size: 10px;
+    font-size: 13px;
     letter-spacing: 0.03em;
     border: 2px solid rgba(64, 232, 255, 0.28);
     border-bottom: none;
@@ -103,7 +103,7 @@
     transition: none;
     user-select: none;
     background: rgba(6, 4, 14, 0.80);
-    color: #403860;
+    color: #6a6090;
     white-space: nowrap;
     text-align: center;
   }
@@ -128,14 +128,14 @@
 
   .pixel-tab--inactive:hover {
     background: rgba(12, 6, 26, 0.80);
-    color: #605888;
+    color: #8a80b0;
   }
 
   /* ── Section header ── */
   .pixel-section-header {
     padding: 5px 12px;
     font-family: var(--font-pixel, monospace);
-    font-size: 12px;
+    font-size: 15px;
     letter-spacing: 0.10em;
     color: #40e8ff;
     background: rgba(4, 10, 22, 0.85);
@@ -151,7 +151,7 @@
     gap: 4px;
     padding: 6px 14px;
     font-family: var(--font-pixel, monospace);
-    font-size: 12px;
+    font-size: 15px;
     background: rgba(8, 6, 20, 0.92);
     border: 2px solid #40e8ff;
     box-shadow: 2px 2px 0 rgba(64, 232, 255, 0.30), 0 0 8px rgba(64, 232, 255, 0.22);
@@ -175,7 +175,7 @@
   .pixel-statusbar {
     padding: 4px 10px;
     font-family: var(--font-pixel, monospace);
-    font-size: 11px;
+    font-size: 14px;
     color: #ff40c0;
     background: rgba(4, 2, 12, 0.96);
     border-top: 1px solid rgba(255, 64, 192, 0.38);
@@ -275,10 +275,10 @@
   background: rgba(20,10,40,0.95) !important;
 }
 .leaflet-control-attribution {
-  font-size: 8px !important;
+  font-size: 11px !important;
   background: rgba(4,2,12,0.70) !important;
-  color: #403060 !important;
+  color: #6a6090 !important;
 }
 .leaflet-control-attribution a {
-  color: #604878 !important;
+  color: #8a7aa8 !important;
 }

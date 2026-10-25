@@ -29,7 +29,7 @@ type FriendQuestion = {
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 const INPUT_STYLE = {
   ...STYLE,
-  fontSize: 11,
+  fontSize: 14,
   color: '#d0c8f0',
   background: 'rgba(4, 2, 12, 0.80)',
   border: '1px solid rgba(64,232,255,0.35)',
@@ -187,11 +187,11 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 style={{
-                  ...STYLE, flex: 1, fontSize: 10,
+                  ...STYLE, flex: 1, fontSize: 13,
                   padding: '6px 4px',
                   cursor: 'pointer',
                   letterSpacing: '0.06em',
-                  color: activeTab === tab ? '#40e8ff' : '#504870',
+                  color: activeTab === tab ? '#40e8ff' : '#7a70a0',
                   background: activeTab === tab ? 'rgba(64,232,255,0.08)' : 'transparent',
                   border: 'none',
                   borderBottom: activeTab === tab ? '2px solid #40e8ff' : '2px solid transparent',
@@ -207,7 +207,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
               <button
                 onClick={openEdit}
                 style={{
-                  ...STYLE, fontSize: 10, color: '#ffd700',
+                  ...STYLE, fontSize: 13, color: '#ffd700',
                   background: 'transparent', border: 'none',
                   borderBottom: '2px solid transparent',
                   padding: '6px 10px', cursor: 'pointer',
@@ -228,7 +228,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
               {answered.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-10">
                   <span style={{ fontSize: 28 }}>📝</span>
-                  <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>
+                  <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>
                     まだ回答がありません<br />[編集] から回答を入力しましょう
                   </p>
                 </div>
@@ -246,15 +246,15 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                     }}>
                       <div style={{ padding: '8px 12px 10px' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
-                          <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>
+                          <span style={{ fontSize: 13, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>
                             {String(idx + 1).padStart(2, '0')}
                           </span>
-                          <p style={{ ...STYLE, fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
+                          <p style={{ ...STYLE, fontSize: 14, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
                             {item.q}
                           </p>
                         </div>
                         <div style={{ paddingLeft: 30 }}>
-                          <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+                          <p style={{ ...STYLE, fontSize: 14, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
                             <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
                           </p>
                         </div>
@@ -262,7 +262,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                         {itemPending.length > 0 && (
                           <button
                             onClick={() => toggleHashExpand(hash)}
-                            style={{ ...STYLE, fontSize: 9, color: '#ff8830', background: 'rgba(255,136,48,0.10)', border: '1px solid rgba(255,136,48,0.35)', padding: '2px 8px', cursor: 'pointer', marginTop: 6, marginLeft: 30 }}
+                            style={{ ...STYLE, fontSize: 12, color: '#ff8830', background: 'rgba(255,136,48,0.10)', border: '1px solid rgba(255,136,48,0.35)', padding: '2px 8px', cursor: 'pointer', marginTop: 6, marginLeft: 30 }}
                           >
                             💬 承認待ち {itemPending.length}件 {isExpanded ? '▲' : '▼'}
                           </button>
@@ -274,18 +274,18 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                         <div style={{ borderTop: '1px solid rgba(255,136,48,0.20)', background: 'rgba(4,2,12,0.60)', padding: '8px 12px' }}>
                           {itemPending.map(c => (
                             <div key={c.id} style={{ borderLeft: '2px solid rgba(255,136,48,0.35)', paddingLeft: 8, marginBottom: 8 }}>
-                              <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
-                              <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                              <p style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{c.body}</p>
+                              <p style={{ ...STYLE, fontSize: 11, color: '#7a70a0', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
                               <div style={{ display: 'flex', gap: 6, marginTop: 5, alignItems: 'center' }}>
                                 <button
                                   onClick={() => handleCommentAction(c.id, 'approved')}
-                                  style={{ ...STYLE, fontSize: 9, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '3px 10px', cursor: 'pointer' }}
+                                  style={{ ...STYLE, fontSize: 12, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(56,255,120,0.40)', padding: '3px 10px', cursor: 'pointer' }}
                                 >
                                   ✓ 承認
                                 </button>
                                 <button
                                   onClick={() => handleCommentAction(c.id, 'rejected')}
-                                  style={{ ...STYLE, fontSize: 9, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.40)', padding: '3px 10px', cursor: 'pointer' }}
+                                  style={{ ...STYLE, fontSize: 12, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.40)', padding: '3px 10px', cursor: 'pointer' }}
                                 >
                                   ✕ 却下
                                 </button>
@@ -314,13 +314,13 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
           <div className="flex flex-col">
             {friendQsLocked && (
               <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
-                <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
+                <p style={{ ...STYLE, fontSize: 13, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
                   🔒 残り{friendQsTotal - friendQs.length}件あります
                 </p>
-                <p style={{ ...STYLE, fontSize: 9, color: '#a080c0', margin: '4px 0 8px' }}>
+                <p style={{ ...STYLE, fontSize: 12, color: '#a080c0', margin: '4px 0 8px' }}>
                   ライトプラン(¥300/月)でまとめて見れます
                 </p>
-                <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
+                <a href="/pricing" style={{ ...STYLE, fontSize: 12, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
                   プランを見る →
                 </a>
               </div>
@@ -328,7 +328,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
             {friendQs.length === 0 && !friendQsLocked ? (
               <div className="flex flex-col items-center gap-3 py-10">
                 <span style={{ fontSize: 28 }}>💬</span>
-                <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>
+                <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>
                   まだ質問が届いていません<br />友達のプロフィールから質問を送れます
                 </p>
               </div>
@@ -342,8 +342,8 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                   <div className="px-3 pt-3 pb-1">
                     <div className="flex items-start justify-between gap-2">
                       <div>
-                        <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.8 }}>{fq.question}</p>
-                        <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>
+                        <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', lineHeight: 1.8 }}>{fq.question}</p>
+                        <p style={{ ...STYLE, fontSize: 11, color: '#7a70a0', marginTop: 2 }}>
                           {fq.anonymous
                             ? '👤 匿名'
                             : `from @${fq.sender_handle ?? '?'}${fq.sender_name ? ` (${fq.sender_name})` : ''}`}
@@ -359,7 +359,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                         />
                         <button
                           onClick={() => dismissQuestion(fq.id)}
-                          style={{ ...STYLE, fontSize: 8, color: '#403860', background: 'none', border: 'none', cursor: 'pointer' }}
+                          style={{ ...STYLE, fontSize: 11, color: '#6a6090', background: 'none', border: 'none', cursor: 'pointer' }}
                         >
                           ✕
                         </button>
@@ -367,7 +367,7 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                     </div>
 
                     {fq.answer ? (
-                      <p style={{ ...STYLE, fontSize: 11, color: '#38ff78', lineHeight: 1.9, marginTop: 6, paddingLeft: 8, borderLeft: '2px solid rgba(56,255,120,0.30)' }}>
+                      <p style={{ ...STYLE, fontSize: 14, color: '#38ff78', lineHeight: 1.9, marginTop: 6, paddingLeft: 8, borderLeft: '2px solid rgba(56,255,120,0.30)' }}>
                         {'> '}{fq.answer}
                       </p>
                     ) : (
@@ -378,13 +378,13 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
                           onChange={e => setAnswerDrafts(d => ({ ...d, [fq.id]: e.target.value }))}
                           onKeyDown={e => e.key === 'Enter' && submitAnswer(fq.id)}
                           placeholder="回答を入力..."
-                          style={{ ...INPUT_STYLE, flex: 1, fontSize: 11 }}
+                          style={{ ...INPUT_STYLE, flex: 1, fontSize: 14 }}
                         />
                         <button
                           onClick={() => submitAnswer(fq.id)}
                           disabled={answering === fq.id}
                           style={{
-                            ...STYLE, fontSize: 9, color: '#38ff78',
+                            ...STYLE, fontSize: 12, color: '#38ff78',
                             background: 'rgba(4,2,12,0.90)',
                             border: '1px solid rgba(56,255,120,0.50)',
                             padding: '4px 10px', cursor: 'pointer',
@@ -411,27 +411,27 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
           onClick={(e) => e.target === e.currentTarget && setEditing(false)}
         >
           <div style={{ background: 'rgba(8,6,20,0.99)', border: '3px solid #40e8ff', boxShadow: '0 0 24px rgba(64,232,255,0.45)', width: '100%', maxWidth: 340 }}>
-            <div style={{ ...STYLE, background: 'linear-gradient(90deg,#18042e 0%,#2e0860 50%,#18042e 100%)', borderBottom: '2px solid #40e8ff', color: '#40e8ff', fontSize: 13, padding: '5px 10px', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(64,232,255,0.70)' }}>
+            <div style={{ ...STYLE, background: 'linear-gradient(90deg,#18042e 0%,#2e0860 50%,#18042e 100%)', borderBottom: '2px solid #40e8ff', color: '#40e8ff', fontSize: 16, padding: '5px 10px', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(64,232,255,0.70)' }}>
               ■ Q&A 編集
             </div>
             <div className="flex flex-col gap-3 p-3">
               {draft.map((item, idx) => (
                 <div key={idx} style={{ borderLeft: '2px solid rgba(64,232,255,0.30)', paddingLeft: 8 }}>
                   <div className="flex items-center justify-between mb-1">
-                    <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff', textShadow: '0 0 4px rgba(64,232,255,0.50)' }}>{String(idx + 1).padStart(2, '0')}</span>
-                    <button onClick={() => removeItem(idx)} style={{ ...STYLE, fontSize: 9, color: '#ff4060', background: 'transparent', border: 'none', cursor: 'pointer' }}>[削除]</button>
+                    <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff', textShadow: '0 0 4px rgba(64,232,255,0.50)' }}>{String(idx + 1).padStart(2, '0')}</span>
+                    <button onClick={() => removeItem(idx)} style={{ ...STYLE, fontSize: 12, color: '#ff4060', background: 'transparent', border: 'none', cursor: 'pointer' }}>[削除]</button>
                   </div>
                   <input type="text" value={item.q} onChange={e => changeQ(idx, e.target.value)} placeholder="質問" style={{ ...INPUT_STYLE, marginBottom: 4 }} />
                   <textarea value={item.a} onChange={e => changeA(idx, e.target.value)} placeholder="回答" rows={2} style={INPUT_STYLE} />
                 </div>
               ))}
-              <button onClick={addItem} style={{ ...STYLE, fontSize: 11, color: '#40e8ff', background: 'rgba(4,2,12,0.80)', border: '1px dashed rgba(64,232,255,0.40)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em', textShadow: '0 0 5px rgba(64,232,255,0.40)' }}>
+              <button onClick={addItem} style={{ ...STYLE, fontSize: 14, color: '#40e8ff', background: 'rgba(4,2,12,0.80)', border: '1px dashed rgba(64,232,255,0.40)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em', textShadow: '0 0 5px rgba(64,232,255,0.40)' }}>
                 ＋ 質問を追加
               </button>
             </div>
             <div className="flex gap-2 px-3 pb-3" style={{ borderTop: '1px solid rgba(64,232,255,0.20)', paddingTop: 12 }}>
-              <button onClick={save} style={{ ...STYLE, flex: 1, fontSize: 11, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '2px solid #38ff78', boxShadow: '0 0 8px rgba(56,255,120,0.30)', textShadow: '0 0 6px rgba(56,255,120,0.60)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>▶ 保存</button>
-              <button onClick={() => setEditing(false)} style={{ ...STYLE, flex: 1, fontSize: 11, color: '#504870', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(80,72,112,0.40)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>キャンセル</button>
+              <button onClick={save} style={{ ...STYLE, flex: 1, fontSize: 14, color: '#38ff78', background: 'rgba(4,2,12,0.90)', border: '2px solid #38ff78', boxShadow: '0 0 8px rgba(56,255,120,0.30)', textShadow: '0 0 6px rgba(56,255,120,0.60)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>▶ 保存</button>
+              <button onClick={() => setEditing(false)} style={{ ...STYLE, flex: 1, fontSize: 14, color: '#7a70a0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(80,72,112,0.40)', padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>キャンセル</button>
             </div>
           </div>
         </div>

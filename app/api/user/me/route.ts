@@ -10,7 +10,7 @@ export async function GET() {
 
   try {
     const [rows, counts, hp] = await Promise.all([
-      sql`SELECT id, name, email, image, handle, bio, onboarded, hp, proximity_count, proximity_mode
+      sql`SELECT id, name, email, image, handle, bio, onboarded, hp, proximity_count, proximity_mode, howto_seen_at IS NOT NULL AS howto_seen
           FROM users WHERE id = ${userId}`,
       sql`SELECT
             (SELECT COUNT(*)::int FROM follows WHERE follower_id = ${userId}::uuid) AS following_count,

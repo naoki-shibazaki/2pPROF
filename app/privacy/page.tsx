@@ -15,13 +15,13 @@ export default function PrivacyPage() {
       margin: '0 auto',
       ...STYLE,
     }}>
-      <a href="/" style={{ display: 'inline-block', fontSize: 11, color: '#40e8ff', marginBottom: 24 }}>
+      <a href="/" style={{ display: 'inline-block', fontSize: 14, color: '#40e8ff', marginBottom: 24 }}>
         ◀ もどる
       </a>
-      <h1 style={{ fontSize: 18, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
+      <h1 style={{ fontSize: 20, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
         プライバシーポリシー
       </h1>
-      <p style={{ fontSize: 10, color: '#604878', marginBottom: 32 }}>最終更新日：2026年10月</p>
+      <p style={{ fontSize: 13, color: '#8a7aa8', marginBottom: 32 }}>最終更新日：2026年10月</p>
 
       <Section title="1. はじめに">
         2P PROF（以下「本アプリ」）は、ユーザーのプライバシーを尊重し、個人情報の適切な取り扱いに努めます。本ポリシーは、本アプリが収集する情報とその利用方法について説明します。
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
         本ポリシーは必要に応じて更新することがあります。重要な変更がある場合はアプリ内でお知らせします。
       </Section>
 
-      <div style={{ marginTop: 48, paddingTop: 16, borderTop: '1px solid rgba(255,64,192,0.15)', fontSize: 9, color: '#302448' }}>
+      <div style={{ marginTop: 48, paddingTop: 16, borderTop: '1px solid rgba(255,64,192,0.15)', fontSize: 12, color: '#6a6090' }}>
         © 2024 2P PROF
       </div>
     </div>
@@ -88,10 +88,10 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section style={{ marginBottom: 28 }}>
-      <h2 style={{ fontSize: 11, color: '#40e8ff', letterSpacing: '0.08em', marginBottom: 10, textShadow: '0 0 6px rgba(64,232,255,0.4)' }}>
+      <h2 style={{ fontSize: 14, color: '#40e8ff', letterSpacing: '0.08em', marginBottom: 10, textShadow: '0 0 6px rgba(64,232,255,0.4)' }}>
         ■ {title}
       </h2>
-      <div style={{ fontSize: 10, lineHeight: 2.2, color: '#b0a8d0', paddingLeft: 8 }}>
+      <div style={{ fontSize: 13, lineHeight: 2.2, color: '#b0a8d0', paddingLeft: 8 }}>
         {children}
       </div>
     </section>
@@ -101,7 +101,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Item({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', gap: 8, marginBottom: 2 }}>
-      <span style={{ color: '#604878', flexShrink: 0 }}>·</span>
+      <span style={{ color: '#8a7aa8', flexShrink: 0 }}>·</span>
       <span>{children}</span>
     </div>
   )

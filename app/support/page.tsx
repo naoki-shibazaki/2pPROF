@@ -16,10 +16,10 @@ export default function SupportPage() {
       margin: '0 auto',
       ...STYLE,
     }}>
-      <a href="/" style={{ display: 'inline-block', fontSize: 11, color: '#40e8ff', marginBottom: 24 }}>
+      <a href="/" style={{ display: 'inline-block', fontSize: 14, color: '#40e8ff', marginBottom: 24 }}>
         ◀ もどる
       </a>
-      <h1 style={{ fontSize: 18, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 32, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
+      <h1 style={{ fontSize: 20, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 32, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
         サポート
       </h1>
 
@@ -60,10 +60,10 @@ export default function SupportPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section style={{ marginBottom: 28 }}>
-      <h2 style={{ fontSize: 11, color: '#40e8ff', letterSpacing: '0.08em', marginBottom: 10, textShadow: '0 0 6px rgba(64,232,255,0.4)' }}>
+      <h2 style={{ fontSize: 14, color: '#40e8ff', letterSpacing: '0.08em', marginBottom: 10, textShadow: '0 0 6px rgba(64,232,255,0.4)' }}>
         ■ {title}
       </h2>
-      <div style={{ fontSize: 10, lineHeight: 2.2, color: '#b0a8d0', paddingLeft: 8 }}>
+      <div style={{ fontSize: 13, lineHeight: 2.2, color: '#b0a8d0', paddingLeft: 8 }}>
         {children}
       </div>
     </section>

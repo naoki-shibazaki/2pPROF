@@ -25,19 +25,19 @@ export default function QRModal({ url, name, onClose }: { url: string; name: str
           maxWidth: 280, width: '90%',
         }}
       >
-        <span style={{ ...STYLE, fontSize: 10, color: '#ff40c0', letterSpacing: '0.10em', textShadow: '0 0 6px rgba(255,64,192,0.60)' }}>
+        <span style={{ ...STYLE, fontSize: 13, color: '#ff40c0', letterSpacing: '0.10em', textShadow: '0 0 6px rgba(255,64,192,0.60)' }}>
           ■ QRコード
         </span>
         <div style={{ background: '#fff', padding: 10 }}>
           <QRCodeSVG value={url} size={160} />
         </div>
-        <span style={{ ...STYLE, fontSize: 9, color: '#604878', textAlign: 'center', lineHeight: 1.8 }}>
+        <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', textAlign: 'center', lineHeight: 1.8 }}>
           {name} のプロフィール<br />スキャンしてフォローしよう
         </span>
         <button
           onClick={onClose}
           style={{
-            ...STYLE, fontSize: 10, color: '#504870',
+            ...STYLE, fontSize: 13, color: '#7a70a0',
             background: 'transparent', border: '1px solid rgba(80,72,112,0.40)',
             padding: '5px 20px', cursor: 'pointer',
           }}

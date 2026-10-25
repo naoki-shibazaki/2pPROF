@@ -89,13 +89,13 @@ export default function ReactionBar({ friendIndex }: Props) {
             onClick={() => toggle(key)}
             style={{
               ...STYLE,
-              fontSize: 10,
+              fontSize: 13,
               display: 'flex',
               alignItems: 'center',
               gap: 3,
               padding: '2px 8px',
               cursor: 'pointer',
-              color:       active ? '#40e8ff' : '#403060',
+              color:       active ? '#40e8ff' : '#6a6090',
               background:  active ? 'rgba(64,232,255,0.10)' : 'rgba(4,2,12,0.70)',
               border:      active
                 ? '1px solid rgba(64,232,255,0.55)'
@@ -105,11 +105,11 @@ export default function ReactionBar({ friendIndex }: Props) {
               letterSpacing: '0.02em',
             }}
           >
-            <span style={{ fontSize: 12 }}>{emoji}</span>
+            <span style={{ fontSize: 15 }}>{emoji}</span>
             {key}
             {count > 0 && (
               <span style={{
-                color: active ? '#ffd700' : '#504870',
+                color: active ? '#ffd700' : '#7a70a0',
                 textShadow: active ? '0 0 4px rgba(255,215,0,0.50)' : 'none',
               }}>
                 {count}

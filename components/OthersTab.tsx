@@ -50,7 +50,7 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
           background: 'rgba(4, 10, 22, 0.85)',
           borderBottom: '1px solid rgba(64,232,255,0.30)',
           color: '#40e8ff',
-          fontSize: 12,
+          fontSize: 15,
           letterSpacing: '0.06em',
           textShadow: '0 0 7px rgba(64,232,255,0.60)',
         }}
@@ -60,12 +60,12 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
 
       {!loaded ? (
         <div className="flex justify-center py-12">
-          <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+          <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
         </div>
       ) : intros.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-12">
           <span style={{ fontSize: 36 }}>📝</span>
-          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2.2 }}>
+          <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2.2 }}>
             まだ紹介文がありません<br />ともだちに紹介してもらおう
           </p>
         </div>
@@ -80,16 +80,16 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
                 background: rowBg,
                 padding: '10px 12px',
               }}>
-                <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+                <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
                   {intro.body}
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-                  <p style={{ ...STYLE, fontSize: 8, color: '#504870', margin: 0 }}>
+                  <p style={{ ...STYLE, fontSize: 11, color: '#7a70a0', margin: 0 }}>
                     from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     {(intro.met_year || intro.met_month) && (
-                      <p style={{ ...STYLE, fontSize: 8, color: '#504878', margin: 0 }}>
+                      <p style={{ ...STYLE, fontSize: 11, color: '#504878', margin: 0 }}>
                         {intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜
                       </p>
                     )}

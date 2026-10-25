@@ -49,7 +49,7 @@ export default function LevelBadge() {
       {config.visible ? (
         <button
           onClick={openEdit}
-          className="text-xs px-3 py-1"
+          className="text-sm px-3 py-1"
           style={{
             ...STYLE,
             background: 'rgba(8, 6, 20, 0.92)',
@@ -69,7 +69,7 @@ export default function LevelBadge() {
           onClick={openEdit}
           style={{
             ...STYLE,
-            fontSize: 9,
+            fontSize: 12,
             color: '#302848',
             background: 'transparent',
             border: '1px solid rgba(48,40,72,0.40)',
@@ -104,7 +104,7 @@ export default function LevelBadge() {
               ...STYLE,
               background: 'linear-gradient(90deg, #18042e 0%, #2e0860 50%, #18042e 100%)',
               borderBottom: '2px solid #ffd700',
-              color: '#ffd700', fontSize: 13,
+              color: '#ffd700', fontSize: 16,
               padding: '5px 10px', letterSpacing: '0.10em',
               textShadow: '0 0 8px rgba(255,215,0,0.70)',
             }}>
@@ -115,7 +115,7 @@ export default function LevelBadge() {
               {/* Birth date */}
               <div className="flex flex-col gap-2">
                 <label style={{
-                  ...STYLE, fontSize: 11, color: '#40e8ff',
+                  ...STYLE, fontSize: 14, color: '#40e8ff',
                   textShadow: '0 0 6px rgba(64,232,255,0.55)',
                   letterSpacing: '0.08em',
                 }}>
@@ -126,7 +126,7 @@ export default function LevelBadge() {
                   value={draft.birthDate}
                   onChange={e => setDraft(d => ({ ...d, birthDate: e.target.value }))}
                   style={{
-                    ...STYLE, fontSize: 12, color: '#d0c8f0',
+                    ...STYLE, fontSize: 15, color: '#d0c8f0',
                     background: 'rgba(4, 2, 12, 0.80)',
                     border: '1px solid rgba(64,232,255,0.40)',
                     padding: '5px 8px', outline: 'none',
@@ -134,12 +134,12 @@ export default function LevelBadge() {
                   }}
                 />
                 {draft.birthDate && (
-                  <p style={{ ...STYLE, fontSize: 10, color: '#ffd700', letterSpacing: '0.05em' }}>
+                  <p style={{ ...STYLE, fontSize: 13, color: '#ffd700', letterSpacing: '0.05em' }}>
                     → Lv.{calcAge(draft.birthDate)} になります
                   </p>
                 )}
                 {!draft.birthDate && (
-                  <p style={{ ...STYLE, fontSize: 10, color: '#403860', letterSpacing: '0.04em' }}>
+                  <p style={{ ...STYLE, fontSize: 13, color: '#6a6090', letterSpacing: '0.04em' }}>
                     未入力の場合 Lv.{profileData.level}（固定値）
                   </p>
                 )}
@@ -148,7 +148,7 @@ export default function LevelBadge() {
               {/* Visibility toggle */}
               <div className="flex flex-col gap-2">
                 <span style={{
-                  ...STYLE, fontSize: 11, color: '#40e8ff',
+                  ...STYLE, fontSize: 14, color: '#40e8ff',
                   textShadow: '0 0 6px rgba(64,232,255,0.55)',
                   letterSpacing: '0.08em',
                 }}>
@@ -160,10 +160,10 @@ export default function LevelBadge() {
                       key={String(v)}
                       onClick={() => setDraft(d => ({ ...d, visible: v }))}
                       style={{
-                        ...STYLE, flex: 1, fontSize: 11,
+                        ...STYLE, flex: 1, fontSize: 14,
                         padding: '5px 0', cursor: 'pointer',
                         letterSpacing: '0.06em',
-                        color: draft.visible === v ? '#ffd700' : '#403860',
+                        color: draft.visible === v ? '#ffd700' : '#6a6090',
                         background: draft.visible === v
                           ? 'rgba(8, 6, 20, 0.95)'
                           : 'rgba(4, 2, 12, 0.70)',
@@ -187,7 +187,7 @@ export default function LevelBadge() {
                 <button
                   onClick={save}
                   style={{
-                    ...STYLE, flex: 1, fontSize: 11,
+                    ...STYLE, flex: 1, fontSize: 14,
                     color: '#38ff78',
                     background: 'rgba(4, 2, 12, 0.90)',
                     border: '2px solid #38ff78',
@@ -201,7 +201,7 @@ export default function LevelBadge() {
                 <button
                   onClick={() => setEditing(false)}
                   style={{
-                    ...STYLE, flex: 1, fontSize: 11, color: '#504870',
+                    ...STYLE, flex: 1, fontSize: 14, color: '#7a70a0',
                     background: 'rgba(4, 2, 12, 0.90)',
                     border: '1px solid rgba(80,72,112,0.40)',
                     padding: '6px 0', cursor: 'pointer', letterSpacing: '0.08em',

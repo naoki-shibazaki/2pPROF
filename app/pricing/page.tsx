@@ -11,7 +11,7 @@ const PLANS = [
     id: 'free' as const,
     name: '無料',
     price: 'Free',
-    color: '#604878',
+    color: '#8a7aa8',
     border: 'rgba(96,72,120,0.40)',
     features: [
       '受け取った質問 5件まで',
@@ -99,21 +99,21 @@ export default function PricingPage() {
     }}>
       <button
         onClick={() => router.push('/')}
-        style={{ ...STYLE, background: 'none', border: 'none', color: '#604878', fontSize: 9, cursor: 'pointer', alignSelf: 'flex-start', marginBottom: 16 }}
+        style={{ ...STYLE, background: 'none', border: 'none', color: '#8a7aa8', fontSize: 12, cursor: 'pointer', alignSelf: 'flex-start', marginBottom: 16 }}
       >
         ← もどる
       </button>
 
-      <h1 style={{ ...STYLE, fontSize: 13, color: '#ff40c0', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(255,64,192,0.60)', marginBottom: 4 }}>
+      <h1 style={{ ...STYLE, fontSize: 16, color: '#ff40c0', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(255,64,192,0.60)', marginBottom: 4 }}>
         ★ プラン選択 ★
       </h1>
-      <p style={{ ...STYLE, fontSize: 8, color: '#604878', marginBottom: 20 }}>
+      <p style={{ ...STYLE, fontSize: 11, color: '#8a7aa8', marginBottom: 20 }}>
         現在: {currentPlan === 'free' ? '無料' : currentPlan === 'lite' ? 'ライト' : 'プレミアム'} プラン
       </p>
 
       {message && (
         <div style={{
-          ...STYLE, fontSize: 9, padding: '8px 14px', marginBottom: 16, width: '100%', maxWidth: 340,
+          ...STYLE, fontSize: 12, padding: '8px 14px', marginBottom: 16, width: '100%', maxWidth: 340,
           color: message.ok ? '#38ff78' : '#ff4040',
           border: `1px solid ${message.ok ? 'rgba(56,255,120,0.40)' : 'rgba(255,64,64,0.40)'}`,
           background: message.ok ? 'rgba(0,30,10,0.70)' : 'rgba(30,0,0,0.70)',
@@ -138,25 +138,25 @@ export default function PricingPage() {
               {isCurrent && (
                 <span style={{
                   position: 'absolute', top: -1, right: 10,
-                  ...STYLE, fontSize: 7, color: plan.color,
+                  ...STYLE, fontSize: 11, color: plan.color,
                   background: 'rgba(4,2,12,0.98)', padding: '0 6px',
                 }}>
                   現在のプラン
                 </span>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
-                <span style={{ ...STYLE, fontSize: 12, color: plan.color, letterSpacing: '0.08em' }}>{plan.name}</span>
-                <span style={{ ...STYLE, fontSize: 10, color: plan.color }}>{plan.price}</span>
+                <span style={{ ...STYLE, fontSize: 15, color: plan.color, letterSpacing: '0.08em' }}>{plan.name}</span>
+                <span style={{ ...STYLE, fontSize: 13, color: plan.color }}>{plan.price}</span>
               </div>
               {plan.features.map(f => (
-                <p key={f} style={{ ...STYLE, fontSize: 8, color: '#604878', lineHeight: 2, margin: 0 }}>· {f}</p>
+                <p key={f} style={{ ...STYLE, fontSize: 11, color: '#8a7aa8', lineHeight: 2, margin: 0 }}>· {f}</p>
               ))}
               {isUpgrade && (
                 <button
                   onClick={() => handlePurchase(plan.id as 'lite' | 'premium')}
                   disabled={!!loading}
                   style={{
-                    ...STYLE, marginTop: 12, width: '100%', fontSize: 9,
+                    ...STYLE, marginTop: 12, width: '100%', fontSize: 12,
                     color: plan.color, background: 'transparent',
                     border: `1px solid ${plan.border}`,
                     padding: '8px 0', cursor: loading ? 'default' : 'pointer',
@@ -174,12 +174,12 @@ export default function PricingPage() {
       <button
         onClick={handleRestore}
         disabled={!!loading}
-        style={{ ...STYLE, marginTop: 20, fontSize: 8, color: '#403060', background: 'none', border: 'none', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}
+        style={{ ...STYLE, marginTop: 20, fontSize: 11, color: '#6a6090', background: 'none', border: 'none', cursor: 'pointer', opacity: loading ? 0.5 : 1 }}
       >
         {loading === 'restore' ? '確認中...' : '以前の購入を復元する'}
       </button>
 
-      <p style={{ ...STYLE, fontSize: 7, color: '#302448', marginTop: 24, textAlign: 'center', lineHeight: 2.2, maxWidth: 300 }}>
+      <p style={{ ...STYLE, fontSize: 11, color: '#6a6090', marginTop: 24, textAlign: 'center', lineHeight: 2.2, maxWidth: 300 }}>
         · サブスクリプションは App Store アカウントに請求されます<br />
         · 解約は 設定 → Apple ID → サブスクリプション から<br />
         · 更新日の24時間前までに解約しない限り自動更新されます

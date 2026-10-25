@@ -49,14 +49,14 @@ export default function InvitePage() {
       padding: 24,
     }}>
       {loading ? (
-        <span style={{ ...STYLE, fontSize: 11, color: '#40e8ff' }}>読み込み中...</span>
+        <span style={{ ...STYLE, fontSize: 14, color: '#40e8ff' }}>読み込み中...</span>
       ) : invalid ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 40 }}>👾</span>
-          <p style={{ ...STYLE, fontSize: 11, color: '#ff4060', textAlign: 'center' }}>
+          <p style={{ ...STYLE, fontSize: 14, color: '#ff4060', textAlign: 'center' }}>
             招待リンクが無効または期限切れです
           </p>
-          <button onClick={() => router.push('/')} style={{ ...STYLE, fontSize: 10, color: '#40e8ff', background: 'none', border: '1px solid #40e8ff', padding: '6px 16px', cursor: 'pointer' }}>
+          <button onClick={() => router.push('/')} style={{ ...STYLE, fontSize: 13, color: '#40e8ff', background: 'none', border: '1px solid #40e8ff', padding: '6px 16px', cursor: 'pointer' }}>
             ホームへ
           </button>
         </div>
@@ -68,7 +68,7 @@ export default function InvitePage() {
           width: '100%', maxWidth: 300,
         }}>
           <div style={{
-            ...STYLE, fontSize: 13, color: '#ffd700',
+            ...STYLE, fontSize: 16, color: '#ffd700',
             background: 'linear-gradient(90deg,#18042e,#2e0860,#18042e)',
             borderBottom: '2px solid #ffd700',
             padding: '6px 12px', letterSpacing: '0.10em',
@@ -86,20 +86,20 @@ export default function InvitePage() {
               ) : <AvatarSVG size={72} />}
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', letterSpacing: '0.12em' }}>
+              <div style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', letterSpacing: '0.12em' }}>
                 {creator.name ?? creator.handle}
               </div>
-              <div style={{ ...STYLE, fontSize: 9, color: '#504870', marginTop: 2 }}>
+              <div style={{ ...STYLE, fontSize: 12, color: '#7a70a0', marginTop: 2 }}>
                 @{creator.handle}
               </div>
             </div>
 
-            <p style={{ ...STYLE, fontSize: 10, color: '#b0a8d0', textAlign: 'center', lineHeight: 2, marginTop: 4 }}>
+            <p style={{ ...STYLE, fontSize: 13, color: '#b0a8d0', textAlign: 'center', lineHeight: 2, marginTop: 4 }}>
               があなたを招待しています。<br />フォローしてつながりましょう！
             </p>
 
             {done ? (
-              <div style={{ ...STYLE, fontSize: 12, color: '#38ff78', textShadow: '0 0 8px rgba(56,255,120,0.60)' }}>
+              <div style={{ ...STYLE, fontSize: 15, color: '#38ff78', textShadow: '0 0 8px rgba(56,255,120,0.60)' }}>
                 ✓ フォローしました！
               </div>
             ) : (
@@ -107,7 +107,7 @@ export default function InvitePage() {
                 onClick={accept}
                 disabled={accepting}
                 style={{
-                  ...STYLE, fontSize: 12, color: '#38ff78',
+                  ...STYLE, fontSize: 15, color: '#38ff78',
                   background: 'rgba(4,2,12,0.90)',
                   border: '2px solid rgba(56,255,120,0.70)',
                   boxShadow: '0 0 10px rgba(56,255,120,0.25)',

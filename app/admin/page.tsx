@@ -44,38 +44,38 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: '#04020c', color: '#b0a8d0', padding: '32px 16px', maxWidth: 720, margin: '0 auto', ...STYLE }}>
-      <a href="/" style={{ fontSize: 11, color: '#40e8ff' }}>◀ もどる</a>
-      <h1 style={{ fontSize: 16, color: '#ff40c0', margin: '16px 0 4px' }}>通報の管理</h1>
-      <p style={{ fontSize: 9, color: '#604878', marginBottom: 20 }}>通報から24時間以内に対応してください</p>
+      <a href="/" style={{ fontSize: 14, color: '#40e8ff' }}>◀ もどる</a>
+      <h1 style={{ fontSize: 18, color: '#ff40c0', margin: '16px 0 4px' }}>通報の管理</h1>
+      <p style={{ fontSize: 12, color: '#8a7aa8', marginBottom: 20 }}>通報から24時間以内に対応してください</p>
 
       {forbidden ? (
-        <p style={{ fontSize: 11, color: '#ff4060' }}>このページを見る権限がありません</p>
+        <p style={{ fontSize: 14, color: '#ff4060' }}>このページを見る権限がありません</p>
       ) : !reports ? (
-        <p style={{ fontSize: 10 }}>読み込み中...</p>
+        <p style={{ fontSize: 13 }}>読み込み中...</p>
       ) : reports.length === 0 ? (
-        <p style={{ fontSize: 10 }}>通報はありません</p>
+        <p style={{ fontSize: 13 }}>通報はありません</p>
       ) : reports.map(r => {
         const open = r.status === 'open'
         const left = hoursLeft(r.created_at)
         return (
           <div key={r.id} style={{ border: `1px solid ${open ? 'rgba(255,64,96,0.5)' : 'rgba(80,72,112,0.3)'}`, padding: 12, marginBottom: 10, opacity: open ? 1 : 0.55 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 10 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 13 }}>
               <span style={{ color: r.reason === 'block' ? '#ffd700' : '#ff8090' }}>
                 {REASON_LABELS[r.reason] ?? r.reason} ・ {TYPE_LABELS[r.content_type] ?? r.content_type}
               </span>
-              <span style={{ color: open ? (left < 6 ? '#ff4060' : '#b0a8d0') : '#604878' }}>
+              <span style={{ color: open ? (left < 6 ? '#ff4060' : '#b0a8d0') : '#8a7aa8' }}>
                 {open ? `残り ${Math.floor(left)} 時間` : r.status === 'dismissed' ? '問題なし' : '対応済み'}
               </span>
             </div>
-            <p style={{ fontSize: 10, margin: '6px 0' }}>
+            <p style={{ fontSize: 13, margin: '6px 0' }}>
               対象: @{r.target_handle ?? '（削除済み）'}{r.target_name ? ` (${r.target_name})` : ''}
-              <span style={{ color: '#604878' }}> ・ このユーザーへの通報 {r.target_report_count} 件 ・ 報告者 @{r.reporter_handle ?? '?'}</span>
+              <span style={{ color: '#8a7aa8' }}> ・ このユーザーへの通報 {r.target_report_count} 件 ・ 報告者 @{r.reporter_handle ?? '?'}</span>
             </p>
             {r.content_snapshot && (
-              <p style={{ fontSize: 11, color: '#d0c8f0', background: 'rgba(255,255,255,0.04)', padding: 8, whiteSpace: 'pre-wrap', margin: '6px 0' }}>{r.content_snapshot}</p>
+              <p style={{ fontSize: 14, color: '#d0c8f0', background: 'rgba(255,255,255,0.04)', padding: 8, whiteSpace: 'pre-wrap', margin: '6px 0' }}>{r.content_snapshot}</p>
             )}
-            {r.detail && <p style={{ fontSize: 9, color: '#8070a8' }}>補足: {r.detail}</p>}
-            <p style={{ fontSize: 8, color: '#604878' }}>{new Date(r.created_at).toLocaleString('ja-JP')}</p>
+            {r.detail && <p style={{ fontSize: 12, color: '#8070a8' }}>補足: {r.detail}</p>}
+            <p style={{ fontSize: 11, color: '#8a7aa8' }}>{new Date(r.created_at).toLocaleString('ja-JP')}</p>
 
             {open && (
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
@@ -84,7 +84,7 @@ export default function AdminPage() {
                 {r.target_handle && (confirmBan === r.id ? (
                   <>
                     <Btn onClick={() => act(r.id, 'ban_user')} disabled={busy === r.id} color="#ff4060">本当に追放する</Btn>
-                    <Btn onClick={() => setConfirmBan(null)} color="#604878">やめる</Btn>
+                    <Btn onClick={() => setConfirmBan(null)} color="#8a7aa8">やめる</Btn>
                   </>
                 ) : (
                   <Btn onClick={() => setConfirmBan(r.id)} color="#ff4060">削除してユーザーを追放</Btn>
@@ -101,7 +101,7 @@ export default function AdminPage() {
 function Btn({ children, onClick, disabled, color }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; color: string }) {
   return (
     <button onClick={onClick} disabled={disabled}
-      style={{ ...STYLE, fontSize: 10, color, background: 'transparent', border: `1px solid ${color}80`, padding: '6px 12px', cursor: 'pointer', opacity: disabled ? 0.5 : 1 }}>
+      style={{ ...STYLE, fontSize: 13, color, background: 'transparent', border: `1px solid ${color}80`, padding: '6px 12px', cursor: 'pointer', opacity: disabled ? 0.5 : 1 }}>
       {children}
     </button>
   )

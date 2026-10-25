@@ -233,11 +233,11 @@ export default function ProfilePage() {
           <div className="pixel-titlebar" style={{ justifyContent: 'space-between' }}>
             <button
               onClick={() => router.back()}
-              style={{ ...STYLE, fontSize: 11, color: '#ff40c0', background: 'none', border: 'none', cursor: 'pointer', textShadow: '0 0 6px rgba(255,64,192,0.60)', padding: '0 4px' }}
+              style={{ ...STYLE, fontSize: 14, color: '#ff40c0', background: 'none', border: 'none', cursor: 'pointer', textShadow: '0 0 6px rgba(255,64,192,0.60)', padding: '0 4px' }}
             >
               ‹ もどる
             </button>
-            <span style={{ ...STYLE, fontSize: 12, color: '#ffd700', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(255,215,0,0.70)', flex: 1, textAlign: 'center' }}>
+            <span style={{ ...STYLE, fontSize: 15, color: '#ffd700', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(255,215,0,0.70)', flex: 1, textAlign: 'center' }}>
               {titleText}
             </span>
             <div style={{ width: 52 }} />
@@ -248,12 +248,12 @@ export default function ProfilePage() {
 
             {loading ? (
               <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ ...STYLE, fontSize: 10, color: '#40e8ff' }}>読み込み中...</span>
+                <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
               </div>
             ) : notFound ? (
               <div style={{ height: 240, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
                 <span style={{ fontSize: 40 }}>👾</span>
-                <p style={{ ...STYLE, fontSize: 11, color: '#504870' }}>ユーザーが見つかりません</p>
+                <p style={{ ...STYLE, fontSize: 14, color: '#7a70a0' }}>ユーザーが見つかりません</p>
               </div>
             ) : user && pt ? (
               <>
@@ -275,22 +275,22 @@ export default function ProfilePage() {
                   <span className="text-xl font-bold" style={{ ...STYLE, color: '#d0c8f0', letterSpacing: '0.15em', textShadow: '0 0 10px rgba(208,200,240,0.35)' }}>
                     {user.name ?? user.handle ?? '???'}
                   </span>
-                  <p className="text-xs -mt-2" style={{ ...STYLE, color: '#604878' }}>@{user.handle}</p>
+                  <p className="text-sm -mt-2" style={{ ...STYLE, color: '#8a7aa8' }}>@{user.handle}</p>
 
                   <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
                     <button onClick={() => setFollowListType('following')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
-                      <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.followingCount ?? 0}</span>
-                      <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロー</span>
+                      <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followingCount ?? 0}</span>
+                      <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロー</span>
                     </button>
                     <button onClick={() => setFollowListType('followers')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>
-                      <span style={{ ...STYLE, fontSize: 16, color: '#d0c8f0', lineHeight: 1 }}>{user.followersCount ?? 0}</span>
-                      <span style={{ ...STYLE, fontSize: 8, color: '#604878' }}>フォロワー</span>
+                      <span style={{ ...STYLE, fontSize: 18, color: '#d0c8f0', lineHeight: 1 }}>{user.followersCount ?? 0}</span>
+                      <span style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>フォロワー</span>
                     </button>
                   </div>
 
                   {!user.isSelf && (
                     <div className="w-full flex flex-col gap-2 mt-1">
-                      <button onClick={toggleFollow} disabled={followLoading} style={{ ...STYLE, width: '100%', fontSize: 10, color: isFollowing ? '#38ff78' : '#ff40c0', background: 'rgba(8,6,20,0.92)', border: `1px solid ${isFollowing ? 'rgba(56,255,120,0.50)' : 'rgba(255,64,192,0.45)'}`, padding: '5px 0', cursor: followLoading ? 'default' : 'pointer', opacity: followLoading ? 0.6 : 1, letterSpacing: '0.06em' }}>
+                      <button onClick={toggleFollow} disabled={followLoading} style={{ ...STYLE, width: '100%', fontSize: 13, color: isFollowing ? '#38ff78' : '#ff40c0', background: 'rgba(8,6,20,0.92)', border: `1px solid ${isFollowing ? 'rgba(56,255,120,0.50)' : 'rgba(255,64,192,0.45)'}`, padding: '5px 0', cursor: followLoading ? 'default' : 'pointer', opacity: followLoading ? 0.6 : 1, letterSpacing: '0.06em' }}>
                         {isFollowing ? '✓ フォロー中' : '＋ フォロー'}
                       </button>
                       <button
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                           if (navigator.share) { await navigator.share({ title: `${user.name ?? user.handle} のプロフ`, url }) }
                           else { await navigator.clipboard.writeText(url).catch(() => {}); setShareCopied(true); setTimeout(() => setShareCopied(false), 2500) }
                         }}
-                        style={{ ...STYLE, width: '100%', fontSize: 10, color: shareCopied ? '#38ff78' : '#ffd700', background: 'rgba(8,6,20,0.92)', border: `1px solid ${shareCopied ? 'rgba(56,255,120,0.50)' : 'rgba(255,215,0,0.45)'}`, padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em' }}
+                        style={{ ...STYLE, width: '100%', fontSize: 13, color: shareCopied ? '#38ff78' : '#ffd700', background: 'rgba(8,6,20,0.92)', border: `1px solid ${shareCopied ? 'rgba(56,255,120,0.50)' : 'rgba(255,215,0,0.45)'}`, padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em' }}
                       >
                         {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
                       </button>
@@ -309,13 +309,13 @@ export default function ProfilePage() {
                         target={{ contentType: 'profile', handle: user.handle }}
                         reportOnly
                         label="🚩 このユーザーを通報"
-                        labelStyle={{ width: '100%', fontSize: 9, color: '#ff8090', background: 'transparent', border: '1px solid rgba(255,128,144,0.30)', padding: '4px 0', letterSpacing: '0.06em' }}
+                        labelStyle={{ width: '100%', fontSize: 12, color: '#ff8090', background: 'transparent', border: '1px solid rgba(255,128,144,0.30)', padding: '4px 0', letterSpacing: '0.06em' }}
                       />
                       {!showBlockConfirm ? (
                         <button
                           onClick={() => isBlocked ? toggleBlock() : setShowBlockConfirm(true)}
                           disabled={blockLoading}
-                          style={{ ...STYLE, width: '100%', fontSize: 9, color: isBlocked ? '#ff4060' : '#403860', background: 'transparent', border: `1px solid ${isBlocked ? 'rgba(255,64,96,0.35)' : 'rgba(64,56,96,0.25)'}`, padding: '4px 0', cursor: blockLoading ? 'default' : 'pointer', opacity: blockLoading ? 0.5 : 1, letterSpacing: '0.06em' }}
+                          style={{ ...STYLE, width: '100%', fontSize: 12, color: isBlocked ? '#ff4060' : '#6a6090', background: 'transparent', border: `1px solid ${isBlocked ? 'rgba(255,64,96,0.35)' : 'rgba(64,56,96,0.25)'}`, padding: '4px 0', cursor: blockLoading ? 'default' : 'pointer', opacity: blockLoading ? 0.5 : 1, letterSpacing: '0.06em' }}
                         >
                           {isBlocked ? '🚫 ブロック中（タップで解除）' : 'ブロックする'}
                         </button>
@@ -324,13 +324,13 @@ export default function ProfilePage() {
                           <button
                             onClick={toggleBlock}
                             disabled={blockLoading}
-                            style={{ ...STYLE, flex: 1, fontSize: 9, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.50)', padding: '4px 0', cursor: 'pointer' }}
+                            style={{ ...STYLE, flex: 1, fontSize: 12, color: '#ff4060', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,96,0.50)', padding: '4px 0', cursor: 'pointer' }}
                           >
                             ブロックする
                           </button>
                           <button
                             onClick={() => setShowBlockConfirm(false)}
-                            style={{ ...STYLE, flex: 1, fontSize: 9, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '4px 0', cursor: 'pointer' }}
+                            style={{ ...STYLE, flex: 1, fontSize: 12, color: '#7a70a0', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '4px 0', cursor: 'pointer' }}
                           >
                             キャンセル
                           </button>
@@ -347,9 +347,9 @@ export default function ProfilePage() {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       style={{
-                        ...STYLE, flex: 1, fontSize: 10, padding: '7px 4px',
+                        ...STYLE, flex: 1, fontSize: 13, padding: '7px 4px',
                         cursor: 'pointer', letterSpacing: '0.05em',
-                        color: activeTab === tab.id ? '#40e8ff' : '#504870',
+                        color: activeTab === tab.id ? '#40e8ff' : '#7a70a0',
                         background: activeTab === tab.id ? 'rgba(64,232,255,0.08)' : 'transparent',
                         border: 'none',
                         borderBottom: activeTab === tab.id ? '2px solid #40e8ff' : '2px solid transparent',
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                     >
                       {tab.label}
                       {tab.badge ? (
-                        <span style={{ marginLeft: 3, ...STYLE, fontSize: 8, color: activeTab === tab.id ? '#40e8ff' : '#504870' }}>
+                        <span style={{ marginLeft: 3, ...STYLE, fontSize: 11, color: activeTab === tab.id ? '#40e8ff' : '#7a70a0' }}>
                           ({tab.badge})
                         </span>
                       ) : null}
@@ -376,17 +376,17 @@ export default function ProfilePage() {
                       {/* あなたとの関係 */}
                       <div style={{ padding: '12px 12px 0' }}>
                         <div style={{ background: 'rgba(4,2,12,0.70)', border: `2px solid ${pt.color}55`, boxShadow: `0 0 12px ${pt.color}22` }}>
-                          <div style={{ ...STYLE, fontSize: 10, color: pt.color, background: `${pt.color}14`, borderBottom: `1px solid ${pt.color}33`, padding: '4px 10px', letterSpacing: '0.08em' }}>
+                          <div style={{ ...STYLE, fontSize: 13, color: pt.color, background: `${pt.color}14`, borderBottom: `1px solid ${pt.color}33`, padding: '4px 10px', letterSpacing: '0.08em' }}>
                             ■ あなたとの関係
                           </div>
                           <div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>
-                              <div style={{ ...STYLE, fontSize: 11, color: pt.color, textShadow: `0 0 8px ${pt.color}99`, letterSpacing: '0.12em' }}>⚔️ {pt.title}</div>
-                              {next && <div style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 3 }}>次: {next.min - user.proximityCount}回で「{next.title}」</div>}
+                              <div style={{ ...STYLE, fontSize: 14, color: pt.color, textShadow: `0 0 8px ${pt.color}99`, letterSpacing: '0.12em' }}>⚔️ {pt.title}</div>
+                              {next && <div style={{ ...STYLE, fontSize: 11, color: '#7a70a0', marginTop: 3 }}>次: {next.min - user.proximityCount}回で「{next.title}」</div>}
                             </div>
                             <div style={{ textAlign: 'right' }}>
                               <div style={{ ...STYLE, fontSize: 26, color: '#ffd700', textShadow: '0 0 10px rgba(255,215,0,0.60)', lineHeight: 1 }}>{user.proximityCount}</div>
-                              <div style={{ ...STYLE, fontSize: 8, color: '#504870' }}>近くにいた回数</div>
+                              <div style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>近くにいた回数</div>
                             </div>
                           </div>
                         </div>
@@ -395,15 +395,15 @@ export default function ProfilePage() {
                       {/* Bio */}
                       {user.bio && (
                         <div className="px-4 py-3" style={{ marginTop: 8, borderTop: '1px solid rgba(64,232,255,0.15)' }}>
-                          <h3 className="text-xs font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>■ じこしょうかい</h3>
-                          <p className="text-xs whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>{user.bio}</p>
+                          <h3 className="text-sm font-bold mb-2" style={{ ...STYLE, color: '#40e8ff', letterSpacing: '0.08em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>■ じこしょうかい</h3>
+                          <p className="text-sm whitespace-pre-line" style={{ ...STYLE, color: '#b0a8d0', lineHeight: '2.1' }}>{user.bio}</p>
                         </div>
                       )}
 
                       {/* Q&A */}
                       {user.qaItems?.filter(i => i.a.trim()).length > 0 && (
                         <div style={{ borderTop: '1px solid rgba(64,232,255,0.15)' }}>
-                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', padding: '6px 12px', ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
+                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', padding: '6px 12px', ...STYLE, fontSize: 13, color: '#40e8ff', letterSpacing: '0.06em', textShadow: '0 0 6px rgba(64,232,255,0.60)' }}>
                             ■ Q&amp;A
                           </div>
                           {user.qaItems.filter(i => i.a.trim()).map((item, idx) => (
@@ -415,17 +415,17 @@ export default function ProfilePage() {
                       {/* 訪問者セクション（自分のプロフィールのみ） */}
                       {user.isSelf && (
                         <div style={{ borderTop: '1px solid rgba(64,232,255,0.15)', marginTop: 8 }}>
-                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.25)', padding: '6px 12px', ...STYLE, fontSize: 10, color: '#40e8ff', letterSpacing: '0.06em' }}>
+                          <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.25)', padding: '6px 12px', ...STYLE, fontSize: 13, color: '#40e8ff', letterSpacing: '0.06em' }}>
                             ■ プロフィール訪問者
                           </div>
                           {viewersLocked ? (
                             <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
-                              <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0 }}>🔒 ライトプランで直近6時間の訪問者が見れます</p>
-                              <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block', marginTop: 8 }}>プランを見る →</a>
+                              <p style={{ ...STYLE, fontSize: 13, color: '#ff40c0', margin: 0 }}>🔒 ライトプランで直近6時間の訪問者が見れます</p>
+                              <a href="/pricing" style={{ ...STYLE, fontSize: 12, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block', marginTop: 8 }}>プランを見る →</a>
                             </div>
                           ) : viewers.length === 0 ? (
                             <div style={{ padding: '10px 12px' }}>
-                              <p style={{ ...STYLE, fontSize: 9, color: '#504870' }}>まだ訪問者はいません</p>
+                              <p style={{ ...STYLE, fontSize: 12, color: '#7a70a0' }}>まだ訪問者はいません</p>
                             </div>
                           ) : (
                             <div style={{ padding: '6px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -445,8 +445,8 @@ export default function ProfilePage() {
                                         : <AvatarSVG size={28} />
                                       }
                                     </div>
-                                    <span style={{ ...STYLE, fontSize: 10, color: '#d0c8f0' }}>{v.name ?? v.handle ?? '?'}</span>
-                                    <span style={{ ...STYLE, fontSize: 8, color: '#504870', marginLeft: 'auto' }}>{timeLabel}</span>
+                                    <span style={{ ...STYLE, fontSize: 13, color: '#d0c8f0' }}>{v.name ?? v.handle ?? '?'}</span>
+                                    <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0', marginLeft: 'auto' }}>{timeLabel}</span>
                                   </button>
                                 )
                               })}
@@ -467,19 +467,19 @@ export default function ProfilePage() {
                               width: '100%', padding: '5px 12px', cursor: 'pointer',
                               background: showQuestion ? 'rgba(255,64,192,0.06)' : 'rgba(4,2,12,0.40)',
                               border: 'none',
-                              color: showQuestion ? '#ff40c0' : '#504870',
+                              color: showQuestion ? '#ff40c0' : '#7a70a0',
                               textShadow: showQuestion ? '0 0 5px rgba(255,64,192,0.40)' : 'none',
                             }}
                           >
-                            <span style={{ fontSize: 9 }}>💬 質問を送る</span>
-                            {!qSent && <span style={{ fontSize: 8 }}>{showQuestion ? '▲' : '▼'}</span>}
+                            <span style={{ fontSize: 12 }}>💬 質問を送る</span>
+                            {!qSent && <span style={{ fontSize: 11 }}>{showQuestion ? '▲' : '▼'}</span>}
                           </button>
 
                           {/* Accordion body */}
                           {showQuestion && (
                             <div style={{ padding: '8px 12px 10px', background: 'rgba(4,2,12,0.50)', borderTop: '1px solid rgba(255,64,192,0.10)' }}>
                               {qSent ? (
-                                <p style={{ ...STYLE, fontSize: 10, color: '#38ff78', textAlign: 'center' }}>✓ 質問を送りました！</p>
+                                <p style={{ ...STYLE, fontSize: 13, color: '#38ff78', textAlign: 'center' }}>✓ 質問を送りました！</p>
                               ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                   <textarea
@@ -489,13 +489,13 @@ export default function ProfilePage() {
                                     placeholder="質問を入力..."
                                     maxLength={100}
                                     rows={3}
-                                    style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
+                                    style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,64,192,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                                   />
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <button
                                       onClick={sendQuestion}
                                       disabled={qSending || !questionText.trim()}
-                                      style={{ ...STYLE, flex: 1, fontSize: 10, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: qSending ? 'default' : 'pointer', opacity: qSending ? 0.5 : 1 }}
+                                      style={{ ...STYLE, flex: 1, fontSize: 13, color: '#ff40c0', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(255,64,192,0.50)', padding: '5px 0', cursor: qSending ? 'default' : 'pointer', opacity: qSending ? 0.5 : 1 }}
                                     >
                                       {qSending ? '送信中...' : '送信'}
                                     </button>
@@ -506,7 +506,7 @@ export default function ProfilePage() {
                                         onChange={e => setQuestionAnon(e.target.checked)}
                                         style={{ accentColor: '#ff8830', width: 13, height: 13, cursor: 'pointer' }}
                                       />
-                                      <span style={{ ...STYLE, fontSize: 9, color: questionAnon ? '#ff8830' : '#504870' }}>匿名で送る</span>
+                                      <span style={{ ...STYLE, fontSize: 12, color: questionAnon ? '#ff8830' : '#7a70a0' }}>匿名で送る</span>
                                     </label>
                                   </div>
                                 </div>
@@ -524,7 +524,7 @@ export default function ProfilePage() {
                       {friends.length === 0 ? (
                         <div className="flex flex-col items-center gap-3 py-10">
                           <span style={{ fontSize: 28 }}>👥</span>
-                          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>まだ友達がいません</p>
+                          <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>まだ友達がいません</p>
                         </div>
                       ) : (
                         friends.map(f => (
@@ -541,12 +541,12 @@ export default function ProfilePage() {
                               }
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', letterSpacing: '0.08em' }}>{f.name ?? f.handle ?? '???'}</div>
-                              <div style={{ ...STYLE, fontSize: 8, color: '#604878' }}>@{f.handle}</div>
+                              <div style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', letterSpacing: '0.08em' }}>{f.name ?? f.handle ?? '???'}</div>
+                              <div style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>@{f.handle}</div>
                             </div>
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <div style={{ ...STYLE, fontSize: 14, color: '#ffd700' }}>{f.proximity_count}</div>
-                              <div style={{ ...STYLE, fontSize: 7, color: '#504870' }}>近くにいた</div>
+                              <div style={{ ...STYLE, fontSize: 16, color: '#ffd700' }}>{f.proximity_count}</div>
+                              <div style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>近くにいた</div>
                             </div>
                           </button>
                         ))
@@ -559,13 +559,13 @@ export default function ProfilePage() {
                     <div>
                       {introsLocked && (
                         <div style={{ margin: '10px 12px', background: 'rgba(255,64,192,0.08)', border: '1px solid rgba(255,64,192,0.35)', padding: '10px 12px' }}>
-                          <p style={{ ...STYLE, fontSize: 10, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
+                          <p style={{ ...STYLE, fontSize: 13, color: '#ff40c0', margin: 0, lineHeight: 1.8 }}>
                             🔒 残り{introsTotal - intros.length}件あります
                           </p>
-                          <p style={{ ...STYLE, fontSize: 9, color: '#a080c0', margin: '4px 0 8px' }}>
+                          <p style={{ ...STYLE, fontSize: 12, color: '#a080c0', margin: '4px 0 8px' }}>
                             ライトプラン(¥300/月)でまとめて見れます
                           </p>
-                          <a href="/pricing" style={{ ...STYLE, fontSize: 9, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
+                          <a href="/pricing" style={{ ...STYLE, fontSize: 12, color: '#ff40c0', background: 'rgba(255,64,192,0.15)', border: '1px solid rgba(255,64,192,0.45)', padding: '4px 12px', textDecoration: 'none', display: 'inline-block' }}>
                             プランを見る →
                           </a>
                         </div>
@@ -573,19 +573,19 @@ export default function ProfilePage() {
                       {intros.length === 0 && !introsLocked ? (
                         <div className="flex flex-col items-center gap-3 py-10">
                           <span style={{ fontSize: 28 }}>📝</span>
-                          <p style={{ ...STYLE, fontSize: 10, color: '#504870', textAlign: 'center', lineHeight: 2 }}>まだ紹介文がありません</p>
+                          <p style={{ ...STYLE, fontSize: 13, color: '#7a70a0', textAlign: 'center', lineHeight: 2 }}>まだ紹介文がありません</p>
                         </div>
                       ) : (
                         intros.map((intro, idx) => {
                           const rowBg = idx % 2 === 0 ? 'rgba(8,6,20,0.70)' : 'rgba(12,8,28,0.70)'
                           return (
                             <div key={intro.id} style={{ borderBottom: '1px solid rgba(64,232,255,0.10)', borderLeft: '3px solid #40e8ff', background: rowBg, padding: '10px 12px' }}>
-                              <p style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>{intro.body}</p>
+                              <p style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>{intro.body}</p>
                               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-                                <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}</span>
+                                <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>from @{intro.author_handle ?? '?'}{intro.author_name ? ` (${intro.author_name})` : ''}</span>
                                 <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                                   {(intro.met_year || intro.met_month) && (
-                                    <span style={{ ...STYLE, fontSize: 8, color: '#504870' }}>{intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜</span>
+                                    <span style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>{intro.met_year ?? ''}{intro.met_year ? '年' : ''}{intro.met_month ? `${intro.met_month}月` : ''}〜</span>
                                   )}
                                   {intro.author_handle && (
                                     <ModerationMenu
@@ -606,33 +606,33 @@ export default function ProfilePage() {
                       {!user.isSelf && (
                         <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(64,232,255,0.10)' }}>
                           {!showIntro ? (
-                            <button onClick={() => setShowIntro(true)} style={{ ...STYLE, width: '100%', fontSize: 10, color: '#40e8ff', background: 'rgba(8,6,20,0.92)', border: '1px solid rgba(64,232,255,0.40)', padding: '8px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>
+                            <button onClick={() => setShowIntro(true)} style={{ ...STYLE, width: '100%', fontSize: 13, color: '#40e8ff', background: 'rgba(8,6,20,0.92)', border: '1px solid rgba(64,232,255,0.40)', padding: '8px 0', cursor: 'pointer', letterSpacing: '0.08em' }}>
                               ✎ この人の紹介文を書く
                             </button>
                           ) : introSent ? (
-                            <div style={{ ...STYLE, fontSize: 11, color: '#38ff78', textAlign: 'center', padding: '8px 0' }}>✓ 紹介文を送りました！</div>
+                            <div style={{ ...STYLE, fontSize: 14, color: '#38ff78', textAlign: 'center', padding: '8px 0' }}>✓ 紹介文を送りました！</div>
                           ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'rgba(8,6,20,0.90)', border: '1px solid rgba(64,232,255,0.35)', padding: 10 }}>
-                              <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff' }}>✎ この人の紹介文を書く</span>
+                              <span style={{ ...STYLE, fontSize: 12, color: '#40e8ff' }}>✎ この人の紹介文を書く</span>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <span style={{ ...STYLE, fontSize: 9, color: '#604878', whiteSpace: 'nowrap' }}>出会った頃</span>
+                                <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', whiteSpace: 'nowrap' }}>出会った頃</span>
                                 <input type="number" value={metYear} onChange={e => setMetYear(e.target.value)} placeholder="2024" min={1900} max={2099}
-                                  style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', width: 70, textAlign: 'center', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 6px', outline: 'none' }} />
-                                <span style={{ ...STYLE, fontSize: 9, color: '#604878' }}>年</span>
+                                  style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', width: 70, textAlign: 'center', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 6px', outline: 'none' }} />
+                                <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8' }}>年</span>
                                 <select value={metMonth} onChange={e => setMetMonth(e.target.value)}
-                                  style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', width: 52, background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 4px', outline: 'none' }}>
+                                  style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', width: 52, background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 4px', outline: 'none' }}>
                                   <option value="">--</option>
                                   {Array.from({ length: 12 }, (_, i) => i + 1).map(m => <option key={m} value={m}>{m}</option>)}
                                 </select>
-                                <span style={{ ...STYLE, fontSize: 9, color: '#604878' }}>月</span>
+                                <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8' }}>月</span>
                               </div>
                               <textarea value={introText} onChange={e => setIntroText(e.target.value)} placeholder={`${user.name ?? user.handle} さんの紹介文を書いてあげよう`} maxLength={200} rows={3}
-                                style={{ ...STYLE, fontSize: 11, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.8 }} />
+                                style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '5px 8px', outline: 'none', resize: 'none', lineHeight: 1.8 }} />
                               <div style={{ display: 'flex', gap: 6 }}>
-                                <button onClick={sendIntro} disabled={introSending || !introText.trim()} style={{ ...STYLE, flex: 1, fontSize: 10, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.45)', padding: '5px 0', cursor: 'pointer', opacity: introSending ? 0.5 : 1 }}>
+                                <button onClick={sendIntro} disabled={introSending || !introText.trim()} style={{ ...STYLE, flex: 1, fontSize: 13, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.45)', padding: '5px 0', cursor: 'pointer', opacity: introSending ? 0.5 : 1 }}>
                                   {introSending ? '送信中...' : '送信'}
                                 </button>
-                                <button onClick={() => { setShowIntro(false); setIntroText(''); setMetYear(String(new Date().getFullYear())); setMetMonth('') }} style={{ ...STYLE, fontSize: 10, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '5px 12px', cursor: 'pointer' }}>
+                                <button onClick={() => { setShowIntro(false); setIntroText(''); setMetYear(String(new Date().getFullYear())); setMetMonth('') }} style={{ ...STYLE, fontSize: 13, color: '#7a70a0', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '5px 12px', cursor: 'pointer' }}>
                                   キャンセル
                                 </button>
                               </div>
@@ -749,11 +749,11 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
       {/* Q&A body */}
       <div style={{ padding: '8px 12px 10px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 5 }}>
-          <span style={{ fontSize: 10, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>{String(idx + 1).padStart(2, '0')}</span>
-          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{item.q}</p>
+          <span style={{ fontSize: 13, color: '#40e8ff', minWidth: 22, flexShrink: 0, paddingTop: 1 }}>{String(idx + 1).padStart(2, '0')}</span>
+          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 14, color: '#9888b8', margin: 0, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{item.q}</p>
         </div>
         <div style={{ paddingLeft: 30 }}>
-          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 11, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
+          <p style={{ fontFamily: 'var(--font-pixel, monospace)', fontSize: 14, color: '#38ff78', lineHeight: 1.9, whiteSpace: 'pre-wrap', margin: 0 }}>
             <span style={{ color: '#38ff7888' }}>{'> '}</span>{item.a}
           </p>
         </div>
@@ -769,29 +769,29 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
           background: expanded ? 'rgba(64,232,255,0.06)' : 'rgba(4,2,12,0.40)',
           border: 'none',
           borderTop: '1px solid rgba(64,232,255,0.12)',
-          color: expanded ? '#40e8ff' : '#504870',
+          color: expanded ? '#40e8ff' : '#7a70a0',
           textShadow: expanded ? '0 0 5px rgba(64,232,255,0.40)' : 'none',
         }}
       >
-        <span style={{ fontSize: 9 }}>
+        <span style={{ fontSize: 12 }}>
           💬 コメント{comments.length > 0 ? ` (${comments.length})` : (myPending ? ' (1)' : '')}
         </span>
-        <span style={{ fontSize: 8 }}>{expanded ? '▲' : '▼'}</span>
+        <span style={{ fontSize: 11 }}>{expanded ? '▲' : '▼'}</span>
       </button>
 
       {/* Comment section */}
       {expanded && (
         <div style={{ borderTop: '1px solid rgba(64,232,255,0.08)', background: 'rgba(4,2,12,0.50)', padding: '8px 12px 10px' }}>
           {!commentsLoaded ? (
-            <p style={{ ...STYLE, fontSize: 9, color: '#504870' }}>読み込み中...</p>
+            <p style={{ ...STYLE, fontSize: 12, color: '#7a70a0' }}>読み込み中...</p>
           ) : comments.length === 0 ? (
-            <p style={{ ...STYLE, fontSize: 9, color: '#504870', marginBottom: 6 }}>まだコメントはありません</p>
+            <p style={{ ...STYLE, fontSize: 12, color: '#7a70a0', marginBottom: 6 }}>まだコメントはありません</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
               {comments.map(c => (
                 <div key={c.id} style={{ borderLeft: '2px solid rgba(64,232,255,0.25)', paddingLeft: 8, position: 'relative' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4 }}>
-                    <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap', flex: 1 }}>{c.body}</p>
+                    <p style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap', flex: 1 }}>{c.body}</p>
                     <ModerationMenu
                       target={{ contentType: 'qa_comment', contentId: c.id, handle: c.author_handle }}
                       onReported={() => setComments(prev => prev.filter(x => x.id !== c.id))}
@@ -800,7 +800,7 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
                     />
                   </div>
                   {isSelf && (
-                    <p style={{ ...STYLE, fontSize: 8, color: '#504870', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
+                    <p style={{ ...STYLE, fontSize: 11, color: '#7a70a0', marginTop: 2 }}>from @{c.author_handle ?? '?'}{c.author_name ? ` (${c.author_name})` : ''}</p>
                   )}
                 </div>
               ))}
@@ -810,7 +810,7 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
           {/* Non-self: own pending comment or new comment form */}
           {!isSelf && (
             submitFlagged ? (
-              <p style={{ ...STYLE, fontSize: 9, color: '#ff4060' }}>⚠ このコメントは送信できませんでした</p>
+              <p style={{ ...STYLE, fontSize: 12, color: '#ff4060' }}>⚠ このコメントは送信できませんでした</p>
             ) : myPending ? (
               // Show own pending comment with edit option
               <div style={{ borderLeft: '2px solid rgba(255,136,48,0.40)', paddingLeft: 8, marginTop: commentsLoaded && comments.length > 0 ? 8 : 0 }}>
@@ -821,20 +821,20 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
                       onChange={e => setEditText(e.target.value)}
                       maxLength={200}
                       rows={3}
-                      style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,136,48,0.40)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
+                      style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(255,136,48,0.40)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                     />
-                    {editError && <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', margin: 0 }}>{editError}</p>}
+                    {editError && <p style={{ ...STYLE, fontSize: 12, color: '#ff4060', margin: 0 }}>{editError}</p>}
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button
                         onClick={saveEdit}
                         disabled={editSaving || !editText.trim()}
-                        style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '3px 10px', cursor: editSaving ? 'default' : 'pointer', opacity: editSaving ? 0.5 : 1 }}
+                        style={{ ...STYLE, fontSize: 12, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '3px 10px', cursor: editSaving ? 'default' : 'pointer', opacity: editSaving ? 0.5 : 1 }}
                       >
                         {editSaving ? '保存中...' : '保存'}
                       </button>
                       <button
                         onClick={() => { setEditingPending(false); setEditError(null) }}
-                        style={{ ...STYLE, fontSize: 9, color: '#504870', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '3px 10px', cursor: 'pointer' }}
+                        style={{ ...STYLE, fontSize: 12, color: '#7a70a0', background: 'transparent', border: '1px solid rgba(80,72,112,0.30)', padding: '3px 10px', cursor: 'pointer' }}
                       >
                         キャンセル
                       </button>
@@ -842,12 +842,12 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
                   </div>
                 ) : (
                   <>
-                    <p style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{myPending.body}</p>
+                    <p style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{myPending.body}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-                      <span style={{ ...STYLE, fontSize: 8, color: '#ff8830' }}>承認待ち</span>
+                      <span style={{ ...STYLE, fontSize: 11, color: '#ff8830' }}>承認待ち</span>
                       <button
                         onClick={() => { setEditText(myPending.body); setEditingPending(true) }}
-                        style={{ ...STYLE, fontSize: 8, color: '#ff8830', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                        style={{ ...STYLE, fontSize: 11, color: '#ff8830', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                       >
                         [編集]
                       </button>
@@ -864,12 +864,12 @@ function QARow({ idx, item, handle, isSelf }: { idx: number; item: { q: string; 
                   placeholder="コメントを入力..."
                   maxLength={200}
                   rows={3}
-                  style={{ ...STYLE, fontSize: 10, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
+                  style={{ ...STYLE, fontSize: 13, color: '#d0c8f0', background: 'rgba(4,2,12,0.80)', border: '1px solid rgba(64,232,255,0.30)', padding: '4px 8px', outline: 'none', resize: 'none', lineHeight: 1.7 }}
                 />
                 <button
                   onClick={submitComment}
                   disabled={submitting || !commentText.trim()}
-                  style={{ ...STYLE, fontSize: 9, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 0', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1 }}
+                  style={{ ...STYLE, fontSize: 12, color: '#40e8ff', background: 'rgba(4,2,12,0.90)', border: '1px solid rgba(64,232,255,0.40)', padding: '4px 0', cursor: submitting ? 'default' : 'pointer', opacity: submitting ? 0.5 : 1 }}
                 >
                   {submitting ? '送信中...' : 'コメントを送る'}
                 </button>

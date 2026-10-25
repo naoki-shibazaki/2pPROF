@@ -81,7 +81,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
             background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(64,232,255,0.40)', borderTop: 'none',
           }}>
             <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(64,232,255,0.25)' }}>
-              <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff', letterSpacing: '0.08em' }}>🔗 シェア</span>
+              <span style={{ ...STYLE, fontSize: 12, color: '#40e8ff', letterSpacing: '0.08em' }}>🔗 シェア</span>
             </div>
 
             <MenuItem
@@ -104,11 +104,11 @@ export default function SharePanel({ open, onClose, demo }: Props) {
 
             {invite && (
               <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <span style={{ ...STYLE, fontSize: 9, color: invite.copied ? '#38ff78' : '#b0a8d0' }}>
+                <span style={{ ...STYLE, fontSize: 12, color: invite.copied ? '#38ff78' : '#b0a8d0' }}>
                   {invite.copied ? '✓ 招待リンクをコピーしました（7日間有効）' : '招待リンクを作成しました（7日間有効）'}
                 </span>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <span style={{ ...STYLE, fontSize: 9, color: '#604878', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', userSelect: 'all' }}>
+                  <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', userSelect: 'all' }}>
                     {invite.url}
                   </span>
                   <button onClick={copyInvite} style={smallButton}>コピー</button>
@@ -119,7 +119,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
               </div>
             )}
             {error && (
-              <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', padding: '8px 12px' }}>⚠ {error}</p>
+              <p style={{ ...STYLE, fontSize: 12, color: '#ff4060', padding: '8px 12px' }}>⚠ {error}</p>
             )}
           </div>
         </>
@@ -134,7 +134,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
 }
 
 const smallButton = {
-  ...STYLE, fontSize: 9, color: '#40e8ff', background: 'transparent',
+  ...STYLE, fontSize: 12, color: '#40e8ff', background: 'transparent',
   border: '1px solid rgba(64,232,255,0.45)', padding: '5px 10px', cursor: 'pointer', flexShrink: 0,
 } as const
 
@@ -151,8 +151,8 @@ function MenuItem({ icon, label, onClick, disabled, color, last }: {
         borderBottom: last ? 'none' : '1px solid rgba(255,255,255,0.05)', opacity: disabled ? 0.5 : 1,
       }}
     >
-      <span style={{ fontSize: 13, width: 18, textAlign: 'center' }}>{icon}</span>
-      <span style={{ ...STYLE, fontSize: 11, color: color ?? '#c0f0ff' }}>{label}</span>
+      <span style={{ fontSize: 16, width: 18, textAlign: 'center' }}>{icon}</span>
+      <span style={{ ...STYLE, fontSize: 14, color: color ?? '#c0f0ff' }}>{label}</span>
     </button>
   )
 }

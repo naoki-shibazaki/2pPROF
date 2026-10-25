@@ -134,7 +134,7 @@ export default function AvatarUploader({ currentImage }: Props) {
       >
         {loading ? (
           <div style={{ width: 140, height: 140, background: 'rgba(20,8,40,0.90)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ ...STYLE, fontSize: 9, color: '#40e8ff' }}>処理中...</span>
+            <span style={{ ...STYLE, fontSize: 12, color: '#40e8ff' }}>処理中...</span>
           </div>
         ) : image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -149,7 +149,7 @@ export default function AvatarUploader({ currentImage }: Props) {
       <input ref={libraryInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={onInputChange} />
 
       {error && (
-        <p style={{ ...STYLE, fontSize: 9, color: '#ff4060', textAlign: 'center', maxWidth: 200 }}>
+        <p style={{ ...STYLE, fontSize: 12, color: '#ff4060', textAlign: 'center', maxWidth: 200 }}>
           ⚠ {error}
         </p>
       )}
@@ -175,7 +175,7 @@ function PhotoMenu({ hasImage, onCamera, onLibrary, onDelete, onClose }: {
   onClose: () => void
 }) {
   const item = (color: string) => ({
-    ...STYLE, width: '100%', minHeight: 52, fontSize: 14, color, letterSpacing: '0.06em',
+    ...STYLE, width: '100%', minHeight: 52, fontSize: 16, color, letterSpacing: '0.06em',
     background: 'transparent', border: 'none', borderBottom: '1px solid rgba(64,232,255,0.15)', cursor: 'pointer',
   })
 
@@ -194,7 +194,7 @@ function PhotoMenu({ hasImage, onCamera, onLibrary, onDelete, onClose }: {
         }}
       >
         <div style={{ background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(64,232,255,0.45)' }}>
-          <p style={{ ...STYLE, fontSize: 10, color: '#40e8ff80', textAlign: 'center', padding: '10px 0', borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
+          <p style={{ ...STYLE, fontSize: 13, color: '#40e8ff80', textAlign: 'center', padding: '10px 0', borderBottom: '1px solid rgba(64,232,255,0.15)' }}>
             プロフィール写真
           </p>
           <button role="menuitem" onClick={onCamera} style={item('#c0f0ff')}>📷 写真を撮る</button>

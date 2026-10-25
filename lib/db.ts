@@ -77,6 +77,7 @@ export async function initSchema() {
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_day DATE`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_opens INTEGER DEFAULT 0`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS hp_last_open TIMESTAMPTZ`)
+    await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS howto_seen_at TIMESTAMPTZ`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS proximity_count INTEGER DEFAULT 0`)
     await client.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS proximity_mode TEXT DEFAULT 'on'`)
 

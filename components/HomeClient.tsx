@@ -12,6 +12,7 @@ import NotifPanel from '@/components/NotifPanel'
 import SettingsPanel from '@/components/SettingsPanel'
 import SharePanel from '@/components/SharePanel'
 import EncounterPrompt from '@/components/EncounterPrompt'
+import HowToModal from '@/components/HowToModal'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -22,6 +23,19 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
   const [openPanel, setOpenPanel] = useState<'notif' | 'share' | 'settings' | null>(null)
   const togglePanel = (p: 'notif' | 'share' | 'settings') => setOpenPanel(cur => (cur === p ? null : p))
   const closePanel = () => setOpenPanel(null)
+  // 使い方: 初めてホームを開いたときに自動で出す。設定からも開ける
+  const [howToOpen, setHowToOpen] = useState(false)
+  useEffect(() => {
+    if (demo) return
+    fetch('/api/user/me')
+      .then(r => (r.ok ? r.json() : null))
+      .then(u => { if (u && u.howto_seen === false) setHowToOpen(true) })
+      .catch(() => {})
+  }, [demo])
+  const closeHowTo = () => {
+    setHowToOpen(false)
+    if (!demo) fetch('/api/user/howto', { method: 'POST' }).catch(() => {})
+  }
 
   const totalUnread = notifCounts.hitokoto + notifCounts.friends + notifCounts.others
 
@@ -55,7 +69,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
   const iconButton = (active: boolean) => ({
     ...STYLE,
     background: 'none', border: 'none', cursor: 'pointer',
-    fontSize: 13, lineHeight: 1, padding: '2px 4px',
+    fontSize: 16, lineHeight: 1, padding: '2px 4px',
     opacity: active ? 1 : 0.75,
   })
 
@@ -113,15 +127,19 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
               onTabChange={tab => { closePanel(); handleTabChange(tab) }}
             />
             <SharePanel open={openPanel === 'share'} onClose={closePanel} demo={demo} />
-            <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} />
+            <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} onShowHowTo={() => { closePanel(); setHowToOpen(true) }} />
           </div>
-          {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
+          {/* 中身が短いタブでも、開いたパネル（設定の「アカウントを削除」など）が切れないよう高さを確保する */}
+          <div style={{ minHeight: openPanel ? 600 : undefined }}>
+            {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
+          </div>
           <div className="pixel-statusbar">
             友達と紹介しあおう！
           </div>
         </PixelWindow>
       </main>
       {!demo && <EncounterPrompt />}
+      <HowToModal open={howToOpen} onClose={closeHowTo} />
     </div>
   )
 }
