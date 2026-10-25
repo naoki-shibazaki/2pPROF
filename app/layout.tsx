@@ -4,6 +4,7 @@ import './globals.css'
 import HpGate from '@/components/HpGate'
 import DeepLinkHandler from '@/components/DeepLinkHandler'
 import NavTracker from '@/components/NavTracker'
+import ViewportFix from '@/components/ViewportFix'
 
 // DotGothic16: pixel font covering Latin + Japanese
 const pixelFont = DotGothic16({
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <HpGate />
         <DeepLinkHandler />
         <NavTracker />
+        <ViewportFix />
       </body>
     </html>
   )
