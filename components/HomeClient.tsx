@@ -13,8 +13,8 @@ import SettingsPanel from '@/components/SettingsPanel'
 import SharePanel from '@/components/SharePanel'
 import EncounterPrompt from '@/components/EncounterPrompt'
 import HowToModal from '@/components/HowToModal'
+import PixelIcon from '@/components/PixelIcon'
 
-const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
 export default function HomeClient({ demo }: { demo?: boolean }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
@@ -66,27 +66,30 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
     }
   }, [demo])
 
+  // タップしやすいよう 40×40 にし、上下は負のマージンでタイトルバーの高さを変えない
   const iconButton = (active: boolean) => ({
-    ...STYLE,
     background: 'none', border: 'none', cursor: 'pointer',
-    fontSize: 16, lineHeight: 1, padding: '2px 4px',
-    opacity: active ? 1 : 0.75,
+    width: 40, height: 40, margin: '-8px 0', padding: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    opacity: active ? 1 : 0.85,
   })
 
   const headerButtons = (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <div style={{ display: 'flex', alignItems: 'center', marginRight: -6 }}>
       <div style={{ position: 'relative' }}>
         <button
-          aria-label="通知"
+          aria-label={totalUnread > 0 ? '通知（未読あり）' : '通知'}
           onClick={() => togglePanel('notif')}
           style={iconButton(openPanel === 'notif')}
         >
-          🔔
+          <span className={totalUnread > 0 && openPanel !== 'notif' ? 'bell-ring' : undefined} style={{ display: 'block' }}>
+            <PixelIcon name="bell" color="#ffd700" />
+          </span>
         </button>
         {totalUnread > 0 && openPanel !== 'notif' && (
-          <span style={{
-            position: 'absolute', top: 0, right: 0,
-            width: 7, height: 7, borderRadius: '50%',
+          <span aria-hidden style={{
+            position: 'absolute', top: 2, right: 6,
+            width: 6, height: 6,
             background: '#ff3040',
             boxShadow: '0 0 4px rgba(255,48,64,0.9)',
           }} />
@@ -97,14 +100,14 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
         onClick={() => togglePanel('share')}
         style={iconButton(openPanel === 'share')}
       >
-        🔗
+        <PixelIcon name="share" color="#40e8ff" />
       </button>
       <button
         aria-label="設定"
         onClick={() => togglePanel('settings')}
         style={iconButton(openPanel === 'settings')}
       >
-        ⚙️
+        <PixelIcon name="gear" color="#ff40c0" />
       </button>
     </div>
   )

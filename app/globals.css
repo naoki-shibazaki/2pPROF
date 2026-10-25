@@ -282,3 +282,19 @@
 .leaflet-control-attribution a {
   color: #8a7aa8 !important;
 }
+
+/* 未読があるときのベル: ときどき小さく揺れる */
+@keyframes bell-ring {
+  0%, 80%, 100% { transform: rotate(0deg); }
+  84% { transform: rotate(14deg); }
+  88% { transform: rotate(-12deg); }
+  92% { transform: rotate(8deg); }
+  96% { transform: rotate(-4deg); }
+}
+.bell-ring {
+  transform-origin: 50% 10%;
+  animation: bell-ring 3s steps(1, end) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bell-ring { animation: none; }
+}
