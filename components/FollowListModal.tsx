@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import AvatarSVG from './AvatarSVG'
 
@@ -58,9 +59,11 @@ export default function FollowListModal({
     }
   }
 
-  return (
+  // スクロールする枠の中に置くと iPhone で切れるので、body 直下に出す
+  if (typeof document === 'undefined') return null
+  return createPortal(
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(4,2,12,0.88)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(4,2,12,0.88)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
       onClick={onClose}
     >
       <div
@@ -71,7 +74,9 @@ export default function FollowListModal({
           border: '2px solid #ff40c0',
           borderBottom: 'none',
           boxShadow: '0 0 24px rgba(255,64,192,0.35)',
-          maxHeight: '75dvh',
+          maxHeight: 'calc(85dvh - env(safe-area-inset-top))',
+          // 下のホームバーに一覧が隠れないように
+          paddingBottom: 'env(safe-area-inset-bottom)',
           display: 'flex', flexDirection: 'column',
         }}
       >
@@ -86,14 +91,15 @@ export default function FollowListModal({
           </span>
           <button
             onClick={onClose}
-            style={{ ...STYLE, fontSize: 13, color: '#7a70a0', background: 'none', border: 'none', cursor: 'pointer' }}
+            aria-label="閉じる"
+            style={{ ...STYLE, fontSize: 16, color: '#b0a8d0', background: 'none', border: 'none', cursor: 'pointer', minWidth: 44, minHeight: 44, marginRight: -10 }}
           >
             ✕
           </button>
         </div>
 
         {/* List */}
-        <div style={{ overflowY: 'auto', flex: 1 }}>
+        <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, overscrollBehavior: 'contain' }}>
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
               <span style={{ ...STYLE, fontSize: 13, color: '#40e8ff' }}>読み込み中...</span>
@@ -140,7 +146,7 @@ export default function FollowListModal({
                       color: followStates[u.id] ? '#38ff78' : '#ff40c0',
                       background: 'rgba(4,2,12,0.80)',
                       border: `1px solid ${followStates[u.id] ? 'rgba(56,255,120,0.45)' : 'rgba(255,64,192,0.45)'}`,
-                      padding: '3px 10px', cursor: 'pointer', flexShrink: 0,
+                      padding: '0 12px', minHeight: 36, cursor: 'pointer', flexShrink: 0,
                     }}
                   >
                     {followStates[u.id] ? 'フォロー中' : 'フォロー'}
@@ -151,6 +157,7 @@ export default function FollowListModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

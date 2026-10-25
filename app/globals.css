@@ -305,5 +305,4 @@
 /* リストの端まで行っても、画面全体のスクロールに連鎖させない */
 .overflow-y-auto {
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
 }
