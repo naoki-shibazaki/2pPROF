@@ -132,8 +132,9 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
             <SharePanel open={openPanel === 'share'} onClose={closePanel} demo={demo} />
             <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} onShowHowTo={() => { closePanel(); setHowToOpen(true) }} />
           </div>
-          {/* 中身が短いタブでも、開いたパネル（設定の「アカウントを削除」など）が切れないよう高さを確保する */}
-          <div style={{ minHeight: openPanel ? 600 : undefined }}>
+          {/* タブを切り替えて読み込み中でもウィンドウが縮まないよう、いつも画面いっぱいの高さを確保する
+              （開いたパネル＝設定の「アカウントを削除」などが切れないようにも） */}
+          <div style={{ minHeight: openPanel ? 'max(600px, calc(100dvh - 205px))' : 'calc(100dvh - 205px)' }}>
             {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           </div>
           <div className="pixel-statusbar">
