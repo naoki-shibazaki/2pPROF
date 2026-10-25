@@ -13,10 +13,14 @@ export default auth((req) => {
     pathname.startsWith('/privacy') ||
     pathname.startsWith('/support') ||
     pathname.startsWith('/terms') ||
+    pathname.startsWith('/.well-known') ||
     (pathname === '/' && isDemo)
 
   if (!isLoggedIn && !isPublic) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    const login = new URL('/login', req.url)
+    // 友達のリンクから来た人は、ログイン後にそのページへ戻す
+    if (/^\/(profile|invite)\/[^/]+$/.test(pathname)) login.searchParams.set('next', pathname)
+    return NextResponse.redirect(login)
   }
 
   return NextResponse.next()

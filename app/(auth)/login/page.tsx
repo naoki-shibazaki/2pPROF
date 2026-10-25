@@ -8,6 +8,13 @@ import { nativeOAuthSignIn } from '@/lib/native-oauth'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
+// 友達のプロフィールや招待リンクから来た人は、ログイン後にそのページへ戻す（?next=/profile/... など）
+function afterLoginPath() {
+  if (typeof window === 'undefined') return '/'
+  const next = new URLSearchParams(window.location.search).get('next')
+  return next && /^\/(profile|invite)\/[^/]+$/.test(next) ? next : '/'
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [isSignUp, setIsSignUp] = useState(false)
@@ -87,7 +94,7 @@ export default function LoginPage() {
         redirect: false,
       })
       if (result?.error) setError('Apple でのサインインに失敗しました')
-      else router.push('/')
+      else router.push(afterLoginPath())
     } catch (e) {
       // ユーザーがキャンセルした場合（エラーコード 1001）は何も表示しない
       if (!String(e).includes('1001')) setError('Apple でのサインインに失敗しました')
@@ -96,11 +103,11 @@ export default function LoginPage() {
   }
 
   async function handleOAuth(provider: 'google' | 'line') {
-    if (!isIOSApp) return signIn(provider, { callbackUrl: '/' })
+    if (!isIOSApp) return signIn(provider, { callbackUrl: afterLoginPath() })
     setLoading(true)
     setError('')
     const result = await nativeOAuthSignIn(provider)
-    if (result === 'success') router.push('/')
+    if (result === 'success') router.push(afterLoginPath())
     else if (result === 'outdated') setError('アプリを最新バージョンに更新してください')
     else if (result === 'error') setError('ログインに失敗しました。もう一度お試しください')
     setLoading(false)
@@ -129,7 +136,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('メールアドレスまたはパスワードが正しくありません')
     } else {
-      router.push('/')
+      router.push(afterLoginPath())
     }
     setLoading(false)
   }
