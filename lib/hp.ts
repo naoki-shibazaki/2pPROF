@@ -8,11 +8,14 @@ const DEBOUNCE_SECONDS = 30
 
 export type HpState = { hp: number; max: number; locked: boolean; resetAt: string }
 
-// App Review のデモアカウント（とデモの友達）は HP が 0 になっても締め出さない（審査中に使えなくなるため）
-function isExempt(email: string | null | undefined) {
+// HP が 0 になっても締め出さない人
+// - App Review のデモアカウントとデモの友達（審査中に使えなくなるため）: メールで指定
+// - 運営者（@naoki）: ハンドルで指定
+function isExemptEmail(email: string | null | undefined) {
   const list = (process.env.HP_EXEMPT_EMAILS ?? 'review@2pprof.com,friend1@2pprof.com').split(',').map(s => s.trim().toLowerCase())
   return !!email && list.includes(email.toLowerCase())
 }
+const EXEMPT_HANDLES = (process.env.HP_EXEMPT_HANDLES ?? 'naoki').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
 
 // 次の日本時間 0:00
 function nextResetAt() {
@@ -24,10 +27,11 @@ function nextResetAt() {
 // アプリを開いた（起動・復帰した）ことを記録して、残り HP を返す
 // hp_opens が HP_MAX を超えたら締め出し中（HP 0 の状態で新しく開いた）
 export async function recordOpen(userId: string, email: string | null | undefined): Promise<HpState> {
-  const cap = isExempt(email) ? HP_MAX : HP_MAX + 1
+  const emailExempt = isExemptEmail(email)
   const [row] = await sql`
     WITH cur AS (
       SELECT
+        (${emailExempt}::boolean OR LOWER(handle) = ANY(${EXEMPT_HANDLES}::text[])) AS exempt,
         CASE WHEN hp_day = (NOW() AT TIME ZONE 'Asia/Tokyo')::date THEN COALESCE(hp_opens, 0) ELSE 0 END AS opens,
         COALESCE(hp_day = (NOW() AT TIME ZONE 'Asia/Tokyo')::date
           AND hp_last_open > NOW() - make_interval(secs => ${DEBOUNCE_SECONDS}), false) AS recent
@@ -35,9 +39,9 @@ export async function recordOpen(userId: string, email: string | null | undefine
     )
     UPDATE users SET
       hp_day = (NOW() AT TIME ZONE 'Asia/Tokyo')::date,
-      hp_opens = CASE WHEN cur.recent THEN cur.opens ELSE LEAST(cur.opens + 1, ${cap}) END,
+      hp_opens = CASE WHEN cur.recent THEN cur.opens ELSE LEAST(cur.opens + 1, CASE WHEN cur.exempt THEN ${HP_MAX}::int ELSE ${HP_MAX + 1}::int END) END,
       hp_last_open = NOW(),
-      hp = GREATEST(0, ${HP_MAX} - CASE WHEN cur.recent THEN cur.opens ELSE LEAST(cur.opens + 1, ${cap}) END)
+      hp = GREATEST(0, ${HP_MAX} - CASE WHEN cur.recent THEN cur.opens ELSE LEAST(cur.opens + 1, CASE WHEN cur.exempt THEN ${HP_MAX}::int ELSE ${HP_MAX + 1}::int END) END)
     FROM cur
     WHERE id = ${userId}::uuid
     RETURNING hp_opens
