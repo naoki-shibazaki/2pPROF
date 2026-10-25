@@ -1,6 +1,9 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { SELF_QA_ANSWER_MAX, SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
 
+// check: true のときは名前とハンドルを確かめるだけで保存しない（質問ステップに進む前に使う）
+// qa: 初期登録の質問への答え。順番は SELF_QA_QUESTIONS と同じ
 export async function POST(req: Request) {
   const session = await auth()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,7 +11,7 @@ export async function POST(req: Request) {
   if (!userId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { name, handle, bio } = await req.json()
+    const { name, handle, bio, qa, check } = await req.json()
     if (!name?.trim() || !handle?.trim()) {
       return Response.json({ error: '名前とハンドルは必須です' }, { status: 400 })
     }
@@ -26,10 +29,25 @@ export async function POST(req: Request) {
       return Response.json({ error: 'このハンドルはすでに使われています' }, { status: 409 })
     }
 
+    if (check) return Response.json({ ok: true })
+
+    // 答えていない質問も残しておくと、あとで [編集] から答えられる
+    const answers: unknown[] = Array.isArray(qa) ? qa : []
+    const items = SELF_QA_QUESTIONS.map((q, i) => ({
+      q,
+      a: typeof answers[i] === 'string' ? (answers[i] as string).trim().slice(0, SELF_QA_ANSWER_MAX) : '',
+    }))
+
     await sql`
       UPDATE users
       SET name = ${name.trim()}, handle = ${handle.trim()}, bio = ${bio?.trim() || null}, onboarded = TRUE
       WHERE id = ${userId}
+    `
+    // すでに自分の回答がある人（作り直しなど）は上書きしない
+    await sql`
+      INSERT INTO self_qa (user_id, items, updated_at)
+      VALUES (${userId}::uuid, ${JSON.stringify(items)}, NOW())
+      ON CONFLICT (user_id) DO NOTHING
     `
 
     return Response.json({ ok: true })

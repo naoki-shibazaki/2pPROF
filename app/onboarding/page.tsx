@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { SELF_QA_ANSWER_MAX, SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -10,7 +11,15 @@ export default function OnboardingPage() {
   const [bio, setBio] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [step, setStep] = useState<'form' | 'done'>('form')
+  const [step, setStep] = useState<'form' | 'qa' | 'done'>('form')
+  // 質問は 1 問ずつ聞く。答えはあとから [編集] で直せるので、とばしてもよい
+  const [qIndex, setQIndex] = useState(0)
+  const [answers, setAnswers] = useState<string[]>(() => SELF_QA_QUESTIONS.map(() => ''))
+  const answerRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (step === 'qa') answerRef.current?.focus()
+  }, [step, qIndex])
 
   // Googleログイン時の名前を初期値に
   useEffect(() => {
@@ -31,6 +40,7 @@ export default function OnboardingPage() {
     }
   }
 
+  // プロフィールを確かめてから質問へ進む（ハンドルの重複はここで分かる）
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -39,19 +49,48 @@ export default function OnboardingPage() {
     const res = await fetch('/api/user/onboard', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, handle, bio }),
-    })
+      body: JSON.stringify({ name, handle, bio, check: true }),
+    }).catch(() => null)
+    setLoading(false)
 
-    if (!res.ok) {
-      const d = await res.json()
-      setError(d.error || '登録に失敗しました')
+    if (!res?.ok) {
+      const d = await res?.json().catch(() => null)
+      setError(d?.error || '確認できませんでした。もう一度お試しください')
+      return
+    }
+    setStep('qa')
+  }
+
+  async function finish() {
+    setLoading(true)
+    setError('')
+
+    const res = await fetch('/api/user/onboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, handle, bio, qa: answers }),
+    }).catch(() => null)
+
+    if (!res?.ok) {
+      const d = await res?.json().catch(() => null)
+      setError(d?.error || '登録に失敗しました')
       setLoading(false)
+      // ハンドルが先に取られた場合などはプロフィールに戻す（答えは残る）
+      if (res && res.status !== 500) setStep('form')
       return
     }
 
     setStep('done')
     setTimeout(() => router.replace('/'), 1200)
   }
+
+  function next() {
+    if (qIndex < SELF_QA_QUESTIONS.length - 1) setQIndex(i => i + 1)
+    else void finish()
+  }
+
+  const answeredCount = answers.filter(a => a.trim()).length
+  const isLast = qIndex === SELF_QA_QUESTIONS.length - 1
 
   return (
     <div
@@ -94,10 +133,90 @@ export default function OnboardingPage() {
                 <p className="font-pixel text-sm" style={{ color: '#38ff78' }}>登録完了！</p>
                 <p className="font-pixel text-xs" style={{ color: '#40e8ff60' }}>プロフィールへ移動中...</p>
               </div>
+            ) : step === 'qa' ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between font-pixel text-xs" style={{ color: '#40e8ff80' }}>
+                    <span>STEP 2 / 2　じぶんのこと</span>
+                    <span aria-live="polite">{String(qIndex + 1).padStart(2, '0')} / {SELF_QA_QUESTIONS.length}</span>
+                  </div>
+                  <div
+                    role="progressbar"
+                    aria-valuemin={1}
+                    aria-valuemax={SELF_QA_QUESTIONS.length}
+                    aria-valuenow={qIndex + 1}
+                    aria-label="質問の進み具合"
+                    style={{ height: 6, marginTop: 6, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(56,255,120,0.30)' }}
+                  >
+                    <div style={{ width: `${((qIndex + 1) / SELF_QA_QUESTIONS.length) * 100}%`, height: '100%', background: '#38ff78', boxShadow: '0 0 6px #38ff78' }} />
+                  </div>
+                </div>
+
+                <p className="font-pixel text-xs" style={{ color: '#40e8ff60', lineHeight: 1.8 }}>
+                  答えはプロフィールの「自分の回答」に載ります。わからない質問はとばして、あとで [編集] から答えられます。
+                </p>
+
+                {error && (
+                  <div role="alert" className="px-3 py-2 font-pixel text-xs border" style={{ borderColor: '#ff4060', background: 'rgba(255,64,96,0.12)', color: '#ff8090' }}>
+                    ⚠ {error}
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="qa-answer" className="block font-pixel text-sm mb-2" style={{ color: '#d0c8f0' }}>
+                    <span style={{ color: '#40e8ff', marginRight: 8 }}>{String(qIndex + 1).padStart(2, '0')}</span>
+                    {SELF_QA_QUESTIONS[qIndex]}
+                  </label>
+                  <textarea
+                    id="qa-answer"
+                    ref={answerRef}
+                    value={answers[qIndex]}
+                    onChange={e => setAnswers(a => a.map((v, i) => (i === qIndex ? e.target.value : v)))}
+                    maxLength={SELF_QA_ANSWER_MAX}
+                    rows={3}
+                    className="w-full bg-transparent font-pixel text-sm px-3 py-2 outline-none resize-none"
+                    style={{ border: '1px solid rgba(56,255,120,0.45)', color: '#38ff78', lineHeight: '1.8' }}
+                    placeholder="回答を入力"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => (qIndex === 0 ? setStep('form') : setQIndex(i => i - 1))}
+                    disabled={loading}
+                    className="font-pixel text-xs"
+                    style={{ minHeight: 44, padding: '0 14px', color: '#b0a8d0', background: 'transparent', border: '1px solid rgba(176,168,208,0.35)', cursor: 'pointer' }}
+                  >
+                    ◀ 戻る
+                  </button>
+                  <button
+                    type="button"
+                    onClick={next}
+                    disabled={loading}
+                    className="pixel-action-btn flex-1 justify-center"
+                    style={{ minHeight: 44, fontSize: '13px' }}
+                  >
+                    {loading ? '...' : isLast ? '▶ 登録してはじめる' : answers[qIndex].trim() ? '次へ ▶' : 'とばす ▶'}
+                  </button>
+                </div>
+
+                {!isLast && (
+                  <button
+                    type="button"
+                    onClick={() => void finish()}
+                    disabled={loading}
+                    className="w-full font-pixel text-xs"
+                    style={{ minHeight: 40, color: '#605888', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                  >
+                    残りはあとで答える（{answeredCount}問 回答済み）
+                  </button>
+                )}
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <p className="font-pixel text-xs" style={{ color: '#40e8ff60' }}>
-                  はじめてのログインです。プロフィールを設定してください。
+                  STEP 1 / 2　はじめてのログインです。プロフィールを設定してください。
                 </p>
 
                 {error && (
@@ -173,7 +292,7 @@ export default function OnboardingPage() {
                   className="pixel-action-btn w-full justify-center py-3"
                   style={{ fontSize: '13px' }}
                 >
-                  {loading ? '...' : '▶ 登録してはじめる'}
+                  {loading ? '...' : '次へ ▶ 質問に答える'}
                 </button>
               </form>
             )}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import ModerationMenu from './ModerationMenu'
 import { qaHash } from '@/lib/qa-hash'
+import { SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
 
 export interface QAItem {
   q: string
@@ -125,7 +126,11 @@ export default function QASection({ items: defaultItems, demo }: QASectionProps)
       .catch(() => {})
   }, [])
 
-  function openEdit() { setDraft(items.map(i => ({ ...i }))); setEditing(true) }
+  // まだ何も無い人には、初期登録と同じ質問を並べておく
+  function openEdit() {
+    setDraft(items.length > 0 ? items.map(i => ({ ...i })) : SELF_QA_QUESTIONS.map(q => ({ q, a: '' })))
+    setEditing(true)
+  }
   function save() {
     const filtered = draft.filter(i => i.q.trim())
     setItems(filtered)
