@@ -20,6 +20,19 @@ export async function GET(req: Request) {
       targetId = selfId
     }
 
+    // 会った回数（誰とどのくらい会っているか）は本人にだけ返す
+    // 他の人の友達一覧では回数を返さず、並び順も回数に関係ない名前順にする
+    if (targetId !== selfId) {
+      const rows = await sql`
+        SELECT u.id, u.name, u.handle, u.image
+        FROM follows f
+        JOIN users u ON u.id = f.following_id
+        WHERE f.follower_id = ${targetId}::uuid
+        ORDER BY u.name NULLS LAST, u.handle
+      `
+      return Response.json(rows)
+    }
+
     const rows = await sql`
       SELECT
         u.id,

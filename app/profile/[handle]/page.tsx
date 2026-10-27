@@ -12,7 +12,7 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
 type QAItem = { q: string; a: string }
 type IntroItem = { id: string; body: string; met_year: number | null; met_month: number | null; author_name: string | null; author_handle: string | null }
-type FriendItem = { id: string; name: string | null; handle: string | null; image: string | null; proximity_count: number }
+type FriendItem = { id: string; name: string | null; handle: string | null; image: string | null }
 type TabType = 'profile' | 'friends' | 'intro'
 
 type PublicUser = {
@@ -541,10 +541,6 @@ export default function ProfilePage() {
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ ...STYLE, fontSize: 14, color: '#d0c8f0', letterSpacing: '0.08em' }}>{f.name ?? f.handle ?? '???'}</div>
                               <div style={{ ...STYLE, fontSize: 11, color: '#8a7aa8' }}>@{f.handle}</div>
-                            </div>
-                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <div style={{ ...STYLE, fontSize: 16, color: '#ffd700' }}>{f.proximity_count}</div>
-                              <div style={{ ...STYLE, fontSize: 11, color: '#7a70a0' }}>近くにいた</div>
                             </div>
                           </button>
                         ))
