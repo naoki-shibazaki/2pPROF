@@ -44,7 +44,10 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100dvh', background: '#04020c', color: '#b0a8d0', padding: '32px 16px', maxWidth: 720, margin: '0 auto', ...STYLE }}>
-      <a href="/" style={{ fontSize: 14, color: '#40e8ff' }}>◀ もどる</a>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <a href="/" style={{ fontSize: 14, color: '#40e8ff' }}>◀ もどる</a>
+        <a href="/admin/stats" style={{ fontSize: 14, color: '#ffd700' }}>利用状況 ▶</a>
+      </div>
       <h1 style={{ fontSize: 18, color: '#ff40c0', margin: '16px 0 4px' }}>通報の管理</h1>
       <p style={{ fontSize: 12, color: '#8a7aa8', marginBottom: 20 }}>通報から24時間以内に対応してください</p>
 
