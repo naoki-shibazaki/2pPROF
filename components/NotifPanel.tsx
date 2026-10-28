@@ -69,9 +69,10 @@ interface NotifPanelProps {
   hasUnread: boolean
   onMarkAllRead: () => void
   onTabChange: (tab: Tab) => void
+  onRead: () => void
 }
 
-export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, onTabChange }: NotifPanelProps) {
+export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, onTabChange, onRead }: NotifPanelProps) {
   const router = useRouter()
   const [items, setItems] = useState<NotifItem[]>([])
   const [loading, setLoading] = useState(false)
@@ -97,8 +98,15 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
   }
 
   function handleItemClick(n: NotifItem) {
-    // 既読化（該当1件）
+    // 既読化（該当1件）。サーバーにも記録して、未読数に残らないようにする
     setItems(prev => prev.map(item => item.id === n.id ? { ...item, read: true } : item))
+    if (!n.read) {
+      fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: n.id }),
+      }).then(onRead, onRead)
+    }
 
     const dest = getDestination(n.type, n.from_handle)
     onClose()

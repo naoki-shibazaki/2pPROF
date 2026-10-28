@@ -39,8 +39,9 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
 
   const totalUnread = notifCounts.hitokoto + notifCounts.friends + notifCounts.others
 
-  useEffect(() => {
-    if (demo) return
+  // 未読数はアプリを開いている間も取り直す（アプリはバックグラウンドで開いたままになるので、
+  // 最初の 1 回だけだと後から来た通知に気づけない）。復帰したとき＋表示中は 30 秒ごと
+  const loadCounts = useCallback(() => {
     fetch('/api/notifications')
       .then(r => r.json())
       .then(data => setNotifCounts({
@@ -49,7 +50,15 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
         others:   data?.others   ?? 0,
       }))
       .catch(() => {})
-  }, [demo])
+  }, [])
+  useEffect(() => {
+    if (demo) return
+    loadCounts()
+    const onVisible = () => { if (document.visibilityState === 'visible') loadCounts() }
+    document.addEventListener('visibilitychange', onVisible)
+    const id = setInterval(() => { if (document.visibilityState === 'visible') loadCounts() }, 30_000)
+    return () => { document.removeEventListener('visibilitychange', onVisible); clearInterval(id) }
+  }, [demo, loadCounts])
 
   const handleTabChange = useCallback((tab: Tab) => {
     setActiveTab(tab)
@@ -87,12 +96,18 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
           </span>
         </button>
         {totalUnread > 0 && openPanel !== 'notif' && (
+          // 小さな点だと気づけないので、件数入りのバッジにする
           <span aria-hidden style={{
-            position: 'absolute', top: 4, right: 8,
-            width: 6, height: 6,
-            background: '#ff3040',
-            boxShadow: '0 0 4px rgba(255,48,64,0.9)',
-          }} />
+            position: 'absolute', top: -6, right: 0,
+            minWidth: 18, height: 18, padding: '0 4px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-pixel, monospace)', fontSize: 12, lineHeight: 1, color: '#fff',
+            background: '#ff3040', border: '1px solid #04020c',
+            boxShadow: '0 0 6px rgba(255,48,64,0.9)',
+            pointerEvents: 'none',
+          }}>
+            {totalUnread > 9 ? '9+' : totalUnread}
+          </span>
         )}
       </div>
       <button
@@ -128,6 +143,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
               hasUnread={totalUnread > 0}
               onMarkAllRead={() => setNotifCounts({ hitokoto: 0, friends: 0, others: 0 })}
               onTabChange={tab => { closePanel(); handleTabChange(tab) }}
+              onRead={loadCounts}
             />
             <SharePanel open={openPanel === 'share'} onClose={closePanel} demo={demo} />
             <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} onShowHowTo={() => { closePanel(); setHowToOpen(true) }} />

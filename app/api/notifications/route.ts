@@ -43,7 +43,7 @@ export async function GET() {
   }
 }
 
-// POST: 指定タブの通知を既読に { tab: 'hitokoto' | 'friends' | 'others' | 'all' }
+// POST: 指定タブの通知を既読に { tab: 'hitokoto' | 'friends' | 'others' | 'all' }、または 1 件だけ { id }
 export async function POST(req: Request) {
   const session = await auth()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,7 +51,12 @@ export async function POST(req: Request) {
   if (!userId) return Response.json({ ok: false })
 
   let tab: string = 'all'
-  try { tab = (await req.json())?.tab ?? 'all' } catch { /* no body */ }
+  let id: string | null = null
+  try {
+    const body = await req.json()
+    tab = body?.tab ?? 'all'
+    id = typeof body?.id === 'string' ? body.id : null
+  } catch { /* no body */ }
 
   const typeMap: Record<string, string[]> = {
     hitokoto: ['post_comment'],
@@ -60,7 +65,13 @@ export async function POST(req: Request) {
   }
 
   try {
-    if (tab === 'all' || !typeMap[tab]) {
+    // 通知を 1 件タップしたときは、その 1 件だけ既読にする
+    if (id) {
+      await sql`
+        UPDATE notifications SET read = TRUE
+        WHERE id = ${id}::uuid AND user_id = ${userId}::uuid
+      `
+    } else if (tab === 'all' || !typeMap[tab]) {
       await sql`
         UPDATE notifications SET read = TRUE
         WHERE user_id = ${userId}::uuid AND read = FALSE

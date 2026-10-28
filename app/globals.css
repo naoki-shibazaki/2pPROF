@@ -291,16 +291,19 @@
 }
 
 /* 未読があるときのベル: ときどき小さく揺れる */
+/* 未読があるあいだ、2 秒ごとにベルを揺らす */
 @keyframes bell-ring {
-  0%, 80%, 100% { transform: rotate(0deg); }
-  84% { transform: rotate(14deg); }
-  88% { transform: rotate(-12deg); }
-  92% { transform: rotate(8deg); }
-  96% { transform: rotate(-4deg); }
+  0%, 45%, 100% { transform: rotate(0deg); }
+  5%  { transform: rotate(22deg); }
+  12% { transform: rotate(-20deg); }
+  19% { transform: rotate(16deg); }
+  26% { transform: rotate(-12deg); }
+  33% { transform: rotate(6deg); }
+  40% { transform: rotate(-3deg); }
 }
 .bell-ring {
-  transform-origin: 50% 10%;
-  animation: bell-ring 3s steps(1, end) infinite;
+  transform-origin: 50% 8%;
+  animation: bell-ring 2s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .bell-ring { animation: none; }
