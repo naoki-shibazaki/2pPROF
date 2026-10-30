@@ -77,7 +77,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
         <>
           <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 200 }} />
           <div style={{
-            position: 'absolute', top: 42, left: 0, right: 0, zIndex: 201,
+            position: 'absolute', top: 0, left: 0, right: 0, zIndex: 201,
             background: 'rgba(6,4,18,0.98)', border: '1px solid rgba(64,232,255,0.40)', borderTop: 'none',
           }}>
             <div style={{ padding: '6px 10px', borderBottom: '1px solid rgba(64,232,255,0.25)' }}>

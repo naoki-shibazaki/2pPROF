@@ -39,7 +39,7 @@ export default function OthersTab({ hasNotif, demo }: { hasNotif?: boolean; demo
   return (
     <div
       className="overflow-y-auto"
-      style={{ background: 'transparent', maxHeight: 'calc(100dvh - 205px)' }}
+      style={{ background: 'transparent', maxHeight: 'var(--home-content-h)' }}
     >
       <NotifBanner tab="others" show={!!hasNotif} />
       {/* Sub-header */}

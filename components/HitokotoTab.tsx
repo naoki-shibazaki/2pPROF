@@ -307,7 +307,7 @@ export default function HitokotoTab({ hasNotif, demo }: { hasNotif?: boolean; de
   const visiblePosts = posts.filter(p => !hiddenPostIds.has(p.id) && !blockedHandles.has(p.handle ?? ''))
 
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: 'calc(100dvh - 205px)' }}>
+    <div className="overflow-y-auto" style={{ maxHeight: 'var(--home-content-h)' }}>
       <NotifBanner tab="hitokoto" show={!!hasNotif} />
       {/* Compose box */}
       <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(64,232,255,0.20)', background: 'rgba(4,10,22,0.70)' }}>

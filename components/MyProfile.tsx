@@ -128,7 +128,7 @@ export default function MyProfile({ demo, initialUser }: { demo?: boolean; initi
 
 
   return (
-    <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'calc(100dvh - 205px)' }}>
+    <div className="overflow-y-auto" style={{ background: 'transparent', maxHeight: 'var(--home-content-h)' }}>
       {/* ── Header ── */}
       <div
         className="flex flex-col items-center py-5 px-4 gap-3"

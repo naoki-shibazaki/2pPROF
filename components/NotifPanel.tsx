@@ -127,7 +127,7 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
 
       {/* Panel */}
       <div style={{
-        position: 'absolute', top: 42, left: 0, right: 0, zIndex: 201,
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 201,
         background: 'rgba(6,4,18,0.98)',
         border: '1px solid rgba(255,64,192,0.40)',
         borderTop: 'none',

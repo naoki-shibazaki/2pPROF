@@ -130,7 +130,6 @@ export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: 
       >
         <PixelWindow rightSlot={headerButtons}>
           <div style={{ position: 'relative' }}>
-            <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
             <NotifPanel
               open={openPanel === 'notif'}
               onClose={closePanel}
@@ -144,12 +143,10 @@ export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: 
           </div>
           {/* タブを切り替えて読み込み中でもウィンドウが縮まないよう、いつも画面いっぱいの高さを確保する
               （開いたパネル＝設定の「アカウントを削除」などが切れないようにも） */}
-          <div style={{ minHeight: openPanel ? 'max(600px, calc(100dvh - 205px))' : 'calc(100dvh - 205px)' }}>
+          <div style={{ minHeight: openPanel ? 'max(600px, var(--home-content-h))' : 'var(--home-content-h)' }}>
             {activeTab === 'my' ? <MyProfile demo={demo} initialUser={initialMe} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           </div>
-          <div className="pixel-statusbar">
-            友達と紹介しあおう！
-          </div>
+          <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
         </PixelWindow>
       </main>
       {!demo && <EncounterPrompt />}

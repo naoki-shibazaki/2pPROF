@@ -44,6 +44,63 @@ const GRIDS = {
     '..#.####.#..',
     '.....##.....',
   ],
+  // 下のタブ用
+  person: [
+    '............',
+    '....####....',
+    '...######...',
+    '...######...',
+    '...######...',
+    '....####....',
+    '............',
+    '..########..',
+    '.##########.',
+    '.##########.',
+    '.##########.',
+    '............',
+  ],
+  bubble: [
+    '............',
+    '.##########.',
+    '############',
+    '############',
+    '############',
+    '############',
+    '.##########.',
+    '..###.......',
+    '..##........',
+    '..#.........',
+    '............',
+    '............',
+  ],
+  friends: [
+    '............',
+    '.###....###.',
+    '.###....###.',
+    '.###....###.',
+    '............',
+    '#####..#####',
+    '#####..#####',
+    '#####..#####',
+    '#####..#####',
+    '............',
+    '............',
+    '............',
+  ],
+  letter: [
+    '............',
+    '............',
+    '############',
+    '##........##',
+    '#.#......#.#',
+    '#..#....#..#',
+    '#...#..#...#',
+    '#....##....#',
+    '#..........#',
+    '############',
+    '............',
+    '............',
+  ],
 } as const
 
 export type PixelIconName = keyof typeof GRIDS
@@ -67,7 +124,7 @@ const RECTS = Object.fromEntries(
   Object.entries(GRIDS).map(([k, g]) => [k, toRects(g)]),
 ) as Record<PixelIconName, { x: number; y: number; w: number }[]>
 
-export default function PixelIcon({ name, color, size = 24 }: { name: PixelIconName; color: string; size?: number }) {
+export default function PixelIcon({ name, color, size = 24, glow = true }: { name: PixelIconName; color: string; size?: number; glow?: boolean }) {
   return (
     <svg
       width={size}
@@ -75,7 +132,7 @@ export default function PixelIcon({ name, color, size = 24 }: { name: PixelIconN
       viewBox="0 0 12 12"
       shapeRendering="crispEdges"
       aria-hidden
-      style={{ display: 'block', filter: `drop-shadow(0 0 3px ${color})` }}
+      style={{ display: 'block', filter: glow ? `drop-shadow(0 0 3px ${color})` : undefined }}
     >
       {RECTS[name].map(r => <rect key={`${r.x}-${r.y}`} x={r.x} y={r.y} width={r.w} height={1} fill={color} />)}
     </svg>

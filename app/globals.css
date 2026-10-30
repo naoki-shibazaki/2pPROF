@@ -12,6 +12,11 @@
     -moz-osx-font-smoothing: unset;
   }
 
+  :root {
+    /* ホームのタブの中身の高さ（上のタイトルと下のタブを除いた分） */
+    --home-content-h: calc(100dvh - 194px);
+  }
+
   html {
     font-size: 18px;
     height: 100%;
@@ -136,6 +141,37 @@
   .pixel-tab--inactive:hover {
     background: rgba(12, 6, 26, 0.80);
     color: #8a80b0;
+  }
+
+  /* ── Bottom tab bar ── */
+  .pixel-bottomnav {
+    display: flex;
+    background: rgba(4, 2, 12, 0.97);
+    border-top: 2px solid #40e8ff;
+    box-shadow: 0 -2px 10px rgba(64, 232, 255, 0.22);
+  }
+
+  .pixel-navtab {
+    flex: 1;
+    height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-family: var(--font-pixel, monospace);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #8a80b0;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .pixel-navtab--active {
+    color: #40e8ff;
+    background: rgba(64, 232, 255, 0.08);
+    text-shadow: 0 0 8px rgba(64, 232, 255, 0.75);
   }
 
   /* ── Section header ── */
