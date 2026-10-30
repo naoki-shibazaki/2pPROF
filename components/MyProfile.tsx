@@ -45,17 +45,18 @@ function StatBar({ label, color, fill, current, max }: {
   )
 }
 
-export default function MyProfile({ demo }: { demo?: boolean }) {
-  const [user, setUser] = useState<UserProfile | null>(null)
+// initialUser: ホームのページと一緒に届いたプロフィール。これですぐ表示し、裏で最新を取り直す
+export default function MyProfile({ demo, initialUser }: { demo?: boolean; initialUser?: UserProfile }) {
+  const [user, setUser] = useState<UserProfile | null>(initialUser ?? null)
 
 
-  const [name, setName] = useState<string | null>(null)
+  const [name, setName] = useState<string | null>(initialUser?.name ?? null)
   const [editingName, setEditingName] = useState(false)
-  const [nameDraft, setNameDraft] = useState('')
+  const [nameDraft, setNameDraft] = useState(initialUser?.name ?? '')
   const nameInputRef = useRef<HTMLInputElement>(null)
 
   const maxHP = HP_MAX
-  const [currentHP, setCurrentHP] = useState(maxHP)
+  const [currentHP, setCurrentHP] = useState(initialUser?.hp ?? maxHP)
 
   const router = useRouter()
   const openFollows = (tab: 'following' | 'followers') => { if (user?.handle) router.push(`/profile/${user.handle}/follows?tab=${tab}`) }

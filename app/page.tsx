@@ -1,7 +1,7 @@
 import { auth } from '@/auth'
-import { sql } from '@/lib/db'
 import { redirect } from 'next/navigation'
 import HomeClient from '@/components/HomeClient'
+import { getMe, getUnreadCounts } from '@/lib/me'
 
 export default async function Home({
   searchParams,
@@ -18,9 +18,10 @@ export default async function Home({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userId = (session.user as any).id
-  const rows = await sql`SELECT onboarded FROM users WHERE id = ${userId}`
+  // 自分のプロフィールと未読数はページと一緒に返す（画面が出てから取りに行くと、もう 1 往復待たせるため）
+  const [me, counts] = await Promise.all([getMe(userId), getUnreadCounts(userId).catch(() => undefined)])
 
-  if (!rows[0]?.onboarded) redirect('/onboarding')
+  if (!me?.onboarded) redirect('/onboarding')
 
-  return <HomeClient />
+  return <HomeClient initialMe={me} initialCounts={counts} />
 }

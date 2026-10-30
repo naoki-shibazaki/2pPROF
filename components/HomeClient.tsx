@@ -14,24 +14,18 @@ import SharePanel from '@/components/SharePanel'
 import EncounterPrompt from '@/components/EncounterPrompt'
 import HowToModal from '@/components/HowToModal'
 import PixelIcon from '@/components/PixelIcon'
+import type { Me, UnreadCounts } from '@/lib/me'
 
 
-export default function HomeClient({ demo }: { demo?: boolean }) {
+export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: boolean; initialMe?: Me; initialCounts?: UnreadCounts }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
-  const [notifCounts, setNotifCounts] = useState<NotifCounts>({ hitokoto: 0, friends: 0, others: 0 })
+  const [notifCounts, setNotifCounts] = useState<NotifCounts>(initialCounts ?? { hitokoto: 0, friends: 0, others: 0 })
   // ヘッダーのドロップダウンは同時に1つだけ開く
   const [openPanel, setOpenPanel] = useState<'notif' | 'share' | 'settings' | null>(null)
   const togglePanel = (p: 'notif' | 'share' | 'settings') => setOpenPanel(cur => (cur === p ? null : p))
   const closePanel = () => setOpenPanel(null)
   // 使い方: 初めてホームを開いたときに自動で出す。設定からも開ける
-  const [howToOpen, setHowToOpen] = useState(false)
-  useEffect(() => {
-    if (demo) return
-    fetch('/api/user/me')
-      .then(r => (r.ok ? r.json() : null))
-      .then(u => { if (u && u.howto_seen === false) setHowToOpen(true) })
-      .catch(() => {})
-  }, [demo])
+  const [howToOpen, setHowToOpen] = useState(!demo && initialMe?.howto_seen === false)
   const closeHowTo = () => {
     setHowToOpen(false)
     if (!demo) fetch('/api/user/howto', { method: 'POST' }).catch(() => {})
@@ -53,7 +47,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
   }, [])
   useEffect(() => {
     if (demo) return
-    loadCounts()
+    if (!initialCounts) loadCounts()
     const onVisible = () => { if (document.visibilityState === 'visible') loadCounts() }
     document.addEventListener('visibilitychange', onVisible)
     const id = setInterval(() => { if (document.visibilityState === 'visible') loadCounts() }, 30_000)
@@ -151,7 +145,7 @@ export default function HomeClient({ demo }: { demo?: boolean }) {
           {/* タブを切り替えて読み込み中でもウィンドウが縮まないよう、いつも画面いっぱいの高さを確保する
               （開いたパネル＝設定の「アカウントを削除」などが切れないようにも） */}
           <div style={{ minHeight: openPanel ? 'max(600px, calc(100dvh - 205px))' : 'calc(100dvh - 205px)' }}>
-            {activeTab === 'my' ? <MyProfile demo={demo} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
+            {activeTab === 'my' ? <MyProfile demo={demo} initialUser={initialMe} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           </div>
           <div className="pixel-statusbar">
             友達と紹介しあおう！

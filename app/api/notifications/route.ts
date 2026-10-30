@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
+import { getUnreadCounts } from '@/lib/me'
 
 async function ensureTable() {
   await sql`
@@ -23,20 +24,7 @@ export async function GET() {
   if (!userId) return Response.json({ hitokoto: 0, friends: 0, others: 0 })
 
   try {
-    const rows = await sql`
-      SELECT
-        COUNT(*) FILTER (WHERE type = 'post_comment')::int AS hitokoto,
-        COUNT(*) FILTER (WHERE type IN ('followed', 'encounter_request', 'encounter_confirmed'))::int AS friends,
-        COUNT(*) FILTER (WHERE type IN ('introduction', 'question', 'qa_comment'))::int AS others
-      FROM notifications
-      WHERE user_id = ${userId}::uuid AND read = FALSE
-    `
-    const r = rows[0] ?? {}
-    return Response.json({
-      hitokoto: r.hitokoto ?? 0,
-      friends:  r.friends  ?? 0,
-      others:   r.others   ?? 0,
-    })
+    return Response.json(await getUnreadCounts(userId))
   } catch {
     await ensureTable().catch(() => {})
     return Response.json({ hitokoto: 0, friends: 0, others: 0 })
