@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { purchasePlan, restorePurchases, initPurchases } from '@/lib/purchases'
+import AppScreen, { BackButton } from '@/components/AppScreen'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -91,22 +92,11 @@ export default function PricingPage() {
   }
 
   return (
+    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="プラン選択">
     <div style={{
-      minHeight: '100dvh',
-      background: 'rgba(4,2,12,0.98)',
-      padding: '24px 16px',
+      padding: '24px 16px 40px',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
     }}>
-      <button
-        onClick={() => router.push('/')}
-        style={{ ...STYLE, background: 'none', border: 'none', color: '#8a7aa8', fontSize: 12, cursor: 'pointer', alignSelf: 'flex-start', marginBottom: 16 }}
-      >
-        ← もどる
-      </button>
-
-      <h1 style={{ ...STYLE, fontSize: 16, color: '#ff40c0', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(255,64,192,0.60)', marginBottom: 4 }}>
-        ★ プラン選択 ★
-      </h1>
       <p style={{ ...STYLE, fontSize: 11, color: '#8a7aa8', marginBottom: 20 }}>
         現在: {currentPlan === 'free' ? '無料' : currentPlan === 'lite' ? 'ライト' : 'プレミアム'} プラン
       </p>
@@ -185,5 +175,6 @@ export default function PricingPage() {
         · 更新日の24時間前までに解約しない限り自動更新されます
       </p>
     </div>
+    </AppScreen>
   )
 }

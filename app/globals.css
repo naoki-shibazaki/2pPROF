@@ -181,6 +181,12 @@
     background: rgba(8, 6, 20, 0.94);
   }
 
+  .pixel-screen-scroll {
+    flex: 1;
+    min-height: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   .home-content {
     flex: 1;
     min-height: 0;

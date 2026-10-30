@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { SELF_QA_ANSWER_MAX, SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
+import AppScreen from '@/components/AppScreen'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -93,36 +94,12 @@ export default function OnboardingPage() {
   const isLast = qIndex === SELF_QA_QUESTIONS.length - 1
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: '#080614',
-        backgroundImage:
-          'linear-gradient(rgba(255,64,192,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,64,192,0.04) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }}
-    >
-      <div className="w-full max-w-sm">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <div
-            className="font-pixel text-2xl tracking-widest mb-1"
-            style={{ color: '#ff40c0', textShadow: '0 0 12px rgba(255,64,192,0.8)' }}
-          >
-            2P PROF
-          </div>
+    <AppScreen title="2P PROF">
+        <div className="text-center pt-5">
           <div className="font-pixel text-sm tracking-widest" style={{ color: '#40e8ff80' }}>
             ▶ プロフィール設定 ◀
           </div>
         </div>
-
-        <div className="pixel-window">
-          <div className="pixel-titlebar">
-            <span className="pixel-btn-chrome" />
-            <span className="pixel-btn-chrome" />
-            <span className="pixel-btn-chrome" />
-            <span className="ml-2">SETUP.EXE</span>
-          </div>
 
           <div className="p-5">
             {step === 'done' ? (
@@ -297,10 +274,6 @@ export default function OnboardingPage() {
               </form>
             )}
           </div>
-
-          <div className="pixel-statusbar">★ 2P PROF — ともだちと紹介しあおう！ ★</div>
-        </div>
-      </div>
-    </div>
+    </AppScreen>
   )
 }

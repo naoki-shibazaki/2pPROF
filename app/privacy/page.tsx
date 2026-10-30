@@ -1,3 +1,5 @@
+import AppScreen, { BackLink } from '@/components/AppScreen'
+
 export const metadata = {
   title: 'プライバシーポリシー | 2P PROF',
 }
@@ -6,21 +8,14 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
 export default function PrivacyPage() {
   return (
+    <AppScreen left={<BackLink />} title="プライバシーポリシー">
     <div style={{
-      minHeight: '100dvh',
-      background: '#04020c',
       color: '#b0a8d0',
-      padding: '40px 20px',
+      padding: '24px 20px 40px',
       maxWidth: 680,
       margin: '0 auto',
       ...STYLE,
     }}>
-      <a href="/" style={{ display: 'inline-block', fontSize: 14, color: '#40e8ff', marginBottom: 24 }}>
-        ◀ もどる
-      </a>
-      <h1 style={{ fontSize: 20, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
-        プライバシーポリシー
-      </h1>
       <p style={{ fontSize: 13, color: '#8a7aa8', marginBottom: 32 }}>最終更新日：2026年10月</p>
 
       <Section title="1. はじめに">
@@ -82,6 +77,7 @@ export default function PrivacyPage() {
         © 2024 2P PROF
       </div>
     </div>
+    </AppScreen>
   )
 }
 

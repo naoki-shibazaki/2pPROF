@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
+import AppScreen, { BackButton } from '@/components/AppScreen'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -43,8 +44,9 @@ export default function InvitePage() {
   }
 
   return (
+    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="ともだち招待">
     <div style={{
-      minHeight: '100dvh', background: 'rgba(4,2,12,1)',
+      minHeight: '100%',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       padding: 24,
     }}>
@@ -123,5 +125,6 @@ export default function InvitePage() {
         </div>
       ) : null}
     </div>
+    </AppScreen>
   )
 }

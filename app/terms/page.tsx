@@ -1,3 +1,5 @@
+import AppScreen, { BackLink } from '@/components/AppScreen'
+
 export const metadata = {
   title: '利用規約 | 2P PROF',
 }
@@ -7,21 +9,14 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 // 利用規約（EULA）。ログイン・登録の前に同意を求める（App Store Review Guideline 1.2）
 export default function TermsPage() {
   return (
+    <AppScreen left={<BackLink />} title="利用規約">
     <div style={{
-      minHeight: '100dvh',
-      background: '#04020c',
       color: '#b0a8d0',
-      padding: '40px 20px',
+      padding: '24px 20px 40px',
       maxWidth: 680,
       margin: '0 auto',
       ...STYLE,
     }}>
-      <a href="/" style={{ display: 'inline-block', fontSize: 14, color: '#40e8ff', marginBottom: 24 }}>
-        ◀ もどる
-      </a>
-      <h1 style={{ fontSize: 20, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 8, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
-        利用規約
-      </h1>
       <p style={{ fontSize: 13, color: '#8a7aa8', marginBottom: 32 }}>最終更新日：2026年10月</p>
 
       <Section title="1. はじめに">
@@ -70,6 +65,7 @@ export default function TermsPage() {
         <span style={{ color: '#40e8ff' }}>support@2p-profile.info</span>
       </Section>
     </div>
+    </AppScreen>
   )
 }
 

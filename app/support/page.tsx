@@ -1,3 +1,5 @@
+import AppScreen, { BackLink } from '@/components/AppScreen'
+
 export const metadata = {
   title: 'サポート | 2P PROF',
 }
@@ -7,21 +9,14 @@ const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 // App Store Connect の「サポート URL」に登録するページ。ログインなしで見られる（proxy.ts）
 export default function SupportPage() {
   return (
+    <AppScreen left={<BackLink />} title="サポート">
     <div style={{
-      minHeight: '100dvh',
-      background: '#04020c',
       color: '#b0a8d0',
-      padding: '40px 20px',
+      padding: '24px 20px 40px',
       maxWidth: 680,
       margin: '0 auto',
       ...STYLE,
     }}>
-      <a href="/" style={{ display: 'inline-block', fontSize: 14, color: '#40e8ff', marginBottom: 24 }}>
-        ◀ もどる
-      </a>
-      <h1 style={{ fontSize: 20, color: '#ff40c0', letterSpacing: '0.1em', marginBottom: 32, textShadow: '0 0 12px rgba(255,64,192,0.5)' }}>
-        サポート
-      </h1>
 
       <Section title="お問い合わせ">
         ご質問・不具合のご報告・ご要望は、以下のメールアドレスまでお送りください。<br />
@@ -54,6 +49,7 @@ export default function SupportPage() {
         <a href="/privacy" style={{ color: '#40e8ff' }}>プライバシーポリシー</a>
       </Section>
     </div>
+    </AppScreen>
   )
 }
 

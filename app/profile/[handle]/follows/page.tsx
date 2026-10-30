@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import PixelBackground from '@/components/PixelBackground'
+import AppScreen, { BackButton } from '@/components/AppScreen'
 import AvatarSVG from '@/components/AvatarSVG'
 import { hasInAppHistory } from '@/components/NavTracker'
 
@@ -74,27 +74,9 @@ export default function FollowsPage() {
   const users = lists[tab]
 
   return (
-    <div className="relative min-h-dvh">
-      <PixelBackground />
-      <main className="relative z-10 flex justify-center items-start min-h-dvh px-3 py-10" role="main">
-        <div className="w-full" style={{ maxWidth: 360 }}>
-          {/* Title bar */}
-          <div className="pixel-titlebar" style={{ justifyContent: 'space-between' }}>
-            <button
-              onClick={goBack}
-              style={{ ...STYLE, fontSize: 14, color: '#ff40c0', background: 'none', border: 'none', cursor: 'pointer', textShadow: '0 0 6px rgba(255,64,192,0.60)', padding: '0 4px', minHeight: 36 }}
-            >
-              ‹ もどる
-            </button>
-            <span style={{ ...STYLE, fontSize: 15, color: '#ffd700', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(255,215,0,0.70)', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              @{handle}
-            </span>
-            <div style={{ width: 52 }} />
-          </div>
-
-          <div className="pixel-window overflow-hidden relative scanlines">
+    <AppScreen left={<BackButton onClick={goBack} />} title={`@${handle}`} scroll={false}>
             {/* Tabs */}
-            <div role="tablist" style={{ display: 'flex', background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)' }}>
+            <div role="tablist" style={{ display: 'flex', background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', flexShrink: 0 }}>
               {(['following', 'followers'] as Tab[]).map(t => {
                 const active = tab === t
                 const count = lists[t]?.length
@@ -120,7 +102,7 @@ export default function FollowsPage() {
             </div>
 
             {/* List */}
-            <div className="overflow-y-auto" style={{ height: 'calc(100dvh - 190px)' }}>
+            <div className="overflow-y-auto pixel-screen-scroll">
               {users === null ? (
                 <p style={{ ...STYLE, fontSize: 13, color: '#40e8ff', textAlign: 'center', padding: 32 }}>読み込み中...</p>
               ) : users.length === 0 ? (
@@ -172,9 +154,6 @@ export default function FollowsPage() {
                 </ul>
               )}
             </div>
-          </div>
-        </div>
-      </main>
-    </div>
+    </AppScreen>
   )
 }

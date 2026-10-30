@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { SignInWithApple } from '@capacitor-community/apple-sign-in'
 import { APP_BUNDLE_ID } from '@/lib/app-id'
 import { nativeOAuthSignIn } from '@/lib/native-oauth'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import AppScreen from '@/components/AppScreen'
 
 // 友達のプロフィールや招待リンクから来た人は、ログイン後にそのページへ戻す（?next=/profile/... など）
 function afterLoginPath() {
@@ -53,25 +54,6 @@ export default function LoginPage() {
       root.style.overscrollBehavior = prev.overscroll
       document.removeEventListener('touchmove', block)
     }
-  }, [])
-
-  // 画面に収まらない場合（小さい端末・新規登録フォーム）はカードを縮小して収める
-  const screenRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
-  useLayoutEffect(() => {
-    const screen = screenRef.current, content = contentRef.current
-    if (!screen || !content) return
-    const fit = () => {
-      const cs = getComputedStyle(screen)
-      const available = screen.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
-      setScale(Math.min(1, available / content.offsetHeight))
-    }
-    fit()
-    const ro = new ResizeObserver(fit)
-    ro.observe(screen)
-    ro.observe(content)
-    return () => ro.disconnect()
   }, [])
 
   async function handleAppleSignIn() {
@@ -142,44 +124,12 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      ref={screenRef}
-      className="fixed inset-0 overflow-hidden flex items-center justify-center px-4"
-      style={{
-        paddingTop: 'calc(env(safe-area-inset-top) + 12px)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 12px)',
-        background: '#080614',
-        backgroundImage:
-          'linear-gradient(rgba(255,64,192,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,64,192,0.04) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }}
-    >
-      <div
-        ref={contentRef}
-        className="w-full max-w-sm"
-        style={{ transform: scale < 1 ? `scale(${scale})` : undefined, transformOrigin: 'center' }}
-      >
-        {/* Header */}
-        <div className="text-center mb-6 short:mb-3">
-          <div
-            className="font-pixel text-2xl tracking-widest mb-1"
-            style={{ color: '#ff40c0', textShadow: '0 0 12px rgba(255,64,192,0.8)' }}
-          >
-            2P PROF
-          </div>
+    <AppScreen title="2P PROF">
+        <div className="text-center pt-5 short:pt-3">
           <div className="font-pixel text-sm tracking-widest" style={{ color: '#40e8ff80' }}>
             {isSignUp ? '▶ NEW ACCOUNT ◀' : '▶ USER LOGIN ◀'}
           </div>
         </div>
-
-        {/* Window */}
-        <div className="pixel-window">
-          <div className="pixel-titlebar">
-            <span className="pixel-btn-chrome" />
-            <span className="pixel-btn-chrome" />
-            <span className="pixel-btn-chrome" />
-            <span className="ml-2">{isSignUp ? 'REGISTER.EXE' : 'LOGIN.EXE'}</span>
-          </div>
 
           <div className="p-5 space-y-4 short:p-4 short:space-y-3">
             {error && (
@@ -306,11 +256,6 @@ export default function LoginPage() {
               </button>
             </div>
           </div>
-
-          <div className="pixel-statusbar">★ 2P PROF — ともだちと紹介しあおう！ ★</div>
-        </div>
-
-      </div>
-    </div>
+    </AppScreen>
   )
 }

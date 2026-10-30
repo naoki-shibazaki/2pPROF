@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
 import ModerationMenu from '@/components/ModerationMenu'
-import PixelBackground from '@/components/PixelBackground'
+import AppScreen, { BackButton } from '@/components/AppScreen'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { qaHash } from '@/lib/qa-hash'
 
@@ -222,27 +222,8 @@ export default function ProfilePage() {
   ]
 
   return (
-    <div className="relative min-h-dvh">
-      <PixelBackground />
-      <main className="relative z-10 flex justify-center items-start min-h-dvh px-3 py-10" role="main">
-        <div className="w-full" style={{ maxWidth: 360 }}>
-
-          {/* ── Title bar ── */}
-          <div className="pixel-titlebar" style={{ justifyContent: 'space-between' }}>
-            <button
-              onClick={() => router.back()}
-              style={{ ...STYLE, fontSize: 14, color: '#ff40c0', background: 'none', border: 'none', cursor: 'pointer', textShadow: '0 0 6px rgba(255,64,192,0.60)', padding: '0 4px' }}
-            >
-              ‹ もどる
-            </button>
-            <span style={{ ...STYLE, fontSize: 15, color: '#ffd700', letterSpacing: '0.10em', textShadow: '0 0 8px rgba(255,215,0,0.70)', flex: 1, textAlign: 'center' }}>
-              {titleText}
-            </span>
-            <div style={{ width: 52 }} />
-          </div>
-
-          {/* ── Window body ── */}
-          <div className="pixel-window overflow-hidden relative scanlines">
+    <AppScreen left={<BackButton onClick={() => router.back()} />} title={titleText}>
+          <div>
 
             {loading ? (
               <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -338,8 +319,8 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                {/* ── Tab bar ── */}
-                <div style={{ background: 'rgba(4,10,22,0.85)', borderBottom: '2px solid #40e8ff', display: 'flex' }}>
+                {/* ── Tab bar ── スクロールしても上に残す */}
+                <div style={{ background: 'rgba(4,10,22,0.97)', borderBottom: '2px solid #40e8ff', display: 'flex', position: 'sticky', top: 0, zIndex: 5 }}>
                   {tabs.map(tab => (
                     <button
                       key={tab.id}
@@ -366,7 +347,7 @@ export default function ProfilePage() {
                 </div>
 
                 {/* ── Tab content ── */}
-                <div className="overflow-y-auto" style={{ maxHeight: 'calc(100dvh - 280px)' }}>
+                <div>
 
                   {/* マイページ tab */}
                   {activeTab === 'profile' && (
@@ -640,15 +621,8 @@ export default function ProfilePage() {
                 </div>
               </>
             ) : null}
-
-            {/* ── Status bar ── */}
-            <div className="pixel-statusbar">友達と紹介しあおう！</div>
           </div>
-
-        </div>
-      </main>
-
-    </div>
+    </AppScreen>
   )
 }
 
