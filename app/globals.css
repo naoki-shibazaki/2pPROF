@@ -143,6 +143,61 @@
     color: #8a80b0;
   }
 
+  /* ── 画面いっぱいのレイアウト（ホーム） ──
+     画面に固定して、ページ全体は動かさない。上下の安全領域（ノッチ・ホームバー）はタイトルとタブの内側の余白にする */
+  .pixel-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    --home-content-h: 100%;
+  }
+
+  @media (min-width: 561px) {
+    .pixel-screen {
+      border-left: 2px solid #ff40c0;
+      border-right: 2px solid #ff40c0;
+      box-shadow: 0 0 24px rgba(255, 64, 192, 0.35);
+    }
+  }
+
+  .pixel-titlebar--screen {
+    border-width: 0 0 2px 0;
+    padding-top: calc(6px + env(safe-area-inset-top, 0px));
+    padding-bottom: 6px;
+    min-height: 48px;
+  }
+
+  .pixel-screen-body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: rgba(8, 6, 20, 0.94);
+  }
+
+  .home-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home-content > * {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .pixel-screen .pixel-bottomnav {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   /* ── Bottom tab bar ── */
   .pixel-bottomnav {
     display: flex;

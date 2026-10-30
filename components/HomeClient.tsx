@@ -124,12 +124,9 @@ export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: 
   return (
     <div className="relative min-h-dvh">
       <PixelBackground />
-      <main
-        className="relative z-10 flex justify-center items-start min-h-dvh px-3 py-10"
-        role="main"
-      >
-        <PixelWindow rightSlot={headerButtons}>
-          <div style={{ position: 'relative' }}>
+      <main role="main">
+        <PixelWindow rightSlot={headerButtons} fullscreen>
+          <div style={{ position: 'relative', zIndex: 20 }}>
             <NotifPanel
               open={openPanel === 'notif'}
               onClose={closePanel}
@@ -141,9 +138,8 @@ export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: 
             <SharePanel open={openPanel === 'share'} onClose={closePanel} demo={demo} />
             <SettingsPanel open={openPanel === 'settings'} onClose={closePanel} demo={demo} onShowHowTo={() => { closePanel(); setHowToOpen(true) }} />
           </div>
-          {/* タブを切り替えて読み込み中でもウィンドウが縮まないよう、いつも画面いっぱいの高さを確保する
-              （開いたパネル＝設定の「アカウントを削除」などが切れないようにも） */}
-          <div style={{ minHeight: openPanel ? 'max(600px, var(--home-content-h))' : 'var(--home-content-h)' }}>
+          {/* 上のタイトルと下のタブのあいだを全部使う。各タブはこの中でスクロールする */}
+          <div className="home-content">
             {activeTab === 'my' ? <MyProfile demo={demo} initialUser={initialMe} /> : activeTab === 'hitokoto' ? <HitokotoTab hasNotif={notifCounts.hitokoto > 0} demo={demo} /> : activeTab === 'friends' ? <FriendsTab onCountChange={() => {}} hasNotif={notifCounts.friends > 0} demo={demo} /> : <OthersTab hasNotif={notifCounts.others > 0} demo={demo} />}
           </div>
           <PixelTabBar activeTab={activeTab} onTabChange={handleTabChange} notifCounts={notifCounts} />
