@@ -17,7 +17,7 @@ import PixelIcon from '@/components/PixelIcon'
 import type { Me, UnreadCounts } from '@/lib/me'
 
 
-export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: boolean; initialMe?: Me; initialCounts?: UnreadCounts }) {
+export default function HomeClient({ demo, initialMe, initialCounts, initialTab }: { demo?: boolean; initialMe?: Me; initialCounts?: UnreadCounts; initialTab?: Tab }) {
   const [activeTab, setActiveTab] = useState<Tab>('my')
   const [notifCounts, setNotifCounts] = useState<NotifCounts>(initialCounts ?? { hitokoto: 0, friends: 0, others: 0 })
   // ヘッダーのドロップダウンは同時に1つだけ開く
@@ -68,6 +68,12 @@ export default function HomeClient({ demo, initialMe, initialCounts }: { demo?: 
       }).catch(() => {})
     }
   }, [demo])
+
+  // ほかのページの下のタブから来たときは、そのタブを開く（未読も既読にする）
+  useEffect(() => {
+    if (initialTab && initialTab !== 'my') handleTabChange(initialTab)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // タップしやすいよう 40×40 にし、上下は負のマージンでタイトルバーの高さを変えない
   const iconButton = (active: boolean) => ({

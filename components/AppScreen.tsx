@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import PixelBackground from './PixelBackground'
+import AppNav from './AppNav'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
 
@@ -14,13 +15,15 @@ interface AppScreenProps {
   footer?: ReactNode
   /** true: 中身をこの画面がスクロールさせる。false: 中身が自分でスクロールを持つ */
   scroll?: boolean
+  /** 下にホームのタブを出す（ログインしている人が見るページ） */
+  nav?: boolean
 }
 
 /**
  * 画面いっぱいのレイアウト（LINE などのアプリと同じ形）。
  * 上のふちにタイトル、下のふちに footer、そのあいだで中身だけがスクロールする。ページ全体は動かない
  */
-export default function AppScreen({ children, title, left, right, footer, scroll = true }: AppScreenProps) {
+export default function AppScreen({ children, title, left, right, footer, scroll = true, nav }: AppScreenProps) {
   return (
     <div className="relative">
       <PixelBackground />
@@ -45,7 +48,7 @@ export default function AppScreen({ children, title, left, right, footer, scroll
         </div>
         <div className="pixel-screen-body scanlines">
           {scroll ? <div className="overflow-y-auto pixel-screen-scroll">{children}</div> : children}
-          {footer}
+          {footer ?? (nav ? <AppNav /> : null)}
         </div>
       </main>
     </div>

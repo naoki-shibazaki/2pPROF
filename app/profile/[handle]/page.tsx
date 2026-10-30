@@ -222,7 +222,7 @@ export default function ProfilePage() {
   ]
 
   return (
-    <AppScreen left={<BackButton onClick={() => router.back()} />} title={titleText}>
+    <AppScreen left={<BackButton onClick={() => router.back()} />} title={titleText} nav>
           <div>
 
             {loading ? (

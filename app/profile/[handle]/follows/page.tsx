@@ -74,7 +74,7 @@ export default function FollowsPage() {
   const users = lists[tab]
 
   return (
-    <AppScreen left={<BackButton onClick={goBack} />} title={`@${handle}`} scroll={false}>
+    <AppScreen left={<BackButton onClick={goBack} />} title={`@${handle}`} scroll={false} nav>
             {/* Tabs */}
             <div role="tablist" style={{ display: 'flex', background: 'rgba(4,10,22,0.85)', borderBottom: '1px solid rgba(64,232,255,0.38)', flexShrink: 0 }}>
               {(['following', 'followers'] as Tab[]).map(t => {

@@ -7,7 +7,8 @@ export type Tab = 'my' | 'friends' | 'others' | 'hitokoto'
 export type NotifCounts = { hitokoto: number; friends: number; others: number }
 
 interface PixelTabBarProps {
-  activeTab: Tab
+  /** ホーム以外のページでは null（どのタブも選んでいない） */
+  activeTab: Tab | null
   onTabChange: (tab: Tab) => void
   notifCounts?: NotifCounts
 }

@@ -44,7 +44,7 @@ export default function InvitePage() {
   }
 
   return (
-    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="ともだち招待">
+    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="ともだち招待" nav>
     <div style={{
       minHeight: '100%',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',

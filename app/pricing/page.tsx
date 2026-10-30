@@ -92,7 +92,7 @@ export default function PricingPage() {
   }
 
   return (
-    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="プラン選択">
+    <AppScreen left={<BackButton onClick={() => router.push('/')} />} title="プラン選択" nav>
     <div style={{
       padding: '24px 16px 40px',
       display: 'flex', flexDirection: 'column', alignItems: 'center',

@@ -6,7 +6,7 @@ import { getMe, getUnreadCounts } from '@/lib/me'
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ demo?: string }>
+  searchParams: Promise<{ demo?: string; tab?: string }>
 }) {
   const params = await searchParams
   if (params.demo === '1') {
@@ -23,5 +23,7 @@ export default async function Home({
 
   if (!me?.onboarded) redirect('/onboarding')
 
-  return <HomeClient initialMe={me} initialCounts={counts} />
+  // ほかのページの下のタブから来たときは、そのタブを開く
+  const tab = (['my', 'hitokoto', 'friends', 'others'] as const).find(t => t === params.tab)
+  return <HomeClient initialMe={me} initialCounts={counts} initialTab={tab} />
 }
