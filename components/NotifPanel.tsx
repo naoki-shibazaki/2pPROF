@@ -13,6 +13,8 @@ type NotifItem = {
   created_at: string
   from_name: string | null
   from_handle: string | null
+  ref_name?: string | null
+  ref_handle?: string | null
 }
 
 function typeIcon(type: string) {
@@ -24,13 +26,15 @@ function typeIcon(type: string) {
     case 'qa_comment':    return '💬'
     case 'encounter_request':   return '📍'
     case 'encounter_confirmed': return '⚔️'
+    case 'connected':     return '🤝'
     default:              return '🔔'
   }
 }
 
-function typeLabel(type: string, name: string | null, handle: string | null) {
+function typeLabel(type: string, name: string | null, handle: string | null, refName?: string | null, refHandle?: string | null) {
   const who = name ?? (handle ? `@${handle}` : '誰か')
   switch (type) {
+    case 'connected':     return `${who} が ${refName ?? (refHandle ? `@${refHandle}` : '友達')} を紹介しました`
     case 'post_comment':  return `${who} がコメントしました`
     case 'followed':      return `${who} にフォローされました`
     case 'introduction':  return `${who} から他己紹介が届きました`
@@ -45,8 +49,10 @@ function typeLabel(type: string, name: string | null, handle: string | null) {
 // 通知タイプ → 遷移先
 // followed → /profile/[handle]
 // それ以外 → タブ切り替え
-function getDestination(type: string, handle: string | null): { href: string } | { tab: Tab } {
+function getDestination(type: string, handle: string | null, refHandle?: string | null): { href: string } | { tab: Tab } {
   switch (type) {
+    // 紹介された相手のプロフィールへ
+    case 'connected':    return { href: refHandle ? `/profile/${refHandle}` : '/' }
     case 'followed':     return { href: handle ? `/profile/${handle}` : '/' }
     case 'post_comment': return { tab: 'hitokoto' }
     case 'encounter_request':
@@ -108,7 +114,7 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
       }).then(onRead, onRead)
     }
 
-    const dest = getDestination(n.type, n.from_handle)
+    const dest = getDestination(n.type, n.from_handle, n.ref_handle)
     onClose()
 
     if ('href' in dest) {
@@ -178,7 +184,7 @@ export default function NotifPanel({ open, onClose, hasUnread, onMarkAllRead, on
               <span style={{ fontSize: 16, lineHeight: 1, marginTop: 1 }}>{typeIcon(n.type)}</span>
               <div style={{ flex: 1 }}>
                 <p style={{ ...STYLE, fontSize: 12, color: n.read ? '#7a70a0' : '#c8a8e8', lineHeight: 1.6 }}>
-                  {typeLabel(n.type, n.from_name, n.from_handle)}
+                  {typeLabel(n.type, n.from_name, n.from_handle, n.ref_name, n.ref_handle)}
                 </p>
                 <p style={{ ...STYLE, fontSize: 11, color: '#6a6090', marginTop: 2 }}>
                   {timeAgo(n.created_at)}

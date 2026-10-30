@@ -48,7 +48,7 @@ export async function POST(req: Request) {
 
   const typeMap: Record<string, string[]> = {
     hitokoto: ['post_comment'],
-    friends:  ['followed', 'encounter_request', 'encounter_confirmed'],
+    friends:  ['followed', 'encounter_request', 'encounter_confirmed', 'connected'],
     others:   ['introduction', 'question', 'qa_comment'],
   }
 

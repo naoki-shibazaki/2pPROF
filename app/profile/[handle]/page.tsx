@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import AvatarSVG from '@/components/AvatarSVG'
 import ModerationMenu from '@/components/ModerationMenu'
 import AppScreen, { BackButton } from '@/components/AppScreen'
+import CommonCard from '@/components/CommonCard'
+import ConnectSheet from '@/components/ConnectSheet'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { qaHash } from '@/lib/qa-hash'
 
@@ -51,6 +53,8 @@ export default function ProfilePage() {
 
   // Share
   const [shareCopied, setShareCopied] = useState(false)
+  // 友達どうしを紹介する画面
+  const [showConnect, setShowConnect] = useState(false)
 
   // Question sending
   const [showQuestion, setShowQuestion] = useState(false)
@@ -282,6 +286,14 @@ export default function ProfilePage() {
                       >
                         {shareCopied ? '✓ コピー完了' : '🔗 プロフをシェア'}
                       </button>
+                      {isFollowing && !isBlocked && (
+                        <button
+                          onClick={() => setShowConnect(true)}
+                          style={{ ...STYLE, width: '100%', fontSize: 13, color: '#38ff78', background: 'rgba(8,6,20,0.92)', border: '1px solid rgba(56,255,120,0.45)', padding: '5px 0', cursor: 'pointer', letterSpacing: '0.06em' }}
+                        >
+                          🤝 友達に紹介する
+                        </button>
+                      )}
 
                       {/* Report / Block (Guideline 1.2) */}
                       <ModerationMenu
@@ -370,6 +382,8 @@ export default function ProfilePage() {
                           </div>
                         </div>
                       </div>
+
+                      {!user.isSelf && user.handle && <CommonCard handle={user.handle} />}
 
                       {/* Bio */}
                       {user.bio && (
@@ -622,6 +636,9 @@ export default function ProfilePage() {
               </>
             ) : null}
           </div>
+          {showConnect && user?.handle && (
+            <ConnectSheet target={{ handle: user.handle, name: user.name }} onClose={() => setShowConnect(false)} />
+          )}
     </AppScreen>
   )
 }

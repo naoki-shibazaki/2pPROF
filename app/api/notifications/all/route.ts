@@ -12,9 +12,11 @@ export async function GET() {
     const rows = await sql`
       SELECT n.id, n.type, n.read, n.created_at,
              u.name  AS from_name,
-             u.handle AS from_handle
+             u.handle AS from_handle,
+             r.name AS ref_name, r.handle AS ref_handle
       FROM notifications n
       LEFT JOIN users u ON u.id = n.from_user_id
+      LEFT JOIN users r ON r.id = n.ref_user_id
       WHERE n.user_id = ${userId}::uuid
       ORDER BY n.created_at DESC
       LIMIT 30

@@ -43,7 +43,7 @@ export async function getUnreadCounts(userId: string): Promise<UnreadCounts> {
   const rows = await sql`
     SELECT
       COUNT(*) FILTER (WHERE type = 'post_comment')::int AS hitokoto,
-      COUNT(*) FILTER (WHERE type IN ('followed', 'encounter_request', 'encounter_confirmed'))::int AS friends,
+      COUNT(*) FILTER (WHERE type IN ('followed', 'encounter_request', 'encounter_confirmed', 'connected'))::int AS friends,
       COUNT(*) FILTER (WHERE type IN ('introduction', 'question', 'qa_comment'))::int AS others
     FROM notifications
     WHERE user_id = ${userId}::uuid AND read = FALSE
