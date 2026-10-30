@@ -13,6 +13,8 @@ export type Me = {
   proximity_count: number | null
   proximity_mode: string | null
   howto_seen: boolean
+  invited_by_name: string | null
+  invited_by_handle: string | null
   following_count: number
   followers_count: number
 }
@@ -22,8 +24,10 @@ export type UnreadCounts = { hitokoto: number; friends: number; others: number }
 // 自分のプロフィール（/api/user/me と、ホームを最初に表示するときに使う）
 export async function getMe(userId: string): Promise<Me | null> {
   const [rows, counts, hp] = await Promise.all([
-    sql`SELECT id, name, email, image, handle, bio, onboarded, hp, proximity_count, proximity_mode, howto_seen_at IS NOT NULL AS howto_seen
-        FROM users WHERE id = ${userId}`,
+    sql`SELECT u.id, u.name, u.email, u.image, u.handle, u.bio, u.onboarded, u.hp, u.proximity_count, u.proximity_mode,
+               u.howto_seen_at IS NOT NULL AS howto_seen, i.name AS invited_by_name, i.handle AS invited_by_handle
+        FROM users u LEFT JOIN users i ON i.id = u.invited_by
+        WHERE u.id = ${userId}`,
     sql`SELECT
           (SELECT COUNT(*)::int FROM follows WHERE follower_id = ${userId}::uuid) AS following_count,
           (SELECT COUNT(*)::int FROM follows WHERE following_id = ${userId}::uuid) AS followers_count`,

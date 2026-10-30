@@ -9,6 +9,7 @@ import HexStatus from './HexStatus'
 import LevelBadge from './LevelBadge'
 import PersonalityBadges from './PersonalityBadges'
 import { profileData } from '@/data/profileData'
+import InvitedBy from './InvitedBy'
 
 type UserProfile = {
   id: string
@@ -23,6 +24,8 @@ type UserProfile = {
   proximity_mode: string | null
   following_count: number
   followers_count: number
+  invited_by_name?: string | null
+  invited_by_handle?: string | null
 }
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -172,6 +175,7 @@ export default function MyProfile({ demo, initialUser }: { demo?: boolean; initi
         <p className="text-sm -mt-2" style={{ ...STYLE, color: '#8a7aa8' }}>
           @{user?.handle ?? ''}
         </p>
+        <InvitedBy name={user?.invited_by_name} handle={user?.invited_by_handle} />
 
         {/* フォロー / フォロワー */}
         {user?.handle && (

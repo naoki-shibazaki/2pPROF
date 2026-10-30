@@ -6,6 +6,7 @@ import AvatarSVG from '@/components/AvatarSVG'
 import ModerationMenu from '@/components/ModerationMenu'
 import AppScreen, { BackButton } from '@/components/AppScreen'
 import CommonCard from '@/components/CommonCard'
+import InvitedBy from '@/components/InvitedBy'
 import ConnectSheet from '@/components/ConnectSheet'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { qaHash } from '@/lib/qa-hash'
@@ -30,6 +31,8 @@ type PublicUser = {
   followingCount: number
   followersCount: number
   isBlocked: boolean
+  invited_by_name?: string | null
+  invited_by_handle?: string | null
 }
 
 type Viewer = { id: string; name: string | null; handle: string | null; image: string | null; created_at: string }
@@ -259,6 +262,7 @@ export default function ProfilePage() {
                     {user.name ?? user.handle ?? '???'}
                   </span>
                   <p className="text-sm -mt-2" style={{ ...STYLE, color: '#8a7aa8' }}>@{user.handle}</p>
+                  <InvitedBy name={user.invited_by_name} handle={user.invited_by_handle} />
 
                   <div style={{ display: 'flex', gap: 20, marginTop: 2 }}>
                     <button onClick={() => user?.handle && router.push(`/profile/${user.handle}/follows?tab=following`)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, padding: 0 }}>

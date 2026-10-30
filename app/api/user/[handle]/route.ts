@@ -10,8 +10,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ handle:
     const { handle } = await params
 
     const rows = await sql`
-      SELECT id, name, handle, image, bio
-      FROM users WHERE handle = ${handle}
+      SELECT u.id, u.name, u.handle, u.image, u.bio,
+             i.name AS invited_by_name, i.handle AS invited_by_handle
+      FROM users u LEFT JOIN users i ON i.id = u.invited_by
+      WHERE u.handle = ${handle}
     `
     if (rows.length === 0) return Response.json(null, { status: 404 })
 
