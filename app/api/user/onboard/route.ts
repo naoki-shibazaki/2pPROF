@@ -1,6 +1,7 @@
 import { auth } from '@/auth'
 import { sql } from '@/lib/db'
 import { SELF_QA_ANSWER_MAX, SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
+import { connectWithInviter, inviteStatus } from '@/lib/invite'
 
 // check: true のときは名前とハンドルを確かめるだけで保存しない（質問ステップに進む前に使う）
 // qa: 初期登録の質問への答え。順番は SELF_QA_QUESTIONS と同じ
@@ -29,6 +30,12 @@ export async function POST(req: Request) {
       return Response.json({ error: 'このハンドルはすでに使われています' }, { status: 409 })
     }
 
+    // 招待制: 誰かの招待リンクを使った人だけが登録を終えられる（すでに登録済みの人の作り直しは除く）
+    const [cur] = await sql`SELECT onboarded FROM users WHERE id = ${userId}::uuid`
+    if (!cur?.onboarded && !(await inviteStatus(userId)).inviter) {
+      return Response.json({ error: '招待が必要です', code: 'invite_required' }, { status: 403 })
+    }
+
     if (check) return Response.json({ ok: true })
 
     // 答えていない質問も残しておくと、あとで [編集] から答えられる
@@ -49,6 +56,8 @@ export async function POST(req: Request) {
       VALUES (${userId}::uuid, ${JSON.stringify(items)}, NOW())
       ON CONFLICT (user_id) DO NOTHING
     `
+    // 招待してくれた友達とお互いにフォローした状態で始める
+    if (!cur?.onboarded) await connectWithInviter(userId)
 
     return Response.json({ ok: true })
   } catch (e) {

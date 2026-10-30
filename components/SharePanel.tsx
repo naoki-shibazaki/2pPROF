@@ -33,10 +33,13 @@ export default function SharePanel({ open, onClose, demo }: Props) {
   const [invite, setInvite] = useState<{ url: string; copied: boolean } | null>(null)
   const [inviteLoading, setInviteLoading] = useState(false)
   const [error, setError] = useState('')
+  // 招待できる残り人数（招待は 1 人 5 人まで）
+  const [inviteLeft, setInviteLeft] = useState<{ remaining: number; limit: number } | null>(null)
 
   // コピーはタップ直後に行わないと iOS で失敗するため、プロフィール URL は開いた時点で用意しておく
   useEffect(() => {
     if (!open) { setCopied(false); setInvite(null); setError(''); return }
+    if (!demo) fetch('/api/user/invite').then(r => (r.ok ? r.json() : null)).then(d => d && setInviteLeft({ remaining: d.remaining, limit: d.limit })).catch(() => {})
     if (me) return
     if (demo) { setMe({ name: profileData.name, handle: profileData.handle }); return }
     fetch('/api/user/me').then(r => r.json()).then(u => u && setMe({ name: u.name, handle: u.handle })).catch(() => {})
@@ -58,7 +61,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
     setError('')
     const data = await fetch('/api/invite', { method: 'POST' }).then(r => r.json()).catch(() => null)
     setInviteLoading(false)
-    if (!data?.token) { setError('招待リンクを作成できませんでした'); return }
+    if (!data?.token) { setError(data?.error || '招待リンクを作成できませんでした'); return }
     const url = `${window.location.origin}/invite/${data.token}`
     // 通信のあとはコピーが拒否されることがある。その場合は下の「コピー」ボタンで再度コピーしてもらう
     setInvite({ url, copied: await copyText(url) })
@@ -98,7 +101,11 @@ export default function SharePanel({ open, onClose, demo }: Props) {
               onClick={copyProfile}
             />
             <MenuItem
-              icon="✉️" label={inviteLoading ? '作成中...' : '招待リンクを作成'} disabled={inviteLoading}
+              icon="✉️"
+              label={inviteLoading ? '作成中...'
+                : inviteLeft?.remaining === 0 ? `招待は ${inviteLeft.limit} 人まで（使い切りました）`
+                : `招待リンクを作成${inviteLeft ? `（あと ${inviteLeft.remaining} 人）` : ''}`}
+              disabled={inviteLoading || inviteLeft?.remaining === 0}
               onClick={createInvite} last={!invite && !error}
             />
 
@@ -106,6 +113,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
               <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <span style={{ ...STYLE, fontSize: 12, color: invite.copied ? '#38ff78' : '#b0a8d0' }}>
                   {invite.copied ? '✓ 招待リンクをコピーしました（7日間有効）' : '招待リンクを作成しました（7日間有効）'}
+                  <br />リンクから登録した人とは、自動でお互いにフォローされます
                 </span>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <span style={{ ...STYLE, fontSize: 12, color: '#8a7aa8', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', userSelect: 'all' }}>

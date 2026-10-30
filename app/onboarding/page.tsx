@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { SELF_QA_ANSWER_MAX, SELF_QA_QUESTIONS } from '@/lib/self-qa-questions'
 import AppScreen from '@/components/AppScreen'
+import InviteGate from '@/components/InviteGate'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -17,6 +18,8 @@ export default function OnboardingPage() {
   const [qIndex, setQIndex] = useState(0)
   const [answers, setAnswers] = useState<string[]>(() => SELF_QA_QUESTIONS.map(() => ''))
   const answerRef = useRef<HTMLTextAreaElement>(null)
+  // 招待制: 招待してくれた友達が分かるまでは登録フォームを出さない
+  const [invite, setInvite] = useState<{ state: 'checking' | 'ok' | 'none'; inviter?: { name: string | null; handle: string | null }; error?: string }>({ state: 'checking' })
 
   useEffect(() => {
     if (step === 'qa') answerRef.current?.focus()
@@ -31,6 +34,20 @@ export default function OnboardingPage() {
         if (user?.onboarded) router.replace('/')
       })
   }, [router])
+
+  // 招待の確認。まだ結びついていなければ、招待リンクを開いたときに覚えた招待を使う
+  useEffect(() => {
+    const fromLink = new URLSearchParams(window.location.search).get('invite_error') ?? undefined
+    ;(async () => {
+      const s = await fetch('/api/user/invite').then(r => (r.ok ? r.json() : null)).catch(() => null)
+      if (s?.inviter) { setInvite({ state: 'ok', inviter: s.inviter }); return }
+      const res = await fetch('/api/user/invite', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).catch(() => null)
+      const d = await res?.json().catch(() => null)
+      if (res?.ok && d?.inviter) setInvite({ state: 'ok', inviter: d.inviter })
+      // cookie がない（招待リンクを開いていない）ときは、エラーではなく案内だけ出す
+      else setInvite({ state: 'none', error: fromLink ?? (res?.status === 400 && d?.error !== '招待リンクがありません' ? d?.error : undefined) })
+    })()
+  }, [])
 
   // ハンドルを名前から自動生成
   function onNameChange(v: string) {
@@ -56,6 +73,7 @@ export default function OnboardingPage() {
 
     if (!res?.ok) {
       const d = await res?.json().catch(() => null)
+      if (d?.code === 'invite_required') { setInvite({ state: 'none' }); return }
       setError(d?.error || '確認できませんでした。もう一度お試しください')
       return
     }
@@ -99,10 +117,19 @@ export default function OnboardingPage() {
           <div className="font-pixel text-sm tracking-widest" style={{ color: '#40e8ff80' }}>
             ▶ プロフィール設定 ◀
           </div>
+          {invite.state === 'ok' && invite.inviter && step !== 'done' && (
+            <p className="font-pixel mt-2" style={{ fontSize: 13, color: '#ffd700' }}>
+              ✉ {invite.inviter.name ?? `@${invite.inviter.handle}`} さんからの招待
+            </p>
+          )}
         </div>
 
           <div className="p-5">
-            {step === 'done' ? (
+            {invite.state === 'checking' ? (
+              <p className="font-pixel text-sm text-center py-6" style={{ color: '#40e8ff' }}>読み込み中...</p>
+            ) : invite.state === 'none' ? (
+              <InviteGate error={invite.error} onClaimed={inviter => setInvite({ state: 'ok', inviter })} />
+            ) : step === 'done' ? (
               <div className="text-center py-6 space-y-3">
                 <div className="font-pixel text-2xl" style={{ color: '#38ff78', textShadow: '0 0 10px rgba(56,255,120,0.8)' }}>
                   ✓

@@ -129,6 +129,11 @@ export default function LoginPage() {
           <div className="font-pixel text-sm tracking-widest" style={{ color: '#40e8ff80' }}>
             {isSignUp ? '▶ NEW ACCOUNT ◀' : '▶ USER LOGIN ◀'}
           </div>
+          {isSignUp && (
+            <p className="font-pixel mt-2 px-5" style={{ fontSize: 13, color: '#ffd700', lineHeight: 1.8 }}>
+              2P PROF は招待制です。友達から届いた招待リンクを開いてから登録してね
+            </p>
+          )}
         </div>
 
           <div className="p-5 space-y-4 short:p-4 short:space-y-3">

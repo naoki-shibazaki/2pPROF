@@ -23,6 +23,16 @@ export default function InvitePage() {
   const [accepting, setAccepting] = useState(false)
   const [done, setDone] = useState(false)
 
+  // まだ登録を終えていない人は、この招待で登録へ進む（招待制）
+  useEffect(() => {
+    fetch('/api/user/me').then(r => (r.ok ? r.json() : null)).then(async me => {
+      if (!me || me.onboarded) return
+      const res = await fetch('/api/user/invite', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) }).catch(() => null)
+      const d = await res?.json().catch(() => null)
+      router.replace(res?.ok ? '/onboarding' : `/onboarding?invite_error=${encodeURIComponent(d?.error ?? '招待リンクを確認できませんでした')}`)
+    }).catch(() => {})
+  }, [token, router])
+
   useEffect(() => {
     fetch(`/api/invite/${token}`)
       .then(r => { if (!r.ok) { setInvalid(true); setLoading(false); return null } return r.json() })

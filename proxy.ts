@@ -20,7 +20,11 @@ export default auth((req) => {
     const login = new URL('/login', req.url)
     // 友達のリンクから来た人は、ログイン後にそのページへ戻す
     if (/^\/(profile|invite)\/[^/]+$/.test(pathname)) login.searchParams.set('next', pathname)
-    return NextResponse.redirect(login)
+    const res = NextResponse.redirect(login)
+    // 招待リンクから来た人は、登録が終わるまで招待を覚えておく（招待制）
+    const invite = pathname.match(/^\/invite\/([a-f0-9]{16})$/)?.[1]
+    if (invite) res.cookies.set('invite_token', invite, { maxAge: 7 * 24 * 3600, httpOnly: true, sameSite: 'lax', secure: true, path: '/' })
+    return res
   }
 
   return NextResponse.next()
