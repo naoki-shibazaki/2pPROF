@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import AvatarSVG from './AvatarSVG'
 import NotifBanner from './NotifBanner'
 import NearbySection from './NearbySection'
+import FriendSuggestions from './FriendSuggestions'
 import { getProximityTitle, PROXIMITY_TITLES } from '@/lib/proximity'
 import { demoFriends } from '@/data/profileData'
 
@@ -276,6 +277,8 @@ export default function FriendsTab({ onCountChange, hasNotif, demo }: { onCountC
       {activeTab === 'friends' && <>
 
       {!demo && <NearbySection />}
+
+      {!demo && <FriendSuggestions onFollowed={load} />}
 
       {/* Global hide toggle */}
       {!loading && friends.length > 0 && (
