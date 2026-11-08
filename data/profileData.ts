@@ -1,3 +1,6 @@
+// デモの投稿は、いつ見ても最近の投稿に見えるよう、今からの時間で作る
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3600_000).toISOString()
+
 // ── Self profile ────────────────────────────────────────────────
 export const profileData = {
   name:   'ひろ',
@@ -46,9 +49,9 @@ export type FriendEntry = {
 }
 
 export const demoPosts = [
-  { id: 'demo-1', body: '今日もいい天気！☀️ 散歩しながらカフェ巡りしてきた', created_at: '2024-03-15T09:00:00Z', author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 3, my_reaction: null, reaction_counts: { '👍': 5, '😂': 2 } },
-  { id: 'demo-2', body: '新しいRPG買っちゃった🎮 やばい沼にハマりそう', created_at: '2024-03-14T21:00:00Z', author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 1, my_reaction: null, reaction_counts: { '👍': 8 } },
-  { id: 'demo-3', body: 'みんな週末どこかおすすめある？旅行したい気分', created_at: '2024-03-13T18:00:00Z', author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 5, my_reaction: null, reaction_counts: { '👍': 3, '😮': 1 } },
+  { id: 'demo-1', body: '今日もいい天気！☀️ 散歩しながらカフェ巡りしてきた', created_at: hoursAgo(2), author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 3, my_reaction: null, reaction_counts: { '👍': 5, '😂': 2 } },
+  { id: 'demo-2', body: '新しいRPG買っちゃった🎮 やばい沼にハマりそう', created_at: hoursAgo(14), author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 1, my_reaction: null, reaction_counts: { '👍': 8 } },
+  { id: 'demo-3', body: 'みんな週末どこかおすすめある？旅行したい気分', created_at: hoursAgo(40), author_name: 'ひろ', author_handle: 'hiro_pixel', author_image: null, comment_count: 5, my_reaction: null, reaction_counts: { '👍': 3, '😮': 1 } },
 ]
 
 export const demoFriends = [

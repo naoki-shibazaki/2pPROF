@@ -67,7 +67,7 @@ export default function ConnectSheet({ target, onClose }: { target: { handle: st
     <div role="dialog" aria-modal="true" aria-label="友達に紹介する" style={{ position: 'fixed', inset: 0, zIndex: 300, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', background: 'rgba(0,0,0,0.6)' }} onClick={onClose}>
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: 'rgba(8,6,20,0.99)', borderTop: '2px solid #ffd700', boxShadow: '0 -4px 24px rgba(255,215,0,0.25)', maxHeight: '88%', display: 'flex', flexDirection: 'column', paddingBottom: 'env(safe-area-inset-bottom, 0px)', width: '100%', maxWidth: 560, margin: '0 auto' }}
+        style={{ background: 'rgba(8,6,20,0.99)', borderTop: '2px solid #ffd700', boxShadow: '0 -4px 24px rgba(255,215,0,0.25)', maxHeight: '88%', display: 'flex', flexDirection: 'column', paddingBottom: 'env(safe-area-inset-bottom, 0px)', width: '100%', maxWidth: 720, margin: '0 auto' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', borderBottom: '1px solid rgba(255,215,0,0.25)' }}>
           <span style={{ ...STYLE, fontSize: 15, color: '#ffd700' }}>🤝 {targetName} を友達に紹介</span>
