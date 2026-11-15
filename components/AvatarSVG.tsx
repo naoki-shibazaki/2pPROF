@@ -13,7 +13,7 @@
 
 const P = 3 // screen pixels per sprite pixel
 
-const PALETTE: Record<number, string> = {
+export const PALETTE: Record<number, string> = {
   1: '#3d1f00',
   2: '#f5c18a',
   3: '#1a1a4e',
@@ -24,7 +24,7 @@ const PALETTE: Record<number, string> = {
 }
 
 // 16 rows × 16 cols; 0 = transparent
-const SPRITE: number[][] = [
+export const SPRITE: number[][] = [
   [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], // 0 hair top
   [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0], // 1 hair
   [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0], // 2 hair full

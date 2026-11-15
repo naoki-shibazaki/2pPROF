@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import QRModal from './QRModal'
 import QRScanner from './QRScanner'
+import StoryShareModal from './StoryShareModal'
 import { profileData } from '@/data/profileData'
 
 const STYLE = { fontFamily: 'var(--font-pixel, monospace)' } as const
@@ -24,11 +25,12 @@ async function copyText(text: string) {
   }
 }
 
-// ヘッダーのシェアアイコンから開くメニュー（QR 表示 / QR 読み込み / リンクをコピー / 招待リンクを作成）
+// ヘッダーのシェアアイコンから開くメニュー（ストーリー用の画像 / QR 表示 / QR 読み込み / リンクをコピー / 招待リンクを作成）
 export default function SharePanel({ open, onClose, demo }: Props) {
   const [me, setMe] = useState<Me | null>(null)
   const [showQR, setShowQR] = useState(false)
   const [showScanner, setShowScanner] = useState(false)
+  const [showStory, setShowStory] = useState(false)
   const [copied, setCopied] = useState(false)
   const [invite, setInvite] = useState<{ url: string; copied: boolean } | null>(null)
   const [inviteLoading, setInviteLoading] = useState(false)
@@ -72,7 +74,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
     setInvite({ ...invite, copied: await copyText(invite.url) })
   }
 
-  if (!open && !showQR && !showScanner) return null
+  if (!open && !showQR && !showScanner && !showStory) return null
 
   return (
     <>
@@ -87,6 +89,11 @@ export default function SharePanel({ open, onClose, demo }: Props) {
               <span style={{ ...STYLE, fontSize: 12, color: '#40e8ff', letterSpacing: '0.08em' }}>🔗 シェア</span>
             </div>
 
+            <MenuItem
+              icon="🖼" label={demo ? 'ストーリーでシェア（デモでは使えません）' : 'ストーリーでシェア'} disabled={demo || !me?.handle}
+              color={demo ? undefined : '#ff40c0'}
+              onClick={() => { onClose(); setShowStory(true) }}
+            />
             <MenuItem
               icon="📱" label="QRコードを表示" disabled={!profileUrl}
               onClick={() => { onClose(); setShowQR(true) }}
@@ -137,6 +144,7 @@ export default function SharePanel({ open, onClose, demo }: Props) {
         <QRModal url={profileUrl} name={me?.name ?? me?.handle ?? ''} onClose={() => setShowQR(false)} />
       )}
       {showScanner && <QRScanner onClose={() => setShowScanner(false)} />}
+      {showStory && me?.handle && <StoryShareModal handle={me.handle} onClose={() => setShowStory(false)} />}
     </>
   )
 }

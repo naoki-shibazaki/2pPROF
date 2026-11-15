@@ -5,16 +5,18 @@ import { useRouter } from 'next/navigation'
 import { Capacitor } from '@capacitor/core'
 import { App } from '@capacitor/app'
 
-// Universal Links（https://2p-profile.info/profile/... や /invite/...）でアプリが開いたら、その画面へ移動する
+// Universal Links（https://2p-profile.info/profile/... や /invite/...、/s/...）でアプリが開いたら、その画面へ移動する
 // 対応するパスは app/.well-known/apple-app-site-association と合わせる
 const LINK_HOSTS = ['2p-profile.info', 'www.2p-profile.info']
-const LINK_PATH = /^\/(profile|invite)\/[^/]+$/
+const LINK_PATH = /^\/(profile|invite|s)\/[^/]+$/
 const HANDLED_KEY = 'deeplink_handled'
 
 function toPath(url: string) {
   try {
     const u = new URL(url)
-    return LINK_HOSTS.includes(u.hostname) && LINK_PATH.test(u.pathname) ? u.pathname : null
+    if (!LINK_HOSTS.includes(u.hostname) || !LINK_PATH.test(u.pathname)) return null
+    // ストーリーのリンク（/s/...）は招待トークン（?inv=）ごと開く
+    return u.pathname.startsWith('/s/') ? u.pathname + u.search : u.pathname
   } catch {
     return null
   }

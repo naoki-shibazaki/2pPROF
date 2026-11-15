@@ -14,6 +14,8 @@ export default auth((req) => {
     pathname.startsWith('/support') ||
     pathname.startsWith('/terms') ||
     pathname.startsWith('/.well-known') ||
+    // ストーリーのリンクから来た人向けのページ（ログインなしで見られる）
+    pathname.startsWith('/s/') ||
     (pathname === '/' && isDemo)
 
   if (!isLoggedIn && !isPublic) {
